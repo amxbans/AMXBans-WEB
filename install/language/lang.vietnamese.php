@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Menu người dùng");
 define("_FILEEXISTS","Cấu hình đã tồn tại!");
 define("_FILEOPENERROR","Cấu hình không được tạo!");
 define("_FILESUCCESS","Cấu hình đã được tạo!");
-define("_MANUALEDIT","Mở /include/db.config.inc.php và copy & paste vào đây:");
+define("_MANUALEDIT","Mở /include/db.Config.inc và copy & paste vào đây:");
 define("_SETUPENDDESC","Tệp tin setup.php sẽ bị xóa ngay bây giờ và bạn sẽ được chuyển sang AMXBans!");
 define("_SETUPEND","Tới AMXBans...");
 ?>

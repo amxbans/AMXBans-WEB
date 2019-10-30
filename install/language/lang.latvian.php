@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Lietotāju izvēlne");
 define("_FILEEXISTS","Konfigurācija jau pastāv!");
 define("_FILEOPENERROR","Konfigurācija nevar tikt izveidota!");
 define("_FILESUCCESS","Konfigurācija izveidota!");
-define("_MANUALEDIT","Atveriet /include/db.config.inc.php un nokopējiet & ielieciet to:");
+define("_MANUALEDIT","Atveriet /include/db.Config.inc un nokopējiet & ielieciet to:");
 define("_SETUPENDDESC","setup.php tiks izdzēsts un jūs tiksiet pārmests uz amxbanu lapu!");
 define("_SETUPEND","Pāriet uz amxbaniem...");
 ?>

@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Uživatelské menu");
 define("_FILEEXISTS","Konfigurace již existuje!");
 define("_FILEOPENERROR","Konfig nemohl být vytvoøen!");
 define("_FILESUCCESS","Konfig vytvoøen!");
-define("_MANUALEDIT","Otevøete /include/db.config.inc.php a zkopírujte tam tyto øádky:");
+define("_MANUALEDIT","Otevøete /include/db.Config.inc a zkopírujte tam tyto øádky:");
 define("_SETUPENDDESC","Soubor setup.php bude smazán a vy budete pøesmìrováni do AMXBans!");
 define("_SETUPEND","Jít do AMXBans...");
 ?>

@@ -540,5 +540,5 @@ define("_UPD_DB_ERROR", "O Banco de Dados de atualizações não foi encontrado.
 define("_UPD_SELECT_ERROR", "O Banco de Dados de atualizações não pôde ser selecionado.");
 define("_ADMINID", "SteamID do admin");  
 define("_TRACKBACK", "Link Direto");
-define("_SETUP_EXISTS", "<b>Alerta de seguran&ccedil;a!</b><br />setup.php continua na sua pasta AMXBans.<br /><br />Voc&ecirc; ainda pode acessar ao Painel de Controlo de Admin, mas nos recomendamos fortemente que voc&ecirc; remova-o!");
+define("_SETUP_EXISTS", "<b>Alerta de seguran&ccedil;a!</b><br />setup.php continua na sua pasta AMXBans.<br /><br />Voc&ecirc; ainda pode acessar ao Painel de Controlo de Admin, mas nos recomendamos fortemente que voc&ecirc; remova-o!");//TODO: change setup.php to install folder in all languages
 ?>

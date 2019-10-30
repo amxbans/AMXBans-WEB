@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Хэрэглэгчийн цэс");
 define("_FILEEXISTS","Тохиргоо үүссэн байна!");
 define("_FILEOPENERROR","Тохиргоог үүсгэж чадсанүй!");
 define("_FILESUCCESS","Тохиргоо үүслээ!");
-define("_MANUALEDIT","/include/db.config.inc.php файлыг нээгээд энийг хуулж байрлуулна уу(copy & paste):");
+define("_MANUALEDIT","/include/db.Config.inc файлыг нээгээд энийг хуулж байрлуулна уу(copy & paste):");
 define("_SETUPENDDESC","Одоо setup.php файлыг устгаад AMXBans-н үндсэн хуудас уруу очих болно!");
 define("_SETUPEND","AMXBans-н үндсэн хуудас уруу очих...");
 ?> 

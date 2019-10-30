@@ -1,309 +1,177 @@
 <?php
-/*
-		AMXBans v7
-	Copyright 2018 by indianiso1
-	This file is part of AMXBans.
-
-	AMXBans is free software, but it's licensed under the Creative Commons - Attribution-NonCommercial-ShareAlike 2.0
-	AMXBans is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-	You should have received a copy of the cc-nC-SA along with AMXBans.
-	If not, see <http://creativecommons.org/licenses/by-nc-sa/2.0/>.
-*/
+/**
+ *    AMXBans v7
+ * Copyright 2018 by indianiso1
+ * This file is part of AMXBans.
+ *
+ * AMXBans is free software, but it's licensed under the Creative Commons - Attribution-NonCommercial-ShareAlike 2.0
+ * AMXBans is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * You should have received a copy of the cc-nC-SA along with AMXBans.
+ * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
+ */
 
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-require_once("../include/config.inc.php");
+require_once "../include/class.Config.inc";
 require_once("functions.inc");
-require_once("../include/functions.inc.php");
+$config = new Config(TRUE);
 
 
-//installation are 6 sites
-$sitenrall=6;
-$sitenr=(int)$_POST["site"];
+/**
+ * Sites:
+ * 1. Intro w/ licence agreement
+ * 2. Checking settings
+ * 3. Form things
+ * 4. Review
+ * 5. Running and completing installation
+ */
 
-if($sitenr==7 && isset($_POST["check7"])) {
-	$sitenrall=7;
-}
-//if all setup data is ok, unlock and open site 7
-if(isset($_POST["check6"])) {
-	$sitenrall=7;
-	$sitenr++;
-}
-if(isset($_POST["back"])) $sitenr--;
-if(isset($_POST["next"])) $sitenr++;
+$site = (int)(Route::getFakePathWay() ?: 1);
+$siteMax = Route::getFakePathWay(1) == "CHECKED" ? 5 : 4;
+if ($site < 1 || $site > $siteMax) $site = 1;
 
 
-if($sitenr < 1 || $sitenr > $sitenrall) $sitenr=1;
+$smarty = new Templating();
+$smarty->setTemplateDir(__DIR__ . '/templates')->setCompileDir(__DIR__ . '/templates');
 
+switch ($site)
+{
+	case 1: // 1. Intro w/ licence agreement
+		$langs = scandir('language');
+		foreach ($langs as $file)
+			if ($file != "." && $file != ".." && substr($file, 0, 4) != "lang" && substr($file, 0, 5) != "index")
+				$lang[] = explode('.', $file)[0];
+		$smarty->assign('languages', $lang);
+		break;
 
-/////////////// basic functions /////////////////
+	case 2:
+		$php_settings = [
+			"display_errors"      => toBool(ini_get('display_errors')),
+			"register_globals"    => toBool(ini_get('register_globals')),
+			"version_php"         => phpversion(),
+			"server_software"     => $_SERVER["SERVER_SOFTWARE"],
+			"mysql_enabled"       => in_array('mysql', PDO::getAvailableDrivers()),
+		];
 
-//$config->path_root=str_replace("/".basename($_SERVER["SCRIPT_FILENAME"]),"",$_SERVER["SCRIPT_FILENAME"]);
-$config->path_root=str_replace(DIRECTORY_SEPARATOR . basename(__FILE__), '', __FILE__);
-$config->document_root=str_replace("/". basename($_SERVER["PHP_SELF"]),"",$_SERVER["PHP_SELF"]);
-$config->templatedir = $config->path_root."/install";
-$config->langfilesdir = $config->path_root."/install/language/";
-$config->default_lang = "english";
-if(empty($_SESSION["lang"])) $_SESSION["lang"]="english";
-//debug
-if(!is__writable($config->path_root."/include/smarty/templates_c/")) {
-	echo '<div style="text-align: center; margin-top: 10%; color: #c04040;font-width=bold;font-size=18px;"><img src="images/warning.gif" /> <u>Directory include/smarty/templates_c is not writable !!</u></div>';
-	exit;
-}
+		$dirs_settings = [
+			"include"     => is_writable(Route::getRootPath() . "/include"),
+			"templates_c" => is_writable(Route::getRootPath() . "/templates/compiled"),
+			'uploads'     => is_writable(Route::getRootPath() . '/webSources/uploads'),
+		];
 
-/* Smarty settings */
-define("SMARTY_DIR", $config->path_root."/include/smarty/");
+		if (version_compare(phpversion(), 7.2) > -1 AND $php_settings['mysql_enabled'] AND $dirs_settings['include'] AND $dirs_settings['templates_c'] AND $dirs_settings['uploads'])
+			$smarty->assign('next', TRUE);
+		$smarty->assign('php_settings', $php_settings);
+		$smarty->assign('dirs_settings', $dirs_settings);
+		break;
 
-require_once(SMARTY_DIR."Smarty.class.php");
+	case 3:
+		if (isset($_POST['validate']))
+		{
+		    $errors = new FormErrors($_POST, __LANG__['STEP3_ERRORS']);
+		    // DATABASE check
+            $errors->validate([
+                'db_host' => 'required',
+                'db_user' => 'required',
+                'db_name' => 'required',
+            ]);
+            $_SESSION["db_host"] = trim($_POST["db_host"]);
+            $_SESSION["db_user"] = trim($_POST["db_user"]);
+            $_SESSION["db_pass"] = trim($_POST["db_pass"]);
+            $_SESSION["db_name"] = trim($_POST["db_name"]);
+            $_SESSION["db_prefix"] = trim($_POST["db_prefix"]);
+            if (!$errors->has('db_user')) {
+                try {
+                    $db = new PDO("mysql:dbname={$_SESSION['db_name']};host={$_SESSION['db_host']}", $_SESSION['db_user'], $_SESSION['db_pass']);
+                    $db->exec("SET CHARSET utf8");
+                } catch (PDOException $e) {
+                    $errors->addError(__LANG__['STEP3_ERR_DB_CRED'] . ': ' . $e->getMessage(), ['db_host', 'db_user', 'db_pass', 'db_name']);
+                }
+            }
+            if (!$errors->has() && $db->query('SELECT * FROM ' . $_SESSION['db_prefix'] . '_webconfig'))
+                $errors->addError(__LANG__['STEP3_ERR_ALREADY_INSTALLED'], ['db_prefix']);
+            if (!$errors->has() && !sql_has_all_privileges($db))
+                $errors->addError(__LANG__['STEP3_ERR_NO_PRIVILEGES']);
 
-class dynamicPage extends Smarty {
-	function __construct() {
-		
-		global $config;
-		
-		parent::__construct();
-		
-		$this->template_dir = $config->templatedir;
-		$this->compile_dir	= SMARTY_DIR."templates_c/";
-		$this->config_dir	= SMARTY_DIR."configs/";
-		$this->cache_dir	= SMARTY_DIR."cache/";
-		$this->caching		= false;
-		
-		//for changing templates it�s better "true", but slow down site load
-		$this->force_compile = true;
-		$this->caching = false;
-		
-		$this->assign("app_name","dynamicPage");
-	}
-}
-$smarty = new dynamicPage;
+			// admin account validation
+            $errors->validate([
+                'admin_email' => 'required',
+                'admin_user' => 'required',
+                'admin_pass' => 'required',
+                'admin_pass2' => 'required|same:admin_pass',
+            ]);
+				$_SESSION["admin_email"] = trim($_POST["admin_email"]);
+				$_SESSION["admin_user"] = trim($_POST["admin_user"]);
+				$_SESSION["admin_pass"] = trim($_POST["admin_pass"]);
+				$admin_pass = trim($_POST["admin_pass2"]);
 
-$smarty->assign("next",false);
-
-if($sitenr==1) {
-	$smarty->assign("next",true);
-}
-
-/////////////// site 2 server settings /////////////////
-if($sitenr==2) {
-	$php_settings=array(
-		"display_errors"=>(ini_get('display_errors')=="")?"off":ini_get('display_errors'),
-		"register_globals"=>(ini_get('register_globals')==1 || ini_get('register_globals')=="on")?"_ON":"_OFF",
-		"magic_quotes_gpc"=>(get_magic_quotes_gpc()==true)?"_ON":"_OFF", #(ini_get('magic_quotes_gpc')=="0")?"off":"on",
-		"safe_mode"=>(ini_get('safe_mode')==1 || ini_get('safe_mode')=="on")?"_ON":"_OFF",
-		"post_max_size"=>ini_get('post_max_size')." (".return_bytes(ini_get('post_max_size'))." bytes)",
-		"upload_max_filesize"=>ini_get('upload_max_filesize')." (".return_bytes(ini_get('upload_max_filesize'))." bytes)",
-		"max_execution_time"=>ini_get('max_execution_time'),
-		"version_php"=>phpversion(),
-		"version_amxbans_web"=>$config->v_web,
-		"server_software"=>$_SERVER["SERVER_SOFTWARE"],
-		"mysql_version"=>mysqli_get_client_info(),
-		"bcmath"=>(extension_loaded('bcmath')=="1")?"_YES":"_NO",
-		"gmp"=>(extension_loaded('gmp')=="1")?"_YES":"_NO"
-	);
-	$smarty->assign("next",true);
-	$smarty->assign("checkvalue","_REFRESH");
-	$smarty->assign("php_settings",$php_settings);
-}
-
-/////////////// site 3 dirs /////////////////
-if($sitenr==3) {
-	if(isset($_POST["path_root"]) && $_POST["path_root"] != $config->path_root) $config->path_root = stripcslashes($_POST["path_root"]);
-	if(isset($_POST["document_root"]) && $_POST["document_root"] != $config->document_root) $config->document_root = stripcslashes($_POST["document_root"]);
-	$include_dir=is__writable($config->path_root."/include/");
-	$backup_dir=is__writable($config->path_root."/include/backup/");
-	$files_dir=is__writable($config->path_root."/include/files/");
-	$temp_dir=is__writable($config->path_root."/temp/");
-	$templates_c_dir=is__writable($config->path_root."/include/smarty/templates_c/");
-	$setupphp=is__writable($config->path_root."/");
-	
-	$dirs=array(
-		"document_root" => $config->document_root,
-		"path_root"		=> $config->path_root,
-		"include" 		=> $include_dir,
-		"files" 		=> $files_dir,
-		"backup"		=> $backup_dir,
-		"temp" 			=> $temp_dir,
-		"templates_c" 	=> $templates_c_dir,
-		"setupphp"		=> $setupphp
-	);
-	if($include_dir && $files_dir && $temp_dir && $templates_c_dir && $backup_dir) $smarty->assign("next",true);
-	$smarty->assign("checkvalue","_RECHECK");
-	$smarty->assign("dirs",$dirs);
-}
-
-/////////////// site 4 db /////////////////
-if($sitenr==4 && isset($_POST["check4"])) {
-	$_SESSION["dbcheck"]=false;
-	$dbhost=trim($_POST["dbhost"]);
-	$dbuser=trim($_POST["dbuser"]);
-	$dbpass=trim($_POST["dbpass"]);
-	$dbdb=trim($_POST["dbdb"]);
-	$dbprefix=trim($_POST["dbprefix"]);
-	
-	$_SESSION["dbhost"]=$dbhost;
-	$_SESSION["dbuser"]=$dbuser;
-	$_SESSION["dbpass"]=$dbpass;
-	$_SESSION["dbdb"]=$dbdb;
-	$_SESSION["dbprefix"]=$dbprefix;
-	
-	$smarty->assign("db",array($dbhost,$dbuser,$dbpass,$dbdb,$dbprefix));
-	
-	if($dbhost=="" || $dbuser=="" || $dbdb=="" || $dbprefix=="") {
-		$msg="_NOREQUIREDFIELDS";
-	}
-	
-	$mysql= new mysqli($dbhost,$dbuser,$dbpass, $dbdb);
-	if (mysqli_connect_errno()) $msg="_CANTCONNECT";
-	if(!$msg) {
-		$enc = @$mysql->set_charset('utf8');
-	}
-	
-	//get user privileges
-	if(!$msg) {
-		$previleges=sql_get_privilege($mysql);
-		$prev[]=array("name"=>"SELECT","value"=>in_array("SELECT",$previleges));
-		$prev[]=array("name"=>"INSERT","value"=>in_array("INSERT",$previleges));
-		$prev[]=array("name"=>"UPDATE","value"=>in_array("UPDATE",$previleges));
-		$prev[]=array("name"=>"DELETE","value"=>in_array("DELETE",$previleges));
-		$prev[]=array("name"=>"CREATE","value"=>in_array("CREATE",$previleges));
-		//search for all needed previleges
-		foreach($prev as $k => $v) {
-			if(in_array(false,$v)) {$msg="_NOTALLPREVILEGES";break;}
+			if (!$errors->has())
+				$smarty->assign('next', TRUE);
+			$smarty->assign('errors', $errors);
 		}
-	}
-	//check for existing tables
-	if(!$msg) {
-		//search for existing dbprefix
-		if($mysql->query("SHOW TABLES FROM `".$dbdb."` LIKE '".$dbprefix."\_%'")->num_rows) {
-			$prefix_exists=true;
-			//search for field "imported" in bans table, added since 6.0
-			if( @$mysql->query("SHOW COLUMNS FROM `".$dbprefix."_bans` WHERE Field LIKE 'imported'")->num_rows) {
-				$prefix_isnew=true;
-			}
-		}
-	}
-	
-	$smarty->assign("prevs",$prev);
-	
-	if(!$msg) {
-		if($prefix_exists) {
-			if($prefix_isnew) {
-				$msg="_PREFIXEXISTSV6";
-				$_SESSION["dbcheck"]=true;
-				$smarty->assign("next",true);
-			} else {
-				$msg="_PREFIXEXISTSV5";
-			}
-		} else {
-			$msg="_DBOK";
-			$_SESSION["dbcheck"]=true;
-			$smarty->assign("next",true);
-		}
-	}
+		else
+		    $smarty->assign('errors', new FormErrors([], []));
+		break;
+
+    case 5:
+        $smarty->assign('securit', 'here!');
+        break;
 }
-if($sitenr==4) $smarty->assign("checkvalue","_DBCHECK");
-
-/////////////// site 5 admin /////////////////
-if($sitenr==5 && isset($_POST["check5"])) {
-	$_SESSION["admincheck"]=false;
-	$adminuser=trim($_POST["adminuser"]);
-	$adminpass=trim($_POST["adminpass"]);
-	$adminpass2=trim($_POST["adminpass2"]);
-	$adminemail=trim($_POST["adminemail"]);
-	
-	$_SESSION["adminuser"]=$adminuser;
-	$_SESSION["adminemail"]=$adminemail;
-	$_SESSION["adminpass"]="";
-	$_SESSION["adminpass2"]="";
-	
-	$smarty->assign("admin",array($adminuser,$adminemail));
-	
-	if(strlen($adminuser) < 4) $validate[]="_USERTOSHORT";
-	if(strlen($adminpass) < 4) $validate[]="_PWTOSHORT";
-	if($adminpass != $adminpass2) $validate[]="_PWNOCONFIRM";
-	#if(!ereg(".+@.+\..{2,}",$adminemail)) $validate[]="_NOVALIDEMAIL";
-	if(!preg_match("/^[a-zA-Z0-9-_.]{2,}@[a-zA-Z0-9-_.]{2,}.[a-zA-Z]{2,6}$/",$adminemail)) $validate[]="_NOVALIDEMAIL";
-	
-	if(!$adminuser || !$adminpass || !$adminpass2 || !$adminemail) {
-		$validate[]="_NOREQUIREDFIELDS";
-	}
-	if(!$validate) {
-		$_SESSION["adminpass"]=$adminpass;
-		$_SESSION["adminpass2"]=$adminpass2;
-		$_SESSION["admincheck"]=true;
-		$msg="_ADMINOK";
-		$smarty->assign("adminpass",$adminpass);
-		$smarty->assign("next",true);
-		
-	}
-	$smarty->assign("validate",$validate);
-}
-if($sitenr==5) $smarty->assign("checkvalue","_ADMINCHECK");
-#if($sitenr==5 && $_SESSION["admincheck"]==true) $smarty->assign("next",true);
-
-/////////////// site 6 show data /////////////////
-if($sitenr==6) $smarty->assign("checkvalue","_STEP7");
-
+/*
 /////////////// site 7 end /////////////////
-if($sitenr==7 && $_SESSION["dbcheck"]==true && $_SESSION["admincheck"]==true && !isset($_POST["check7"])) {
+if ($sitenr == 7 && $_SESSION["dbcheck"] == TRUE && $_SESSION["admincheck"] == TRUE && !isset($_POST["check7"]))
+{
 	// Open connection to database again
 	$mysql = new mysqli($_SESSION["dbhost"], $_SESSION["dbuser"], $_SESSION["dbpass"], $_SESSION["dbdb"]);
-	if (mysqli_connect_errno()) $msg="_CANTCONNECT";
-	include("install/tables.inc");
+	if (mysqli_connect_errno()) $msg = "_CANTCONNECT";
+	include("tables.inc");
 	//create db structure
-	foreach($table_create as $k => $v) {
-		$table=array("table"=>$k,"success"=>($mysql->query("CREATE TABLE ".$k." (".$v.") DEFAULT CHARSET=utf8")? "_CREATED" : "_ALREADYEXISTS"));
-		$tables[]=$table;
+	foreach ($table_create as $k => $v)
+	{
+		$table = ["table" => $k, "success" => ($mysql->query("CREATE TABLE " . $k . " (" . $v . ") DEFAULT CHARSET=utf8") ? "_CREATED" : "_ALREADYEXISTS")];
+		$tables[] = $table;
 	}
 	//get default data
-	include("install/datas.inc");
+	include("datas.inc");
 	//create default data
-	foreach($data_create as $k => $v) {
-		$data=array("data"=>$k,"success"=>($mysql->query("INSERT INTO ".$k." ".$v)? "_INSERTED" : "_FAILED"));
-		$datas[]=$data;
+	foreach ($data_create as $k => $v)
+	{
+		$data = ["data" => $k, "success" => ($mysql->query("INSERT INTO " . $k . " " . $v) ? "_INSERTED" : "_FAILED")];
+		$datas[] = $data;
 	}
 	//create default websettings
-	$websettings_create=array("data"=>"_CREATEWEBSETTINGS","success"=>($mysql->query($websettings_query)? "_INSERTED" : "_FAILED"));
+	$websettings_create = ["data" => "_CREATEWEBSETTINGS", "success" => ($mysql->query($websettings_query) ? "_INSERTED" : "_FAILED")];
 	//create default usermenu
-	$usermenu_create=array("data"=>"_CREATEUSERMENU","success"=>($mysql->query($usermenu_query)? "_INSERTED" : "_FAILED"));
+	$usermenu_create = ["data" => "_CREATEUSERMENU", "success" => ($mysql->query($usermenu_query) ? "_INSERTED" : "_FAILED")];
 	//create webadmin userlevel
-	$webadmin_create[]=array("data"=>"_CREATEUSERLEVEL","success"=>($mysql->query($userlevel_query)? "_INSERTED" : "_FAILED"));
+	$webadmin_create[] = ["data" => "_CREATEUSERLEVEL", "success" => ($mysql->query($userlevel_query) ? "_INSERTED" : "_FAILED")];
 	//create webadmin
-	$webadmin_create[]=array("data"=>"_CREATEWEBADMIN","success"=>($mysql->query($webadmin_query)? "_INSERTED" : "_FAILED"));
+	$webadmin_create[] = ["data" => "_CREATEWEBADMIN", "success" => ($mysql->query($webadmin_query) ? "_INSERTED" : "_FAILED")];
 	//install default modules
-	foreach($modules_install as $k => $v) {
-		$modul=array("name"=>$k,"success"=>($mysql->query($v)? "_INSERTED" : "_FAILED"));
-		$modules[]=$modul;
+	foreach ($modules_install as $k => $v)
+	{
+		$modul = ["name" => $k, "success" => ($mysql->query($v) ? "_INSERTED" : "_FAILED")];
+		$modules[] = $modul;
 	}
-	
-	//write db.config.inc.php
-	$content="<?php
 
-	\$config->document_root = \"".$_SESSION["document_root"]."\";
-	\$config->path_root = \"".$_SESSION["path_root"]."\";
+	//write db.Config.inc
 
-	\$config->db_host = \"".$_SESSION["dbhost"]."\";
-	\$config->db_user = \"".$_SESSION["dbuser"]."\";
-	\$config->db_pass = \"".$_SESSION["dbpass"]."\";
-	\$config->db_db = \"".$_SESSION["dbdb"]."\";
-	\$config->db_prefix = \"".$_SESSION["dbprefix"]."\";
-	
-?>";
-	$msg=write_cfg_file($config->path_root."/include/db.config.inc.php",$content);
-	$smarty->assign("content",$content);
+	$smarty->assign("content", $content);
 	//create first log ;-)
 	$mysql->query($log_query);
-	
-	$smarty->assign("tables",$tables);
-	$smarty->assign("datas",$datas);
-	$smarty->assign("modules",$modules);
-	$smarty->assign("usermenu_create",$usermenu_create);
-	$smarty->assign("websettings_create",$websettings_create);
-	$smarty->assign("webadmin_create",$webadmin_create);
-	$smarty->assign("checkvalue","_SETUPEND");
+
+	$smarty->assign("tables", $tables);
+	$smarty->assign("datas", $datas);
+	$smarty->assign("modules", $modules);
+	$smarty->assign("usermenu_create", $usermenu_create);
+	$smarty->assign("websettings_create", $websettings_create);
+	$smarty->assign("webadmin_create", $webadmin_create);
+	$smarty->assign("checkvalue", "_SETUPEND");
 }
-if($sitenr==7 && isset($_POST["check7"])) {
+if ($sitenr == 7 && isset($_POST["check7"]))
+{
 	//clear smarty cache
 	$smarty->clear_compiled_tpl();
 	//delete setup info
@@ -311,17 +179,10 @@ if($sitenr==7 && isset($_POST["check7"])) {
 	//@rmdir("install");
 	header("Location: index.php");
 	exit;
-}
-
-
-$_SESSION["path_root"] = $config->path_root;
-$_SESSION["document_root"] = $config->document_root;
+}*/
 
 // Generate template
-$smarty->assign("msg",$msg);
-$smarty->assign("sitenr",$sitenr);
-$smarty->assign("sitenrall",$sitenrall);
-$smarty->assign("current_lang",$config->default_lang);
-$smarty->assign("v_web",$config->v_web);
+$smarty->assign("site", $site);
+$smarty->assign("version", $config::version);
 
 $smarty->display('setup.tpl');

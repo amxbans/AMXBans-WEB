@@ -22,56 +22,7 @@
 
 // sql functions
 
-function sql_set_websettings() {
-	global $config, $mysql;
-	$query = $mysql->query("SELECT * FROM `".$config->db_prefix."_webconfig`") or die ($mysql->error);
-	$result = $query->fetch_object();
 
-	$config->cookie=$result->cookie;
-	$config->bans_per_page=($result->bans_per_page)<1 ? 1:$result->bans_per_page;
-	$config->design = $result->design;
-	$config->banner = $result->banner;
-	$config->banner_url = $result->banner_url;
-	$config->default_lang = $result->default_lang;
-	$config->start_page = $result->start_page;
-	$config->show_kick_count = $result->show_kick_count;
-	$config->show_comment_count = $result->show_comment_count;
-	$config->show_demo_count = $result->show_demo_count;
-	$config->demo_all = $result->demo_all;
-	$config->max_file_size = $result->max_file_size;
-	$config->file_type = $result->file_type;
-	$config->comment_all = $result->comment_all;
-	$config->use_capture = $result->use_capture;
-	$config->auto_prune = $result->auto_prune;
-	$config->max_offences = $result->max_offences;
-	$config->max_offences_reason = $result->max_offences_reason;
-	$config->use_demo = $result->use_demo;
-	$config->use_comment = $result->use_comment;
-	//set vars to an array
-	$vars=array(
-			"cookie"=>trim($config->cookie),
-			"design"=>$config->design,
-			"bans_per_page"=>(int)$config->bans_per_page,
-			"banner"=>$config->banner,
-			"banner_url"=>$config->banner_url,
-			"default_lang"=>$config->default_lang,
-			"start_page"=>$config->start_page,
-			"show_kick_count"=>$config->show_kick_count,
-			"show_demo_count"=>$config->show_demo_count,
-			"show_comment_count"=>$config->show_comment_count,
-			"demo_all" => $config->demo_all,
-			"comment_all" => $config->comment_all,
-			"use_capture" => $config->use_capture,
-			"max_file_size" => (int)$config->max_file_size,
-			"file_type" => trim($config->file_type),
-			"auto_prune" => (int)$config->auto_prune,
-			"max_offences" => (int)$config->max_offences,
-			"max_offences_reason" => $config->max_offences_reason,
-			"use_demo" => (int)$result->use_demo,
-			"use_comment" => $result->use_comment
-		);
-	return $vars;
-}
 function sql_get_server($serverid=0) {
 	global $config, $mysql;
 	if($serverid) {

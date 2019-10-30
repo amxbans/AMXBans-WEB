@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Kasutaja menüü");
 define("_FILEEXISTS","Konfiguratsioon juba eksisteerib!");
 define("_FILEOPENERROR","Konfiguratsiooni ei saa teha!");
 define("_FILESUCCESS","Konfiguratsioon tehtud!");
-define("_MANUALEDIT","Ava /include/db.config.inc.php ja copy & paste see:");
+define("_MANUALEDIT","Ava /include/db.Config.inc ja copy & paste see:");
 define("_SETUPENDDESC","Setup.php kustutatakse koheselt ning sind suunatakse AMXBans-i!");
 define("_SETUPEND","Edasi...");
 ?>

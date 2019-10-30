@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Gebruiker Menu");
 define("_FILEEXISTS","De Configuratie bestaat reeds!");
 define("_FILEOPENERROR","De Configuratie kan niet gecre&euml;erd worden!");
 define("_FILESUCCESS","Configuratie gecre&euml;erd!");
-define("_MANUALEDIT","Open /include/db.config.inc.php en kopie&euml;r dit:");
+define("_MANUALEDIT","Open /include/db.Config.inc en kopie&euml;r dit:");
 define("_SETUPENDDESC","De setup.php zal nu verwijderd worden en je zal doorgestuurd worden naar AMXBans!");
 define("_SETUPEND","Ga naar AMXBans...");
 ?>

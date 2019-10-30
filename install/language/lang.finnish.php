@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","K&auml;ytt&auml;j&auml;valikko");
 define("_FILEEXISTS","Asetus on jo olemassa!");
 define("_FILEOPENERROR","Asetusta ei voitu luoda!");
 define("_FILESUCCESS","Asetus luotu!");
-define("_MANUALEDIT","Avaa /include/db.config.inc.php ja kopioi & liit&auml; t&auml;m&auml;:");
+define("_MANUALEDIT","Avaa /include/db.Config.inc ja kopioi & liit&auml; t&auml;m&auml;:");
 define("_SETUPENDDESC","setup.php poistetaan nyt ja sinut ohjataan AMXBansiin!");
 define("_SETUPEND","Mene AMXBansiin...");
 ?>

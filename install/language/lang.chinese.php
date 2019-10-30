@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","用户菜单");
 define("_FILEEXISTS","该配置已经存在!");
 define("_FILEOPENERROR","该配置不能创建!");
 define("_FILESUCCESS","创建配置!");
-define("_MANUALEDIT","Open /include/db.config.inc.php 复制并粘贴在此:");
+define("_MANUALEDIT","Open /include/db.Config.inc 复制并粘贴在此:");
 define("_SETUPENDDESC","setup.php将被删除，你将重定向到AMXBans!");
 define("_SETUPEND","浏览 AMXBans...");
 ?>

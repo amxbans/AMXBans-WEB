@@ -115,7 +115,7 @@ define("_CREATEUSERMENU","Menu u&#380ytkownika");
 define("_FILEEXISTS","Config ju&#380 istnieje!");
 define("_FILEOPENERROR","Config nie zosta&#322 utworzony!");
 define("_FILESUCCESS","Config utworzony!");
-define("_MANUALEDIT","Otw&#243rz plik /include/db.config.inc.php skopiuj i wklej to:");
+define("_MANUALEDIT","Otw&#243rz plik /include/db.Config.inc skopiuj i wklej to:");
 define("_SETUPENDDESC","Setup.php zostanie usuni&#281ty, a ty zostaniesz przekierowany do AMXBans :) !");
 define("_SETUPEND","Id&#378 do AMXBans...");
 ?>

@@ -72,7 +72,7 @@ define("_ADMINSETTINGS","Donn&eacute;es d'acc&egrave;s de l'administrateur");
 define("_PASSWORD2","Retapez le mot de passe");
 define("_EMAILADR","Adresse email");
 define("_ADMINCHECK","V&eacute;rifier les donn&eacute;es");
-define("_PWNOCONFIRM","Les mots de passe ne coïncident pas!");
+define("_PWNOCONFIRM","Les mots de passe ne coï¿½ncident pas!");
 define("_NOREQUIREDFIELDS","Des champs requis manquent!");
 define("_ADMINOK","Donn&eacute;es de l'administrateur : ok!");
 define("_USERTOSHORT","Nom d'utilisateur trop court (min. 4 caract&egrave;res)!");
@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Menu de l'utilisateur");
 define("_FILEEXISTS","La configuration existe d&eacute;j&agrave;!");
 define("_FILEOPENERROR","La configuration n'a pas pu &ecirc;tre cr&eacute;&eacute;e!");
 define("_FILESUCCESS","Configuration cr&eacute;&eacute;e!");
-define("_MANUALEDIT","Ouvrir /include/db.config.inc.php et copier et coller ceci:");
+define("_MANUALEDIT","Ouvrir /include/db.Config.inc et copier et coller ceci:");
 define("_SETUPENDDESC","Le fichier setup.php va &ecirc;tre effac&eacute; et vous serez redirig&eacute; vers AMXBans!");
 define("_SETUPEND","Aller sur AMXBans...");
 ?>

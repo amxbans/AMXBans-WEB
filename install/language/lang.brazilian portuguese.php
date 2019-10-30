@@ -47,7 +47,7 @@ define("_RECHECK","Testar novamente");
 define("_ROOTDIRS","Diretórios do servidor");
 define("_OK","OK");
 define("_NOTWRITABLE","Diretório somente leitura, por favor cheque suas permissões de acesso!");
-define("_SETUPNOTDELETABLE","O arquivo setup.php deve ser deletado manualmente após a instalação!");
+define("_SETUPNOTDELETABLE","O arquivo setup.php deve ser deletado manualmente após a instalação!"); //TODO: change setup.php in all languages
 
 //step4
 define("_STEP4DESC","Informação sobre o Banco de Dados");
@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Menu do usuário");
 define("_FILEEXISTS","A configuração já existe!");
 define("_FILEOPENERROR","A configuração não pode ser criada!");
 define("_FILESUCCESS","Configuração criada!");
-define("_MANUALEDIT","Abra /include/db.config.inc.php e cole o seguinte texto:");
-define("_SETUPENDDESC","O arquivo setup.php será agora deletado e você será redirecionado para o AMXBans!");
+define("_MANUALEDIT","Abra /include/db.Config.inc e cole o seguinte texto:");
+define("_SETUPENDDESC","O arquivo setup.php será agora deletado e você será redirecionado para o AMXBans!"); //TODO: change setup.php in all languages
 define("_SETUPEND","Abrir o AMXBans...");
 ?>

@@ -103,4 +103,3 @@ function _substr($str, $length, $minword = 3) {
     
     return $sub . (($len < strlen($str)) ? '...' : '');
 }
-?>

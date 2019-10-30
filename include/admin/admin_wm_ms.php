@@ -52,7 +52,7 @@
 	
 	//Startseiten suchen
 	//$start_pages[""]="---";
-	$vorbidden=array("index.php","login.php","logout.php","admin.php","search.php","setup.php","motd.php");
+	//TODO: $vorbidden=array("index.php","login.php","logout.php","admin.php","search.php","setup.php","motd.php");
 	$d=opendir($config->path_root."/");
 	while($f=readdir($d)) {
 		if($f=="." || $f==".." || is_dir($config->path_root."/".$f)) continue;

@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Meniu utilizator");
 define("_FILEEXISTS","Configul există deja!");
 define("_FILEOPENERROR","Configul nu a putut fi creat!");
 define("_FILESUCCESS","Config creat cu succes!");
-define("_MANUALEDIT","Deschide /include/db.config.inc.php și prin copy / paste scrie asta:");
+define("_MANUALEDIT","Deschide /include/db.Config.inc și prin copy / paste scrie asta:");
 define("_SETUPENDDESC","Fișierul setup.php va fi acum șters și vei fi redirectat către AMXBans!");
 define("_SETUPEND","Mergi la AMXBans...");
 ?>

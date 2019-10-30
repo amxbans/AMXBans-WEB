@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Naudotojo meniu");
 define("_FILEEXISTS","Konfiguracija jau egzistuoja!");
 define("_FILEOPENERROR","Konfiguracija negali būti sukurta!");
 define("_FILESUCCESS","Konfiguracija sukurta!");
-define("_MANUALEDIT","Atidarykite /include/db.config.inc.php ir nukopijuokite šitą tekstą:");
+define("_MANUALEDIT","Atidarykite /include/db.Config.inc ir nukopijuokite šitą tekstą:");
 define("_SETUPENDDESC","setup.php bus dabar ištrintas ir tu būsi perkeltas į AMXBans!");
 define("_SETUPEND","Eiti į AMXBans...");
 ?>

@@ -102,7 +102,7 @@ define("_CREATEUSERMENU","Bruker Meny");
 define("_FILEEXISTS","Config filen eksisterer allerede!");
 define("_FILEOPENERROR","Config filen kunne ikke bli opprettet!");
 define("_FILESUCCESS","Config filen oprettet!");
-define("_MANUALEDIT","&Aring;pne /include/db.config.inc.php og kopier og lim inn dette:");
+define("_MANUALEDIT","&Aring;pne /include/db.Config.inc og kopier og lim inn dette:");
 define("_SETUPENDDESC","setup.php vil n&aring; bli slettet og du vil bli videresendt til AMXBans!");
 define("_SETUPEND","G&aring; til AMXBans...");
 ?>

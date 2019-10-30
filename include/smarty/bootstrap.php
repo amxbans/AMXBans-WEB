@@ -13,4 +13,4 @@
 if (!class_exists('Smarty_Autoloader')) {
     include dirname(__FILE__) . '/Autoloader.php';
 }
-Smarty_Autoloader::register(true);
+Smarty_Autoloader::register();

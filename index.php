@@ -24,8 +24,8 @@
 session_start();
 
 //check for existing config file
-if(!file_exists("include/db.config.inc.php")) {
-	header("Location: setup.php");
+if(!file_exists("include/db.Config.inc")) {
+	//TODO: header("Location: setup.php");
 }
 
 require_once("include/config.inc.php");

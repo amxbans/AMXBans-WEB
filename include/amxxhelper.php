@@ -150,9 +150,9 @@ function WindowClose() {
 <tr><td><input type="checkbox" id="chku" >u - Menu-Access</input></td></tr>
 <tr><td><input type="checkbox" id="chkz" >z - User (no Admin)</input></td></tr>
 <tr><td align="center">
-	<img src="../images/accept.png" style="cursor:pointer;" title="Accept" onclick="SaveAccess('<?php echo $id ?>');"/>
-	<img src="../images/delete.png" style="cursor:pointer;" title="Delete" onclick="opener.document.getElementById('<?php echo $id ?>').value = '';self.close();"/>
-	<img src="../images/cancel.png" style="cursor:pointer;" title="Cancel" onclick="self.close();"/>
+	<img src="../webSources/images/accept.png" style="cursor:pointer;" title="Accept" onclick="SaveAccess('<?php echo $id ?>');"/>
+	<img src="../webSources/images/delete.png" style="cursor:pointer;" title="Delete" onclick="opener.document.getElementById('<?php echo $id ?>').value = '';self.close();"/>
+	<img src="../webSources/images/cancel.png" style="cursor:pointer;" title="Cancel" onclick="self.close();"/>
 </td></tr>
 </table>
 
