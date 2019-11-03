@@ -27,7 +27,7 @@
 		</label>
 		<label class="input-group">
 			<span class="input-group-prepend"><span class="input-group-text">{$lang.STEP3_DB_prefix}</span></span>
-			<input class="form-control" name="db_prefix" value="{"db_prefix"|input:"amx_"}" />
+			<input class="form-control" name="db_prefix" value="{"db_prefix"|input:"amx"}" />
 		</label>
 	</fieldset>
 

@@ -11,5 +11,5 @@
 	<img alt="Creative Commons License" style="border-width:0" src="https://licensebuttons.net/l/by-nc-sa/3.0/88x31.png"/>
 </a>
 <div class="float-right">
-	<a href="{'2'|url}" class="btn btn-primary">{$lang.STEP1_AGREE_LICENCE}</a>
+	<a href="{'2'|url}" class="btn btn-primary" rel="noreferrer">{$lang.STEP1_AGREE_LICENCE}</a>
 </div>

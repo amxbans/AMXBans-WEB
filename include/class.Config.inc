@@ -44,12 +44,16 @@ class Config
         'max_login_tries' => 5
     ];
 
-	/**
-	 * @var PDO
-	 */
+	/** @var PDO  */
 	protected $db;
 
-	/**
+    /** @var stdClass  */
+	protected $dbData;
+
+	/** @var string  */
+    public $dbPrefix = '';
+
+    /**
 	 * @return PDO
 	 */
 	public function getDb(): PDO
@@ -79,6 +83,7 @@ class Config
 		else
 		{
 			$this->dbData = require "db.Config.inc";
+			$this->dbPrefix = $this->dbData->prefix;
 			try
 			{
 				$this->db = new PDO("mysql:dbname={$this->dbData->name};host={$this->dbData->host}", $this->dbData->user, $this->dbData->pass);
@@ -88,7 +93,7 @@ class Config
 				trigger_error($e->getMessage());
 			}
 
-			$this->setupWebSettings();
+			$this->setupWebConfig();
 		}
 
 		//save current language to session
@@ -113,15 +118,13 @@ class Config
         return $this->variables[$name];
     }
 
-    public function __set($name, $value){}
-
 
     /**
 	 *
 	 */
-	private function setupWebSettings()
+	private function setupWebConfig()
 	{
-		$query = $this->db->prepare("SELECT * FROM `?_webconfig`");
+		$query = $this->db->prepare("SELECT `name`, `value` FROM `?_webconfig`");
 		$query->execute([$this->dbData->prefix]);
 		$query = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 

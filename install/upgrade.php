@@ -12,5 +12,11 @@
 
 session_start();
 
-$file = '../include/db.Config.inc';
-header(file_exists($file) ? 'Location: upgrade.php' : 'Location: install.php');
+require_once "../include/class.Config.inc";
+require_once("functions.inc");
+$config = new Config;
+
+switch ($config::version) {
+    case '7.0': // upgrade from 7.0 to ...
+        break;
+}

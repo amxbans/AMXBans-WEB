@@ -1,10 +1,7 @@
-// Author Notes:
-// This file has been translated from 'SeToY & |PJ| Shorty's head' to English by SeToY & |PJ| Shorty from www.amxbans.de.
-
-// This is the General Language File
-
 <?php
-//encoding and locale
+return [
+
+];
 define("_ENCODING","ISO-8859-1"); //ISO-8859-1,utf-8
 define("_LOCALE","en_EN"); //de_DE,fr_FR,en_EN...
 

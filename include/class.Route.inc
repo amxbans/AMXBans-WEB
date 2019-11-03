@@ -63,8 +63,5 @@ class Route
 	 *
 	 * @return string
 	 */
-	public static function getBaseURL(): string
-	{
-		return str_replace("/index.php", "", self::getURL());
-	}
+	public static function getBaseURL(): string { return dirname(self::getURL()); }
 }

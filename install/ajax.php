@@ -11,15 +11,18 @@
  */
 
 session_start();
-// TODO: Pārbaudīt instalēšanas gaitu + pabeigt izvadīt JSON ar success vai error
 
-require_once "../include/class.Config.inc";
-$config = new Config(TRUE);
-
-if ($_SESSION['db_ok'] && $_SESSION['admin_ok']):
+if (isset($_SESSION['OkoK'], $_GET['action'])):
     header('Content-Type: application/json');
+
+    if ($_GET['action'] != 'dbc') {
+        require_once "../include/class.Config.inc";
+        $config = new Config();
+    }
+
     switch ($_GET['action']) {
         case 'dbc':
+            require_once '../include/class.Route.inc';
             $content = "<?php
 \$out = new stdClass();
 \$out->host = '{$_SESSION["db_host"]}';
@@ -29,12 +32,12 @@ if ($_SESSION['db_ok'] && $_SESSION['admin_ok']):
 \$out->prefix = '{$_SESSION["db_prefix"]}';
 
 return \$out;";
-            $error = !file_put_contents(Route::getRootPath() . "/include/db.Config.inc", $content);
+            $error = file_put_contents(Route::getRootPath() . "/include/db.Config.inc", $content) ? false : 'FILE WRITE ERROR';
             break;
         case 'dbt':
             try {
                 $query = file_get_contents('install.sql');
-                $query = str_replace('PREFIX_', $config->dbData->prefix, $query);
+                $query = str_replace('PREFIX', $config->dbPrefix, $query);
                 $config->getDb()->exec($query);
                 $error = FALSE;
             } catch (PDOException $e) {
@@ -44,7 +47,7 @@ return \$out;";
         case 'dbd':
             try {
                 $query = file_get_contents('install-data.sql');
-                $query = str_replace('PREFIX', $config->dbData->prefix, $query);
+                $query = str_replace('PREFIX', $config->dbPrefix, $query);
                 $config->getDb()->exec($query);
                 $error = FALSE;
             } catch (PDOException $q) {
@@ -52,22 +55,27 @@ return \$out;";
             }
             break;
         case 'acc':
-            $q0 = $config->getDb()->query('SELECT id FROM ' . $config->dbData->prefix . '_levels LIMIT 1')
-                ->fetchObject();
+            $q0 = $config->getDb()
+                ->query('SELECT level FROM ' . $config->dbPrefix . '_permissions LIMIT 1')->fetchObject();
             $q = $config->getDb()
-                ->prepare('INSERT INTO ' . $config->dbData->prefix . '_webadmins (username, password, perm_level, email) VALUES (?, ?, ?, ?)');
-            $q->execute([$_SESSION['admin_name'], password_hash($_SESSION['admin_pass'], PASSWORD_DEFAULT), $q0->id, $_SESSION['admin_email']]);
+                ->prepare('INSERT INTO ' . $config->dbPrefix . '_webadmins (username, password, perm_level, email) VALUES (?, ?, ?, ?)');
+            $q->execute([$_SESSION['admin_user'], password_hash($_SESSION['admin_pass'], PASSWORD_DEFAULT), $q0->level, $_SESSION['admin_email']]);
             $error = FALSE;
             break;
 
         case 'cif':
             delTree(__DIR__);
     }
+
+    echo json_encode([
+        'status' => $error? 'error' : 'success',
+        'text' => $error ?: '',
+    ]);
 endif;
-function delTree($dir) {
-    $files = array_diff(scandir($dir), array('.','..'));
-    foreach ($files as $file) {
+function delTree($dir)
+{
+    $files = array_diff(scandir($dir), array('.', '..'));
+    foreach ($files as $file)
         (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
-    }
     return rmdir($dir);
 }

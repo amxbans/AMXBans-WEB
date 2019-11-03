@@ -19,17 +19,14 @@
     <div id="admin" class="col">{$lang.STEP5_WAITING}</div>
 </div>
 
-<hr />
+<hr/>
 
-<div class="row">
-    <div class="col" id="final"></div>
-    <div class="col text-right">
+    <div id="final"></div>
+    <div class="text-right">
         <a href="{'../'|res_url}" class="disabled btn btn-primary">{$lang.STEP5_FIN_GOTO}</a>
     </div>
-</div>
 
 {if isset($securit)}
-    {* TODO: write script to ajax the installation *}
     <script>
         var data = [
             { id: '#credentials', ajax: 'dbc' },
@@ -44,29 +41,38 @@
             finished: "{$lang.STEP5_FINISHED}",
             fin_desc: "{$lang.STEP5_FIN_DESC}"
         };
-        /*for (let i = 0; i < data.length; i++) {
+
+        var ok = true;
+        let ins = setTimeout('install()', 3000);
+
+
+        function install(i = 0) {
             let itm = $(data[i].id);
             itm.text(lang.installing);
-            $.get('/install/ajax.php?action=' + data[i].ajax, {
-                success: function ( income ) {
-                    if (income.status === 'success')
+            $.get('{$route}/ajax.php?action=' + data[i].ajax)
+                .done(function (income) {
+                    if (income.status === 'success') {
                         itm.text(lang.ok);
-                    else if (income.status === 'error')
+                        if (++i < data.length)
+                            install(i);
+                        else {
+                            $('#final').html('<b>' + lang.finished + '</b><br />' + lang.fin_desc);
+                            $('a.btn.btn-primary').removeClass('disabled').click(function (event) {
+                                event.preventDefault();
+                                if (ok)
+                                    $.get('{$route}/ajax.php?action=cif');
+                                setTimeout('location.href = "{$route}/.."', 3000);
+                            });
+                        }
+                    } else if (income.status === 'error')
                         itm.text(lang.failed + ' ' + income.text);
-                }
-                error: function ( jqXHR, textStatus ) {
+                    else
+                        itm.html(lang.failed + ' ' + income);
+                })
+                .fail(function (jqXHR, textStatus) {
                     itm.text(lang.failed + ' ' + textStatus);
-                }
-            });
-        }*/
-
-        $('a.btn.btn-primary').click(function (event) {
-            let $this = $(this);
-
-        });
-        function clearInstallation(btn) {
-            $btn = $(btn);
-            $.get('/install/ajax.php?action=cif');
+                    ok = false;
+                });
         }
     </script>
 {/if}
