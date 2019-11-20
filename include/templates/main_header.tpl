@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="templates/{$design}_js/amxbans.js.php"></script>
 	<script type="text/javascript" src="templates/{$design}_js/jquery.js"></script>
 	<script type="text/javascript" src="templates/{$design}_js/tooltip.js"></script>	
-	<script type="text/javascript" src="include/layer.js"></script>
+	<script type="text/javascript" src="../layer.js"></script>
 </head>
 
 <body id="top" {if $smarty.session.loginfailed}onLoad="javascript: countdown({$smarty.session.loginfailed});"{/if}>
@@ -46,11 +46,11 @@
 			
 			<ul class="tabbed" id="admin-tabs">
 				{if $smarty.session.loggedin == "true"}
-					<li><a href="admin.php">{"_ADMINAREA"|lang}</a></li>
-					<li><a href="logout.php">{"_LOGOUT"|lang} {$smarty.session.uname}</a></li>
+					<li><a href="../../index.php">{"_ADMINAREA"|lang}</a></li>
+					<li><a href="../../index.php">{"_LOGOUT"|lang} {$smarty.session.uname}</a></li>
 				{else}
 					<li>
-						<form name="loginform" action="login.php" method="post">
+						<form name="loginform" action="../../index.php" method="post">
 							<script type="text/javascript">
 								var languser = '{"_USERNAME"|lang}';
 								var langpass = '{"_PASSWORD"|lang}';

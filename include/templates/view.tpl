@@ -233,7 +233,7 @@
 						<div class="clearer">&nbsp;</div>
 					</li>
 
-					<li><a href="ban_list.php" class="more">{"_BROWSE_ALL"|lang} &#187;</a></li>
+					<li><a href="../../index.php" class="more">{"_BROWSE_ALL"|lang} &#187;</a></li>
 				</ul>
 			</div>
 		</div>

@@ -42,7 +42,7 @@
 						<td class="fat">{"_DATE"|lang}</td> 
 						<td>
 							<input type="text" name="date" value="{$smarty.now|date_format:"%d-%m-%Y"}" style="width:200px;" />
-							&nbsp;<script language="javascript" src="calendar1.js"></script>
+							&nbsp;<script language="javascript" src="../../index.php"></script>
 							<a href="javascript:cal1.popup();">
 								<img src="templates/{$design}_gfx/calendar.png" width="16" height="16" border="0" alt="{"_PICK_DATE"|lang}" title="{"_PICK_DATE"|lang}"/>
 							</a>
@@ -133,7 +133,7 @@
 				<td class="fat" width="1%">{"_LENGHT"|lang}</td>
 			</tr>
 			{foreach from=$ban_list_aktiv item=ban_list_aktiv}
-				<form name="details" method="POST" action="ban_list.php">
+				<form name="details" method="POST" action="../../index.php">
 				<tr class="list" style="cursor:pointer;" onClick="NewToggleLayer('layer_{$ban_list_aktiv.bid}');">
 					<td>{$ban_list_aktiv.ban_created|date_format:"%d.%m.%Y"}</td>
 					<td>{$ban_list_aktiv.player_nick}</td>
@@ -200,7 +200,7 @@
 				<td class="fat" width="1%" nowrap>{"_LENGHT"|lang}</td>
 			</tr>
 			{foreach from=$ban_list_exp item=ban_list_exp}
-				<form name="details" method="POST" action="ban_list.php">
+				<form name="details" method="POST" action="../../index.php">
 				<tr class="list"  style="cursor:pointer;" onClick="NewToggleLayer('layer_{$ban_list_exp.bid}');">
 					<td>{$ban_list_exp.ban_created|date_format:"%d.%m.%Y"}</td>
 					<td>{$ban_list_exp.player_nick}</td>

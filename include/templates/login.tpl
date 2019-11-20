@@ -4,7 +4,7 @@
 	</tr>
 	<tr class="table_list">
 		<td>
-			<form name="loginform" action="login.php" method="post">
+			<form name="loginform" action="../../index.php" method="post">
 				<fieldset><legend><span class='title'>{"_LOGIN"|lang}</span></legend>
 			<table width='20%'>
 				<tr><td class="enter">{"_USERNAME"|lang}:</td> <td class='enter'><input type="text" name="user" /></td><td><input type='checkbox' checked="checked" name='remember'></input> {"_REMEMBERME"|lang}</td></tr>

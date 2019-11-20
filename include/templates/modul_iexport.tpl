@@ -1,4 +1,4 @@
-<script type="text/javascript" src="calendar1.js"></script>
+<script type="text/javascript" src="../../index.php"></script>
 <div id="navigation">
 	<div id="main-nav">
 		<ul class="tabbed">
@@ -14,37 +14,37 @@
 	<div id="sub-nav">
 		<div id="menu_1" style="display: none;">
 			<ul class="tabbed">
-				<li><a href="admin.php">{"_MENUINFO"|lang}</a></li>
-				<li><a href="admin.php?site=ban_add">{"_ADDBAN"|lang}</a></li>
-				<li><a href="admin.php?site=ban_add_online">{"_ADDBANONLINE"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENUINFO"|lang}</a></li>
+				<li><a href="../../index.php">{"_ADDBAN"|lang}</a></li>
+				<li><a href="../../index.php">{"_ADDBANONLINE"|lang}</a></li>
 			</ul>
 		</div>
 		<div id="menu_2" style="display: none;">
 			<ul class="tabbed">
-				<li><a href="admin.php?site=sm_sv">{"_SERVER"|lang}</a></li>
-				<li><a href="admin.php?site=sm_bg">{"_MENUREASONS"|lang}</a></li>
-				<li><a href="admin.php?site=sm_av">{"_ADMINS"|lang}</a></li>
-				<li><a href="admin.php?site=sm_sa">{"_TITLEADMIN"|lang}</a></li>
+				<li><a href="../../index.php">{"_SERVER"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENUREASONS"|lang}</a></li>
+				<li><a href="../../index.php">{"_ADMINS"|lang}</a></li>
+				<li><a href="../../index.php">{"_TITLEADMIN"|lang}</a></li>
 			</ul>
 		</div>
 		<div id="menu_3" style="display: none;">
 			<ul class="tabbed">
-				<li><a href="admin.php?site=wm_wa">{"_ADMINS"|lang}</a></li>
-				<li><a href="admin.php?site=wm_ul">{"_PERM"|lang}</a></li>
-				<li><a href="admin.php?site=wm_um">{"_MENUUSERMENU"|lang}</a></li>
-				<li><a href="admin.php?site=wm_ms">{"_SETTINGS"|lang}</a></li>
+				<li><a href="../../index.php">{"_ADMINS"|lang}</a></li>
+				<li><a href="../../index.php">{"_PERM"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENUUSERMENU"|lang}</a></li>
+				<li><a href="../../index.php">{"_SETTINGS"|lang}</a></li>
 			</ul>
 		</div>
 		<div id="menu_4" style="display: none;">
 			<ul class="tabbed">
-				<li><a href="admin.php?site=so_mo">{"_MODULES"|lang}</a></li>
-				<li><a href="admin.php?site=so_up">{"_MENUUPDATE"|lang}</a></li>
-				<li><a href="admin.php?site=so_lg">{"_MENULOGS"|lang}</a></li>
+				<li><a href="../../index.php">{"_MODULES"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENUUPDATE"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENULOGS"|lang}</a></li>
 			</ul>
 		</div>
 		<div id="menu_5" style="display: block;">
 			<ul class="tabbed">
-				<li><a href="admin.php?modul=iexport">{"_MENUIMPORTEXPORT"|lang}</a></li>
+				<li><a href="../../index.php">{"_MENUIMPORTEXPORT"|lang}</a></li>
 			</ul>
 		</div>
 		<div class="clearer">&nbsp;</div>
