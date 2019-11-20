@@ -141,6 +141,8 @@ class FormErrors
 
     private function valMin($value, array $otherValues = [])
     {
-        return $value >= $otherValues[0];
+        return is_string($value) ?
+            strlen($value) >= strlen($otherValues[0]) :
+            $value >= $otherValues[0];
     }
 }

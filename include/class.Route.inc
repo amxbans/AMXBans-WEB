@@ -24,12 +24,22 @@ class Route
 	 */
 	public static function getFakePathArray(): array { return explode('/', self::getFakePath()); }
 
-	/**
-	 * Makes an internal URL with given parameters for fake path.
-	 * @param string $fakePath
-	 * @return string
-	 */
-	public static function makeURL($fakePath = '') { return self::getURL() . '/' . implode('/', is_array($fakePath) ? $fakePath : func_get_args()); }
+    /**
+     * Makes an internal URL with given parameters for fake path.
+     * @param string      $fakePath
+     * @param string|null $php
+     * @param string|null $real_path
+     * @return string
+     */
+    public static function makeURL(string $fakePath, string $php = NULL, string $real_path = NULL): string
+    {
+        if ($real_path || $php) {
+            $p = explode('/', self::getURL());
+            $php = $php ?? array_pop(explode('/', self::getURL()));
+            return Route::getBaseURL() . $real_path . '/' . $php . '/' . $fakePath;
+        }
+        return self::getURL() . '/' . $fakePath;
+    }
 
 	/**
 	 * @param int $index

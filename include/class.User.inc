@@ -12,36 +12,51 @@
 
 class User
 {
-	public $data;
-	public $logged = FALSE;
-	public $banned = FALSE;
+    /** @var array */
+	public static $data;
+	/** @var bool  */
+	public static $logged = FALSE;
+	/** @var bool  */
+	public static $banned = FALSE;
 
-	protected $db;
+	/** @var Config */
+	protected static $config;
+	protected static $permissions = [];
 
-	/**
-	 * User constructor.
-	 * @param PDO $PDO
-	 */
-	public function __construct(PDO $PDO)
-	{
-		$this->db = $PDO;
 
-		// CHECK LOGIN
-		if (isSet ($_SESSION['unID']))
-			$id = (int)$_SESSION['unID'];
-		else if (self::hasCookie())
-			$id = (int)$_COOKIE['unID'];
+    public static function init(Config $config)
+    {
+        static::$config = $config;
 
-		$user = $this->db->prepare("SELECT * FROM table WHERE unique_id=?");
-		$user->execute([@$id]);
+        if (isSet ($_SESSION['unID']))
+            $id = (int)$_SESSION['unID'];
+        else if (Site::hasCookie())
+            $id = (int)$_COOKIE['unID'];
+        else if (isset($_POST['login_name'])) {
+            $id = static::$config->getDb()
+                ->prepare("SELECT id FROM `{$config->dbPrefix}_webadmins` WHERE email=?");
+            $id->execute([$_POST['login_name']]);
+            $id = $id->fetchObject()->id;
+        }
+        else
+            $id = 0;
 
-		if ($user->rowCount() === 1)
-		{
-			$this->data = $user->fetch(PDO::FETCH_ASSOC);
-			$this->logged = TRUE;
-			if ($this->data['banned'] === 0 OR $this->data['banned'] > time())
-				$this->banned = TRUE;
-		}
+        $user = $config->getDb()
+            ->prepare("SELECT * FROM `{$config->dbPrefix}_webadmins` WHERE id=?");
+        $user->execute([$id]);
+
+        if ($user->rowCount() === 1) {
+            self::$data = $user->fetch(PDO::FETCH_ASSOC);
+            self::$logged = true;
+            self::$banned = ($config->max_login_tries && self::get('try') > $config->max_login_tries);
+
+            $last = $config->getDb()->prepare("UPDATE `{$config->dbPrefix}_webadmins` SET last_action=CURRENT_TIMESTAMP() WHERE id=?");
+            $last->execute([self::get()]);
+
+            $perms = $config->getDb()->prepare("SELECT * FROM `{$config->dbPrefix}_permissions` WHERE level=?");
+            $perms->execute([self::get('perm_level')]);
+            self::$permissions = $perms->fetch(PDO::FETCH_ASSOC);
+        }
 	}
 
 	/**
@@ -51,7 +66,7 @@ class User
 	 * @param string $from Send back user to place they came from (by default - homepage)
 	 * @return string
 	 */
-	public function loginInternal($name, $pass, bool $rem = FALSE, string $from = '')
+	public function login($name, $pass, bool $rem = FALSE, string $from = '')
 	{
 		$user = "SELECT * FROM userTable WHERE";
 		if (CONFIG['login_type'] == 1)
@@ -82,18 +97,7 @@ class User
 			return msg::warn(lang('LOGIN_FAILED', 'ERRORS'));
 	}
 
-	public static function hasCookie(string $what = 'unID'): bool
-	{
-		if (is_array($what))
-		{
-			foreach ($what as $value)
-			{
-				if (!isset($_COOKIE[$value]))
-					return FALSE;
-			}
-			return TRUE;
-		}
-		else
-			return isset($_COOKIE[$what]);
-	}
+    public static function get($what = 'id') { return self::$data[$what] ?? null; }
+
+    public static function hasPermission($which, $power = 1) { return self::$banned? FALSE : self::$permissions[$which] == $power; }
 }

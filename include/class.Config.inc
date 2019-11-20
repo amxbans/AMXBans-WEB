@@ -12,6 +12,20 @@
 
 /**
  * Class Config
+ *
+ * @property-read string $cookie
+ * @property-read int $per_page
+ * @property-read string $banner_src
+ * @property-read string $banner_url
+ * @property-read string $default_lang
+ * @property-read int $start_page
+ * @property-read bool $bans_show_kicks
+ * @property-read bool $bans_show_comments
+ * @property-read int $uploaded_file_size
+ * @property-read array $uploaded_file_types
+ * @property-read string $allow_unregistered_comments
+ * @property-read int $delete_expired_bans
+ * @property-read int $max_login_tries
  */
 class Config
 {
@@ -43,6 +57,9 @@ class Config
         'delete_expired_bans' => 5,
         'max_login_tries' => 5
     ];
+
+	/** @var Templating  */
+	public $output;
 
 	/** @var PDO  */
 	protected $db;
@@ -94,6 +111,8 @@ class Config
 			}
 
 			$this->setupWebConfig();
+			User::init($this);
+			include_once 'functions.inc.php';
 		}
 
 		//save current language to session
@@ -109,6 +128,7 @@ class Config
 		else
 			$lang = require str_ireplace($_SESSION['lang'], 'english', $lang);
 		define('__LANG__', $lang);
+		$this->output = new Templating();
 	}
 
     public function __get($name)
@@ -124,8 +144,9 @@ class Config
 	 */
 	private function setupWebConfig()
 	{
-		$query = $this->db->prepare("SELECT `name`, `value` FROM `?_webconfig`");
-		$query->execute([$this->dbData->prefix]);
+	    // webConfig
+		$query = $this->db->prepare("SELECT `name`, `value` FROM `{$this->dbPrefix}_webconfig`");
+		$query->execute();
 		$query = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 
 		foreach ($query as $k => $v)
@@ -143,5 +164,12 @@ class Config
             elseif (is_int($this->variables[$k]) && $v == '')
                 $this->variables[$k] = NULL;
 		}
+
+
+		// Smilies
+        $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->dbPrefix}_smilies`");
+		$query->execute();
+
+		$this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_NUM|PDO::FETCH_UNIQUE);
 	}
 }
