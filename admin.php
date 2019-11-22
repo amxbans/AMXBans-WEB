@@ -103,7 +103,7 @@ if($modul_exists) {
 	$smarty->assign("site",$admin_site);
 }
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 $smarty->display('admin_index.tpl');
 if($modul_exists) {
 	$smarty->display('modul_'.$modul_site.'.tpl');

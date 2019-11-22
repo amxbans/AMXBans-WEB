@@ -197,12 +197,12 @@ $smarty->assign("menu",$menu);
 $smarty->assign("banner",$config->banner);
 $smarty->assign("banner_url",$config->banner_url);
 $smarty->assign("pagenav", construct_vb_page_nav(@$ban_page['current'], @$ban_page['max_page'], 3, array(10, 50, 100, 500, 1000)));
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 //load main page, currently ban list or ban details/edit
 if($user_site !== "") {
         $smarty->display("user_".$user_site.".tpl");
 } elseif ($config->start_page == "" || $config->start_page == "index.php" || (!file_exists("./$config->start_page"))) {
-        $smarty->display('ban_list.tpl');
+        $smarty->display('index.bans.tpl');
 } else {
         include($config->start_page);
         $start_tpl=str_replace(".php",".tpl",$config->start_page);

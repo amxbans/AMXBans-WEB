@@ -133,8 +133,7 @@ class Config
 
     public function __get($name)
     {
-        if (!isset($this->variables[$name]))
-        trigger_error("No such a variable \"$name\" in Config.inc, called in line " . __LINE__, E_USER_WARNING);
+        if (isset($this->variables[$name]))
         return $this->variables[$name];
     }
 

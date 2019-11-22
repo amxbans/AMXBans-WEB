@@ -1,5 +1,9 @@
 <?php
 return [
+    'locale1' => 'en',
+    'locale2' => 'en_EN',
+    'html_direction' => 'ltr',
+
 
 ];
 define("_ENCODING","ISO-8859-1"); //ISO-8859-1,utf-8
@@ -529,7 +533,7 @@ define("_CL_LAST_RELEASE", "Click here to view the changelog for the latest rele
 define("_NOFILESUNPACK", "No files to unpack!");
 define("_WRITE_PROT", "Write protected");
 define("_DIR_WRITE_PROT", "Directory is write protected");
-define("_SKIP_DIR", "Skipping! Directory already exists"); 
+define("_SKIP_DIR", "Skipping! Directory already exists");
 define("_SKIP_FILE", "File doesn't need to be upgraded");
 define("_UNKNOWN_ERROR", "Unknown error!");
 define("_CANNOT_CREATE", "Can't create file / directory");
@@ -565,8 +569,8 @@ define("_SIZE", "Size");
 define("_UPD_CONNECT_ERROR", "No connection could be established to the Update-Server!");
 define("_UPD_DB_ERROR", "The Update-Database could not be found.");
 define("_UPD_SELECT_ERROR", "The Update-Database could not be selected.");
-define("_ADMINID", "Admin's SteamID"); 
-define("_TRACKBACK", "Trackback");  
+define("_ADMINID", "Admin's SteamID");
+define("_TRACKBACK", "Trackback");
 define("_SETUP_EXISTS", "<b>Security Alert!</b><br />setup.php still remains in your AMXBans Directory.<br /><br />You can still access the Admin Control Panel, but we strongly recommend you to remove it! ");
 define("_BYTES", "bytes");
 define("_MB", "MB");

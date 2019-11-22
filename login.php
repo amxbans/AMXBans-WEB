@@ -169,7 +169,7 @@ if(file_exists("templates/".$config->design."/amxbans.css")) {
 	$smarty->assign("design",$config->design);
 }
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 $smarty->display('login.tpl');
 $smarty->display('main_footer.tpl');
 ?>

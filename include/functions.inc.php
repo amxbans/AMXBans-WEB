@@ -17,7 +17,6 @@
 function db_log(string $action, string $context): void
 {
     global $config;
-    $q = $config->getDb()->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks)
- VALUES (?, ?, ?, ?)");
+    $q = $config->getDb()->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
     $q->execute([$_SERVER['REMOTE_ADDR'], User::get('username'), $action, $context]);
 }

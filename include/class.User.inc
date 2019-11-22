@@ -21,7 +21,8 @@ class User
 
 	/** @var Config */
 	protected static $config;
-	protected static $permissions = [];
+	/** @var stdClass  */
+	protected static $permissions;
 
 
     public static function init(Config $config)
@@ -55,7 +56,7 @@ class User
 
             $perms = $config->getDb()->prepare("SELECT * FROM `{$config->dbPrefix}_permissions` WHERE level=?");
             $perms->execute([self::get('perm_level')]);
-            self::$permissions = $perms->fetch(PDO::FETCH_ASSOC);
+            self::$permissions = $perms->fetch(PDO::FETCH_OBJ);
         }
 	}
 

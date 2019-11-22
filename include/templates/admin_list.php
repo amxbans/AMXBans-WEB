@@ -50,7 +50,7 @@ $smarty->assign("this",$_SERVER['PHP_SELF']);
 $smarty->assign("menu",$menu);
 $smarty->assign("banner",$config->banner);
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 $smarty->display('admin_list.tpl');
 $smarty->display('main_footer.tpl');
 ?>

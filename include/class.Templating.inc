@@ -26,12 +26,11 @@ class Templating extends Smarty
 		parent::__construct();
 
 		$this->setTemplateDir([
-			Route::getRootPath() . '/templates',
-			Route::getRootPath() . '/templates/admin',
+			Route::getRootPath() . '/include/templates',
 			Route::getRootPath() . '/install/templates',
 		]);
 
-		$this->setCompileDir(Route::getRootPath() . '/templates/compiled');
+		$this->setCompileDir(Route::getRootPath() . '/include/templates/compiled');
 		$this->setForceCompile(FALSE);
 
 		$this->assign('lang', __LANG__);

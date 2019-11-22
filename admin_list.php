@@ -51,7 +51,7 @@ $smarty->assign("menu",$menu);
 $smarty->assign("banner",$config->banner);
 $smarty->assign("banner_url",$config->banner_url);
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 $smarty->display('admin_list.tpl');
 $smarty->display('main_footer.tpl');
 ?>

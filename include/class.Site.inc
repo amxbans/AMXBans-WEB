@@ -31,12 +31,12 @@ class Site
         $s = new self();
         $s->config = $config;
         if (!Route::getFakePathWay())
-            $s->tpl = 'index.' . Config::start_pages[$config->default_page];
+            $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
             $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL()) - 1))[0];
             $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
-                'index.' . Config::start_pages[$config->default_page];
+                'index.' . Config::start_pages[$config->start_page];
         }
         return $s;
     }
@@ -45,7 +45,7 @@ class Site
     {
         $s = $this->config->smilies;
         foreach ($s as $smiley => $data) {
-            $r = "<img src='" . Route::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$data[0]}' title='{$data[1]}' />";
+            $r = "<img src='" . Route::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$smiley}' title='{$data[1]}' />";
             $text = str_replace($smiley, $r, $text);
         }
 
@@ -56,16 +56,17 @@ class Site
     /** Get the name of template
      * @return mixed
      */
-    public function getTpl() { return $this->tpl; }
+    public function getTpl() { return $this->tpl . '.tpl'; }
 
     public static function hasCookie($what = 'unID'): bool
     {
         if (!is_array($what))
-            $what = func_get_args();
+            $what = [$what];
 
-        foreach ($what as $value)
+        foreach ($what as $value) {
             if (!isset($_COOKIE[$value]))
                 return FALSE;
+        }
         return TRUE;
     }
 }

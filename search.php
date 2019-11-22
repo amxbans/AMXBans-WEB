@@ -170,7 +170,7 @@ $smarty->assign("msg",$msg);
 $smarty->assign("banner",$config->banner);
 $smarty->assign("banner_url",$config->banner_url);
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
 $smarty->display('search.tpl');
 $smarty->display('main_footer.tpl');
 ?>

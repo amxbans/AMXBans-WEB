@@ -13,15 +13,6 @@
 session_start();
 require_once "include/class.Config.inc";
 $config = new Config;
+$site = Site::init($config);
 
-/*
-require_once("include/config.inc.php");
-require_once("include/access.inc.php");
-
-//start page loader
-if(	$config->start_page == "" || $config->start_page == "index.php" || (!file_exists("$config->start_page"))) {
-	header("Location:ban_list.php");
-} else {
-	header("Location:$config->start_page");
-}
-*/
+$config->output->display($site->getTpl());

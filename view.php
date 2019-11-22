@@ -240,7 +240,7 @@ $smarty->assign("menu",$menu);
 $smarty->assign("banner",$config->banner);
 $smarty->assign("banner_url",$config->banner_url);
 
-$smarty->display('main_header.tpl');
+$smarty->display('master.tpl');
       echo "<script type=\"text/javascript\">
 		function jumpMenu(selection, target)
 		{
