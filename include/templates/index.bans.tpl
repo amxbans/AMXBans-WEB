@@ -1,4 +1,5 @@
 {extends 'master.tpl'}
+{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}
 <div class="main">
 
 
@@ -11,7 +12,7 @@
 
     <div class="pager" style="text-align:right">
 
-        <span class="first">{"_SITE"|lang} {$ban_page.current} {"_OF"|lang} {$ban_page.max_page}:</span>
+        {*<span class="first">{"_SITE"|lang} {$ban_page.current} {"_OF"|lang} {$ban_page.max_page}:</span>
 
         {if $pagenav.first}
 
@@ -55,7 +56,7 @@
 
     <br /><br />
 
-<!-- Pagenation --> 
+<!-- Pagenation -->
 
 
 
@@ -432,7 +433,7 @@
 
         {/if}
 
-    </div>
+    </div>*}
 
     <div class="clearer"></div>
 

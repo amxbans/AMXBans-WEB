@@ -14,5 +14,5 @@
  */
 function smarty_modifier_res_url($string)
 {
-        return Route::getBaseURL() . '/' . $string;
+        return str_replace(DIRECTORY_SEPARATOR . '/', '/', Route::getBaseURL() . '/' . $string);
 }

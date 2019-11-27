@@ -1,13 +1,30 @@
 <?php
+/**
+ * Language: English (UK)
+ * Author Notes:
+ * *
+ */
 return [
-    'locale1' => 'en',
-    'locale2' => 'en_EN',
+    'locale' => 'en',
     'html_direction' => 'ltr',
 
+    'index' => [
+        'titles' => [
+            'ban' => 'Ban details',
+            'bans' => 'Ban list',
+            'servers' => 'Server list',
+            'admins' => 'Admin list',
+            'search' => 'Search',
+            'login' => 'Log in',
+        ],
+        'menu' => ['bans', 'servers', 'admins', 'search'],
 
+    ],
+
+    'admin' => [
+        ''
+    ],
 ];
-define("_ENCODING","ISO-8859-1"); //ISO-8859-1,utf-8
-define("_LOCALE","en_EN"); //de_DE,fr_FR,en_EN...
 
 //default
 define("_SHORTSECONDS","sec");

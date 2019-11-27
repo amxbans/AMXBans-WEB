@@ -17,8 +17,8 @@ class Site
 {
     /** @var array  */
     protected $routes = [
-        'index' => ['bans', 'ban', 'servers', 'admins', 'search', 'login', 'logout'],
-        'admin' => [''],
+        'index' => ['bans', 'ban', 'servers', 'admins', 'search', 'login'],
+        'admin' => ['', 'logout'],
     ];
     /** @var string  */
     private $tpl = '';
@@ -33,7 +33,7 @@ class Site
         if (!Route::getFakePathWay())
             $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
-            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL()) - 1))[0];
+            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
             $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
                 'index.' . Config::start_pages[$config->start_page];
@@ -56,7 +56,22 @@ class Site
     /** Get the name of template
      * @return mixed
      */
-    public function getTpl() { return $this->tpl . '.tpl'; }
+    public function getTpl() { return $this->tpl; }
+
+    /** Get the file of template
+     * @return mixed
+     */
+    public function getTplFile() { return $this->tpl . '.tpl'; }
+
+    /** Get the site name
+     * @return mixed
+     */
+    public function getSite() { return explode('.', $this->tpl)[1]; }
+
+    /** Get the site group
+     * @return mixed
+     */
+    public function getGroup() { return explode('.', $this->tpl)[0]; }
 
     public static function hasCookie($what = 'unID'): bool
     {

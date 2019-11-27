@@ -15,4 +15,5 @@ require_once "include/class.Config.inc";
 $config = new Config;
 $site = Site::init($config);
 
-$config->output->display($site->getTpl());
+$config->output->assign('site', $site);
+$config->output->display(/*$site->getTplFile()*/'index.bans.tpl');

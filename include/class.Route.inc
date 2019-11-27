@@ -34,9 +34,8 @@ class Route
     public static function makeURL(string $fakePath, string $php = NULL, string $real_path = NULL): string
     {
         if ($real_path || $php) {
-            $p = explode('/', self::getURL());
             $php = $php ?? array_pop(explode('/', self::getURL()));
-            return Route::getBaseURL() . $real_path . '/' . $php . '/' . $fakePath;
+            return str_replace(DIRECTORY_SEPARATOR . '/', '/', Route::getBaseURL() . $real_path . '/' . $php . '/' . $fakePath);
         }
         return self::getURL() . '/' . $fakePath;
     }

@@ -22,7 +22,7 @@ class Templating extends Smarty
 	/**
 	 * Templating constructor.
 	 */
-	public function __construct() {
+	public function __construct(Config $config) {
 		parent::__construct();
 
 		$this->setTemplateDir([
@@ -34,8 +34,21 @@ class Templating extends Smarty
 		$this->setForceCompile(FALSE);
 
 		$this->assign('lang', __LANG__);
+		$this->assign('availLangs', $this->getAvailableLanguages());
 		$this->assign('app_name', 'AMXBans v' . Config::version);
 		$this->assign('version', Config::version);
+		$this->assign(compact('config'));
 
+	}
+
+    private function getAvailableLanguages()
+    {
+
+        $langs = scandir('language');
+        foreach ($langs as $file)
+            if ($file != "." && $file != ".." && substr($file, 0, 4) != "lang")
+                $lang[] = explode('.', $file)[0];
+
+        return $lang;
 	}
 }

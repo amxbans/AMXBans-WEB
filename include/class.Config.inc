@@ -45,7 +45,7 @@ class Config
 	private $variables = [
 	    'cookie' => '',
         'per_page' => 50,
-        'banner_src' => 'banner.png',
+        'banner_src' => 'amxbans.png',
         'banner_url' => '//forum.amxbans.net',
         'default_lang' => 'english',
         'start_page' => 0,
@@ -128,7 +128,7 @@ class Config
 		else
 			$lang = require str_ireplace($_SESSION['lang'], 'english', $lang);
 		define('__LANG__', $lang);
-		$this->output = new Templating();
+		$this->output = new Templating($this);
 	}
 
     public function __get($name)
