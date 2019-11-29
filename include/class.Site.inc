@@ -15,34 +15,33 @@
  */
 class Site
 {
-    /** @var array  */
+    /** @var array */
     protected $routes = [
-        'index' => ['bans', 'ban', 'servers', 'admins', 'search', 'login'],
-        'admin' => ['', 'logout'],
+        'index' => [ 'bans', 'ban', 'servers', 'admins', 'search', 'login' ],
+        'admin' => [ '', 'logout' ],
     ];
-    /** @var string  */
+    /** @var string */
     private $tpl = '';
     /** @var Config */
     protected $config;
 
 
-    public static function init(Config $config)
-    {
+    public static function init (Config $config) {
         $s = new self();
         $s->config = $config;
         if (!Route::getFakePathWay())
             $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
-            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
+            $php = substr(explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0], 1);
             $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
                 'index.' . Config::start_pages[$config->start_page];
         }
+
         return $s;
     }
 
-    public function parseComment(string $text): string
-    {
+    public function parseComment (string $text): string {
         $s = $this->config->smilies;
         foreach ($s as $smiley => $data) {
             $r = "<img src='" . Route::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$smiley}' title='{$data[1]}' />";
@@ -54,29 +53,32 @@ class Site
     }
 
     /** Get the name of template
+     *
      * @return mixed
      */
-    public function getTpl() { return $this->tpl; }
+    public function getTpl () { return $this->tpl; }
 
     /** Get the file of template
+     *
      * @return mixed
      */
-    public function getTplFile() { return $this->tpl . '.tpl'; }
+    public function getTplFile () { return $this->tpl . '.tpl'; }
 
     /** Get the site name
+     *
      * @return mixed
      */
-    public function getSite() { return explode('.', $this->tpl)[1]; }
+    public function getSite () { return explode('.', $this->tpl)[1]; }
 
     /** Get the site group
+     *
      * @return mixed
      */
-    public function getGroup() { return explode('.', $this->tpl)[0]; }
+    public function getGroup () { return explode('.', $this->tpl)[0]; }
 
-    public static function hasCookie($what = 'unID'): bool
-    {
+    public static function hasCookie ($what = 'unID'): bool {
         if (!is_array($what))
-            $what = [$what];
+            $what = [ $what ];
 
         foreach ($what as $value) {
             if (!isset($_COOKIE[$value]))
