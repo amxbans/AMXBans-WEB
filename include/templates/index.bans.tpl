@@ -1,5 +1,5 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}
+{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}{*TODO: This point unfinished*}
 <div class="main">
 
 

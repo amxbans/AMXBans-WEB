@@ -13,7 +13,6 @@
 session_start();
 require_once "include/class.Config.inc";
 $config = new Config;
-$site = Site::init($config);
 
-$config->output->assign('site', $site);
-$config->output->display(/*$site->getTplFile()*/'index.bans.tpl');
+
+Site::build($config);

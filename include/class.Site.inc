@@ -15,6 +15,8 @@
  */
 class Site
 {
+    /** @var Config */
+    public $config;
     /** @var array */
     protected $routes = [
         'index' => [ 'bans', 'ban', 'servers', 'admins', 'search', 'login' ],
@@ -22,13 +24,16 @@ class Site
     ];
     /** @var string */
     private $tpl = '';
-    /** @var Config */
-    protected $config;
+    private $method;
+
+    protected $form = 600; // 10 minutes
 
 
-    public static function init (Config $config) {
+    public static function build (Config $config) {
         $s = new self();
         $s->config = $config;
+        $s->method = $method = $s->resolveMethod();
+
         if (!Route::getFakePathWay())
             $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
@@ -38,7 +43,11 @@ class Site
                 'index.' . Config::start_pages[$config->start_page];
         }
 
-        return $s;
+        $config->output->assign('site', $s);
+
+        $controller = ucfirst($s->getGroup()) . 'Controller';
+        $cMethod = $s->getSite();
+        new $controller($s, $method, $cMethod);
     }
 
     public function parseComment (string $text): string {
@@ -85,5 +94,38 @@ class Site
                 return FALSE;
         }
         return TRUE;
+    }
+
+    public function makeFormAuth ($method = 'post') {
+        if (strtolower($method) == 'get')
+            return '';
+        $_SESSION['TOKEN_V'] = uniqid();
+        $_SESSION['TOKEN_T'] = time();
+        $_SESSION['TOKEN_M'] = $method;
+
+        $o = strtolower($method) == 'post' ? '' : "<input type='hidden' name='_method_' value='{$method}' />";
+        return $o . "<input type='hidden' name='f_v_t' value='{$_SESSION['TOKEN_V']}' />";
+    }
+
+    public function validateFormAuth () {
+        $t = $_SESSION['TOKEN_T'];
+        if ((time() - $this->form) > $t)
+            return $this->destroyFormAuth();
+        $m = $_SESSION['TOKEN_M'];
+        $v = $_SESSION['TOKEN_V'];
+        $this->destroyFormAuth();
+        return ($v == $_POST['f_v_t'] && $this->method == $m);
+    }
+
+    protected function destroyFormAuth () {
+        unset($_SESSION['TOKEN_T'], $_SESSION['TOKEN_M'], $_SESSION['TOKEN_V']);
+        return FALSE;
+    }
+
+    private function resolveMethod () {
+        if (strtolower($_SERVER['REQUEST_METHOD']) == 'get')
+            return 'get';
+        else
+            return $_POST['_method_'] ?: 'post';
     }
 }

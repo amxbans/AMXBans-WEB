@@ -22,7 +22,7 @@
 
 <body id="top">
 <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-primary">
-    <div class="mr-2">
+    <div class="mr-2"> {*TODO: this point unfinished; change back to inline list*}
         <a class="nav-item nav-link dropdown-toggle" href="#" id="langDD" role="button" data-toggle="dropdown"
            aria-haspopup="true" aria-expanded="false">
             <img src="{'webSources/images/world.svg'|res_url}" data-author="Smashicons"
@@ -69,7 +69,7 @@
 </header>
 
 <main class="container">
-
+    {block name="BODY"}{/block}
 </main>
 </body>
 </html>
