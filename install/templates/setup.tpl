@@ -6,13 +6,13 @@
 	<meta name="cache-control" content="no-cache" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<meta name="theme-color" content="#9cb3b3"/>
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<link href="{"../webSources/css/bootstrap.min.css"|res_url}" rel="stylesheet">
 	<link rel="stylesheet" href="{"install.css"|res_url}" />
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="{"../webSources/js/jquery.min.js"|res_url}"></script>
 </head>
 <body>
 <header class="text-center">
-	<a href="http://www.amxbans.net" target="_blank" rel="noreferrer" class="_center"><img src="{'../templates/_gfx/amxbans.png'|res_url}" alt="AMXBans" />
+	<a href="http://www.amxbans.net" target="_blank" rel="noreferrer"><img src="{'../webSources/images/banner/amxbans.png'|res_url}" alt="AMXBans" />
 	</a>
 	<h1 class="text-center">{$lang.MAIN_TITLE|replace:':version':$version}</h1>
 </header>

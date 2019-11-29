@@ -31,7 +31,7 @@ $siteMax = Route::getFakePathWay(1) == "CHECKED" ? 5 : 4;
 if ($site < 1 || $site > $siteMax) $site = 1;
 
 
-$smarty = new Templating();
+$smarty = new Templating($config);
 $smarty->setTemplateDir(__DIR__ . '/templates')->setCompileDir(__DIR__ . '/templates');
 
 switch ($site)
@@ -55,7 +55,7 @@ switch ($site)
 
         $dirs_settings = [
             "include"     => is_writable(Route::getRootPath() . "/include"),
-            "templates_c" => is_writable(Route::getRootPath() . "/templates/compiled"),
+            "templates_c" => is_writable(Route::getRootPath() . "/include/templates/compiled"),
             'uploads'     => is_writable(Route::getRootPath() . '/webSources/uploads'),
         ];
 

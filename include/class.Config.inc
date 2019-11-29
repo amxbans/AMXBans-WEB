@@ -95,8 +95,11 @@ class Config
 
 
 		if ($install) ;
-		elseif (!file_exists(__DIR__ . "/db.Config.inc"))
+		elseif (!file_exists(__DIR__ . "/db.Config.inc")) {
+            if (is_dir(Route::getRootPath() . '/install'))
+                header('Location: ' . Route::getBaseURL() . '/install');
 			die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER['SERVER_ADMIN'] . "</p><hr />" . @$_SERVER['SERVER_SIGNATURE']);
+        }
 		else
 		{
 			$this->dbData = require "db.Config.inc";

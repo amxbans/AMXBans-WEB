@@ -84,7 +84,7 @@
         </td>
     </tr>
     <tr>
-        <th>{$lang.STEP2_WRITEABLE}: /templates/compiled</th>
+        <th>{$lang.STEP2_WRITEABLE}: /include/templates/compiled</th>
         <td>TRUE</td>
         <td>{if $dirs_settings.templates_c}TRUE{else}FALSE{/if}</td>
         <td>
