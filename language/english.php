@@ -5,25 +5,71 @@
  * *
  */
 return [
-    'locale' => 'en',
+    'locale'         => 'en',
     'html_direction' => 'ltr',
 
     'index' => [
         'titles' => [
-            'ban' => 'Ban details',
-            'bans' => 'Ban list',
+            'ban'     => 'Ban details',
+            'bans'    => 'Ban list',
             'servers' => 'Server list',
-            'admins' => 'Admin list',
-            'search' => 'Search',
-            'login' => 'Log in',
+            'admins'  => 'Admin list',
+            'search'  => 'Search',
+            'login'   => 'Log in',
         ],
-        'menu' => ['bans', 'servers', 'admins', 'search'],
+        'menu'   => [ 'bans', 'servers', 'admins', 'search' ],
 
+        'login' => [
+            'username' => 'Username',
+            'email'    => 'Email',
+            'pass'     => 'Password',
+            'remember' => 'Remember my login',
+            'blocked'  => 'Blocked login',
+
+            'lost_pass' => 'Forgot password?',
+            'pass_rec'  => 'Password recovery',
+
+            'passcode_exist' => 'Account with this email already requested password change. Please check email for further instructions',
+
+        ],
     ],
 
     'admin' => [
-        ''
+        'titles' => [
+            'index'  => 'Admin area',
+            'logout' => 'Log-Out',
+            'server' => 'Server',
+            'web'    => 'Website',
+            'other'  => 'Others',
+        ],
+        'menu'   => [ 'index', 'server', 'web', 'other' ],
+
+        'subtitles' => [
+            'index'  => [
+                'sys_info'   => 'System Information',
+                'ban_add'    => 'Add Ban',
+                'online_ban' => 'Ban on-line',
+            ],
+            'server' => [
+                'server'         => 'Server list',
+                'reasons'        => 'Ban reasons',
+                'admins'         => 'Admins',
+                'servers_admins' => 'Assign Admins',
+            ],
+            'web'    => [
+                'users'    => 'Web Users',
+                'groups'   => 'Permission levels',
+                'settings' => 'Settings',
+            ],
+            'other'  => [
+                'sys_upgade' => 'System update',
+                'sys_logs'   => 'Action history (logs)',
+            ],
+        ],
     ],
+
+    'back' => 'Back',
+    'send' => 'Send',
 ];
 
 //default

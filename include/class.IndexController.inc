@@ -23,6 +23,7 @@ class IndexController
      * @param Site   $config
      * @param string $method
      * @param string $site
+     * @throws Exception
      */
     public function __construct (Site $config, string $method, string $site) {
         $this->config = $config;
@@ -35,14 +36,51 @@ class IndexController
         $m = $method . ucfirst($site);
         if (method_exists($this, $m))
             $this->$m();
+        else
+            throw new Exception('Method "' . $m . '" not found');
     }
 
     private function getLogin () {
+        if (Route::getFakePathWay(1) == 'lost_pass')
+            return $this->config->config->output->display('index.login.lost_pass.tpl');
+        elseif (Route::getFakePathWay(1) == 'pass_rec')
+            return $this->getPassRec();//config->config->output->display('index.login.pass_rec.tpl');
+
         $remaining = @$_SESSION['login_block'] ? time() - $_SESSION['login_block'] : NULL;
         $this->config->config->output->assign('blocked', $remaining);
 
-        $this->config->config->output->assign('messages', new FormErrors([], [])); // TODO: This point unfinished
-
         $this->config->config->output->display($this->config->getTplFile());
+    }
+
+    private function postLogin () {
+        if (Route::getFakePathWay(1) == 'lost_pass')
+            return $this->postLostPass();
+    }
+
+    private function postLostPass () {
+        if ($this->config->validateFormAuth()) {
+            $d = $this->config->config->getDb();
+            $user = $d->prepare("SELECT id, username, passreset_code as code, passreset_until as until FROM {$this->config->config->dbPrefix}_webadmins WHERE email=?");
+            $user->execute([trim($_POST['email'])]);
+
+            if ($user->rowCount() == 1) {
+                $user = $user->fetchObject();
+                if ($user->code && $user->until > time())
+                    $eMsg[] = __LANG__['index']['login']['passcode_exist'];
+                else {
+                    db_log('Login', 'Requested password change', $user->username);
+                    //TODO: Here??
+                }
+            }
+        }
+
+    }
+
+    private function getPassRec () {
+        if (isset($_GET['code'])) {
+            $c = trim($_GET['code']);
+
+
+        }
     }
 }

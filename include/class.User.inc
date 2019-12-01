@@ -35,8 +35,8 @@ class User
             $id = (int)$_COOKIE['unID'];
         else if (isset($_POST['login_name'])) {
             $id = static::$config->getDb()
-                ->prepare("SELECT id FROM `{$config->dbPrefix}_webadmins` WHERE email=?");
-            $id->execute([$_POST['login_name']]);
+                ->prepare("SELECT id FROM `{$config->dbPrefix}_webadmins` WHERE email=:log OR username=:log");
+            $id->execute(['log' => $_POST['login_name']]);
             $id = $id->fetchObject()->id;
         }
         else

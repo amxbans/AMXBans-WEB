@@ -3,25 +3,56 @@
 {block name="BODY"}
 	{include file="messages.tpl"}
 
-	{* TODO: This point unfinished *}
-<table width="50%" border="1" cellpadding="2">
-	<tr class="table_head">
-		<td>&nbsp;</td>
-	</tr>
-	<tr class="table_list">
-		<td>
-			<form name="loginform" action="../../index.php" method="post">
-				<fieldset><legend><span class='title'>"_LOGIN"|lang</span></legend>
-			<table width='20%'>
-				<tr><td class="enter">"_USERNAME"|lang:</td> <td class='enter'><input type="text" name="user" /></td><td><input type='checkbox' checked="checked" name='remember'></input> "_REMEMBERME"|lang</td></tr>
-				<tr><td class="enter">"_PASSWORD"|lang:</td> <td class='enter'><input type="password" name="pass" /></td><td><button type="submit" name="action" id="action2" value="Login">"_LOGIN"|lang</button></td></tr>
-				{if $msg}<span class='errored'>$msg|lang</span><br />{/if}
-				{if $try}<span class='errored'>"_LOGINTRY"|lang {$try}/3</span><br />{/if}
-				{if $block_left}<span class='errored'>{$block_left|date2word:true} "_REMAINING"|lang</span><br />{/if}
-			</table>
-				</fieldset>
-			</form>
-		</td>
-	</tr>
-</table>
+	<form method="post" class="row">
+		{Site::makeFormAuth()}
+		<label class="col-sm-3 text-sm-right col-form-label" for="name">{$lang.index.login.username}</label>
+		<div class="col-sm-9"><input name="username" class="form-control" id="name" required /></div>
+
+		<label class="col-sm-3 text-sm-right col-form-label" for="pass">{$lang.index.login.pass}</label>
+		<div class="col-sm-9"><input type="password" name="password" class="form-control" id="pass" required /></div>
+
+		<div class="col-sm-3 text-sm-right"><input type="checkbox" name="rem" class="form" id="rem" /></div>
+		<label for="rem" class="col-sm-9">{$lang.index.login.remember}</label>
+
+		<div class="col-sm-3 text-right">{if $blocked}{$lang.index.login.blocked}:{/if}</div>
+		<div class="col-sm-9">
+			<button class="btn btn-primary">{$lang.index.titles.login}</button>
+			{if $blocked}<span id="block"></span>{/if}
+		</div>
+
+		<div class="col-sm-3"></div>
+		<div class="col-sm-9">
+			<a href="{['login', 'lost_pass']|url}">{$lang.index.login.lost_pass}</a> |
+			<a href="{['login', 'pass_rec']|url}">{$lang.index.login.pass_rec}</a>
+		</div>
+	</form>
+
+	{if $blocked}
+		<script>
+		let blocked = {
+			until: {$blocked|intval}000,
+			timerSetup: '',
+
+
+			init: function () {
+				this.timerSetup = setInterval('blocked.check()', 990);
+			},
+
+			check: function () {
+				if (this.until > Date.now()) {
+					$('input').attr('disabled', '');
+					$('main button.btn').hide();
+					timer(this.until - Date.now(), '#block');
+				}
+				else {
+					$('input').attr('disabled', null);
+					$("main button.btn").show();
+					clearInterval(this.timerSetup);
+				}
+			},
+		};
+
+		blocked.init();
+		</script>
+	{/if}
 {/block}

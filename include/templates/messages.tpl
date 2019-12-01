@@ -1,4 +1,4 @@
-{if $messages instanceof FormErrors}
+{if isset($messages) && $messages instanceof FormErrors}
     <div class="alert alert-danger">
         <ul class="mb-0">
             {foreach $messages->getMessages() as $m}
@@ -6,7 +6,7 @@
             {/foreach}
         </ul>
     </div>
-{elseif is_array($messages)}
+{elseif isset($messages) && is_array($messages)}
     {foreach $messages as $m}
         <div class="alert alert-{$m.type}">
             <ul class="mb-0">

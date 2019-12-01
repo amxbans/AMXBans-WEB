@@ -37,7 +37,8 @@ class Site
         if (!Route::getFakePathWay())
             $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
-            $php = substr(explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0], 1);
+            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
+            $php = substr($php, (int)strpos($php, '/'));
             $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
                 'index.' . Config::start_pages[$config->start_page];
@@ -96,7 +97,7 @@ class Site
         return TRUE;
     }
 
-    public function makeFormAuth ($method = 'post') {
+    public static function makeFormAuth ($method = 'post') {
         if (strtolower($method) == 'get')
             return '';
         $_SESSION['TOKEN_V'] = uniqid();

@@ -13,10 +13,11 @@
 /**
  * @param string $action
  * @param string $context
+ * @param string|null   $user
  */
-function db_log(string $action, string $context): void
+function db_log(string $action, string $context, $user = NULL): void
 {
     global $config;
     $q = $config->getDb()->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
-    $q->execute([$_SERVER['REMOTE_ADDR'], User::get('username'), $action, $context]);
+    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
 }

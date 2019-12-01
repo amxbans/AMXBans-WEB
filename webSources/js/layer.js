@@ -1,3 +1,52 @@
+function timer(diff, place) {
+	let y = 0, mo = 0, d = 0, h = 0, m = 0, s = 0, o = '';
+	diff = Math.floor(diff / 1000);
+
+	if (diff <= 0) {
+		$(place).text('0s');
+		return false;
+	}
+	y = Math.floor(diff / (3600 * 24 * 365));
+	if (y) {
+		diff = diff - (y * 3600 * 24 * 365);
+		o += y.toString() + 'y ';
+	}
+
+	mo = Math.floor(diff / (3600 * 24 * 30));
+	if (mo) {
+		diff = diff - (mo * 3600 * 24 * 30);
+		o += mo.toString() + 'mo ';
+	}
+
+	d = Math.floor(diff / (3600 * 24));
+	if (d) {
+		diff = diff - (d * 3600 * 24);
+		o += d.toString() + 'd ';
+	}
+
+	h = Math.floor(diff / 3600);
+	if (h) {
+		diff = diff - (h * 3600);
+		o += h.toString() + 'h ';
+	}
+
+	m = Math.floor(diff / 60);
+	if (m) {
+		diff = diff - (m * 60);
+		o += m.toString() + 'm ';
+	}
+
+	s = Math.floor(diff);
+	if (s) {
+		o += s.toString() + 's';
+	}
+
+	$(place).text(o);
+	return true;
+}
+
+/*
+
 function ToggleLayer(obj) {
 	if(document.all) {
 	  if(document.all[obj].style.display == 'none') {
@@ -115,4 +164,4 @@ function timer() {
 			button.innerHTML = wbuttontext + ' ( ' + wseconds-- + ' )';
         }
     }
-}
+}*/
