@@ -38,7 +38,7 @@ class Site
             $s->tpl = 'index.' . Config::start_pages[$config->start_page];
         else {
             $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
-            $php = substr($php, (int)strpos($php, '/'));
+            $php = substr($php, is_numeric(strpos($php, '/'))? strpos($php, '/')+1 : 0);
             $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
                 'index.' . Config::start_pages[$config->start_page];

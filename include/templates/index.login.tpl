@@ -1,4 +1,5 @@
 {extends file="master.tpl"}
+{block name="head-title" prepend}{$lang.index.titles.login} | {/block}
 
 {block name="BODY"}
 	{include file="messages.tpl"}

@@ -1,5 +1,7 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}{*TODO: This point unfinished*}
+{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}
+
+{block name="BODY"}
 <div class="main">
 
 
@@ -440,3 +442,4 @@
 <!-- Pagenation -->  
 
 </div>
+        {/block}

@@ -43,7 +43,6 @@ class Config
      * @var array
      */
     private $variables = [
-        'cookie'                      => '',
         'per_page'                    => 50,
         'banner_src'                  => 'amxbans.png',
         'banner_url'                  => '//forum.amxbans.net',
