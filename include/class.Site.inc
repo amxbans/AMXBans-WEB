@@ -29,6 +29,11 @@ class Site
     protected $form = 600; // 10 minutes
 
 
+    /**
+     * @param Config $config
+     *
+     * @uses IndexController, Route
+     */
     public static function build (Config $config) {
         $s = new self();
         $s->config = $config;
@@ -109,7 +114,7 @@ class Site
     }
 
     public function validateFormAuth () {
-        $t = $_SESSION['TOKEN_T'];
+        $t = $_SESSION['TOKEN_T'] ?? 0;
         if ((time() - $this->form) > $t)
             return $this->destroyFormAuth();
         $m = $_SESSION['TOKEN_M'];
@@ -127,6 +132,6 @@ class Site
         if (strtolower($_SERVER['REQUEST_METHOD']) == 'get')
             return 'get';
         else
-            return $_POST['_method_'] ?: 'post';
+            return $_POST['_method_'] ?? 'post';
     }
 }

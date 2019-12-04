@@ -23,8 +23,7 @@
 
 		<div class="col-sm-3"></div>
 		<div class="col-sm-9">
-			<a href="{['login', 'lost_pass']|url}">{$lang.index.login.lost_pass}</a> |
-			<a href="{['login', 'pass_rec']|url}">{$lang.index.login.pass_rec}</a>
+			{$lang.index.login.lost_pass} <a href="{['login', 'pass_rec']|url}">{$lang.index.login.pass_rec}</a>
 		</div>
 	</form>
 

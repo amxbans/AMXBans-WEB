@@ -10,7 +10,9 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
-
+/**
+ * Class IndexController
+ */
 class IndexController
 {
     private $site;
@@ -23,9 +25,11 @@ class IndexController
      * @param Site   $config
      * @param string $method
      * @param string $site
+     *
      * @throws Exception
      */
-    public function __construct (Site $config, string $method, string $site) {
+    public function __construct(Site $config, string $method, string $site)
+    {
         $this->config = $config;
         $this->method = $method;
         $this->site = $site;
@@ -40,11 +44,10 @@ class IndexController
             throw new Exception('Method "' . $m . '" not found');
     }
 
-    private function getLogin () {
-        if (Route::getFakePathWay(1) == 'lost_pass')
-            return $this->config->config->output->display('index.login.lost_pass.tpl');
-        elseif (Route::getFakePathWay(1) == 'pass_rec')
-            return $this->getPassRec();//config->config->output->display('index.login.pass_rec.tpl');
+    private function getLogin()
+    {
+        if (Route::getFakePathWay(1) == 'pass_rec')
+            return $this->getPassRec();
 
         $remaining = @$_SESSION['login_block'] ? time() - $_SESSION['login_block'] : NULL;
         $this->config->config->output->assign('blocked', $remaining);
@@ -52,12 +55,14 @@ class IndexController
         $this->config->config->output->display($this->config->getTplFile());
     }
 
-    private function postLogin () {
-        if (Route::getFakePathWay(1) == 'lost_pass')
-            return $this->postLostPass();
+    private function postLogin()
+    {
+        if (Route::getFakePathWay(1) == 'pass_rec')
+            return $this->postPassRec();
     }
 
-    private function postLostPass () {
+    private function postPassRec()
+    {
         if ($this->config->validateFormAuth()) {
             $d = $this->config->config->getDb();
             $user = $d->prepare("SELECT id, username, passreset_code as code, passreset_until as until FROM {$this->config->config->dbPrefix}_webadmins WHERE email=?");
@@ -65,22 +70,31 @@ class IndexController
 
             if ($user->rowCount() == 1) {
                 $user = $user->fetchObject();
-                if ($user->code && $user->until > time())
+                if ($user->code && (new DateTime($user->until) > new DateTime()))
                     $eMsg[] = __LANG__['index']['login']['passcode_exist'];
                 else {
-                    db_log('Login', 'Requested password change', $user->username);
-                    //TODO: Here??
+                    db_log('Password Recovery', 'Unset password', $user->username);
+                    $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_code=?, passreset_until=? WHERE id=?");
+                    $q->execute([md5($user->id . $user->username . time()), (new DateTime('+1 day'))->format('Y-m-d H:i:s'), $user->id]);
+
+                    $msg = $this->config->config->output-> // TODO: needs finishing
+                    mail($user->username . '<' . trim($_POST['email']) . '>', 'Password reset');
+
+                    $sMsg[] = __LANG__['index']['login']['passcode_sent'];
                 }
             }
         }
 
     }
 
-    private function getPassRec () {
+    private function getPassRec()
+    {
         if (isset($_GET['code'])) {
             $c = trim($_GET['code']);
 
 
         }
+
+        $this->config->config->output->display('index.login.lost_pass.tpl');
     }
 }

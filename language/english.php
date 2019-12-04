@@ -28,8 +28,10 @@ return [
 
             'lost_pass' => 'Forgot password?',
             'pass_rec'  => 'Password recovery',
+            'rec_code'  => 'Code from email',
 
             'passcode_exist' => 'Account with this email already requested password change. Please check email for further instructions',
+            'passcode_sent' => '',
 
         ],
     ],
@@ -68,6 +70,11 @@ return [
         ],
     ],
 
+    'email' => [
+        'intro' => ''
+    ],
+
+    'next' => 'Next',
     'back' => 'Back',
     'send' => 'Send',
 ];
