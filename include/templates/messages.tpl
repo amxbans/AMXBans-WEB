@@ -8,12 +8,6 @@
     </div>
 {elseif isset($messages) && is_array($messages)}
     {foreach $messages as $m}
-        <div class="alert alert-{$m.type}">
-            <ul class="mb-0">
-                {foreach $m.data as $m2}
-                    <li>{$m2}</li>
-                {/foreach}
-            </ul>
-        </div>
+        <div class="alert alert-{$m.type}">{$m.text}</div>
     {/foreach}
 {/if}

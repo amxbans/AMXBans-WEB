@@ -63,24 +63,37 @@ class IndexController
 
     private function postPassRec()
     {
-        if ($this->config->validateFormAuth()) {
+        /*TODO: if ($this->config->validateFormAuth())*/ {
             $d = $this->config->config->getDb();
             $user = $d->prepare("SELECT id, username, passreset_code as code, passreset_until as until FROM {$this->config->config->dbPrefix}_webadmins WHERE email=?");
             $user->execute([trim($_POST['email'])]);
 
             if ($user->rowCount() == 1) {
                 $user = $user->fetchObject();
-                if ($user->code && (new DateTime($user->until) > new DateTime()))
-                    $eMsg[] = __LANG__['index']['login']['passcode_exist'];
-                else {
+               /*TODO: if ($user->code && (new DateTime($user->until) > new DateTime()))
+                    $msg[] = ['type' => 'warning', 'text' => __LANG__['index']['login']['passcode_exist']];
+                else*/ {
+                    $code = md5($user->id . $user->username . time());
                     db_log('Password Recovery', 'Unset password', $user->username);
                     $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_code=?, passreset_until=? WHERE id=?");
-                    $q->execute([md5($user->id . $user->username . time()), (new DateTime('+1 day'))->format('Y-m-d H:i:s'), $user->id]);
+                    $q->execute([$code, (new DateTime('+1 day'))->format('Y-m-d H:i:s'), $user->id]);
 
-                    $msg = $this->config->config->output-> // TODO: needs finishing
-                    mail($user->username . '<' . trim($_POST['email']) . '>', 'Password reset');
+                    $msg = new Templating($this->config->config);
+                    $msg->assign('replace', [
+                        ':username' => $user->username,
+                        ':now' => (new DateTime())->format(__LANG__['date_format']),
+                    ]);
+                    $msg->assign('code', $code);
 
-                    $sMsg[] = __LANG__['index']['login']['passcode_sent'];
+                    $mail_headers = [
+                        'From' => $_SERVER['SERVER_ADMIN'],
+                        'MIME-Version' => '1.0',
+                        'Content-type' => 'text/html; charset=utf-8',
+                        'To' => $user->username . '<' . trim($_POST['email']) . '>',
+                    ];
+                    $mail = Smarty::$_MBSTRING? 'mb_send_mail' : 'mail';
+                    $mail(trim($_POST['email']), __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
+                    $msg[] = ['type' => 'info', 'text' => __LANG__['index']['login']['passcode_sent']];
                 }
             }
         }
@@ -92,7 +105,12 @@ class IndexController
         if (isset($_GET['code'])) {
             $c = trim($_GET['code']);
 
+            if ($c) {
+                $d = $this->config->config->getDb();
+                $u = $d->prepare("SELECT id, passreset_until as until, username,  FROM `{$this->config->config->dbPrefix}_webadmins`"); // TODO: HERE
+            }
 
+            return $this->config->config->output->display('index.login.pass_rec.tpl');
         }
 
         $this->config->config->output->display('index.login.lost_pass.tpl');

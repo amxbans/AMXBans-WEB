@@ -71,12 +71,23 @@ return [
     ],
 
     'email' => [
-        'intro' => ''
+        'subject' => 'Password reset',
+        'greet' => 'Hello :username,',
+        'intro' => 'Somebody just tried to reset your accounts password. For security reasons we sent this email to ensure its You.<br />
+ If you cannot remember your previous password - below there is link to change password to new one.
+ Click on it and You will be prompted to provide new password.<br />
+ Link and code is valid only for 24h counting from :now.
+ If this was not You just sit back and relax, link will become invalid afterwards.',
+        'site' => 'Click below to change the password',
+        'code' => 'If link is not letting You to change password then write the code written below to the site opened in link',
+
+
     ],
 
     'next' => 'Next',
     'back' => 'Back',
     'send' => 'Send',
+    'date_format' => 'Y-m-d H:i:s'
 ];
 
 //default
