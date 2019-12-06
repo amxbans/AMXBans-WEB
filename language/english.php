@@ -31,8 +31,8 @@ return [
             'rec_code'  => 'Code from email',
 
             'passcode_exist' => 'Account with this email already requested password change. Please check email for further instructions',
-            'passcode_sent' => '',
-
+            'passcode_sent' => 'Password change instructions sent to :email. Please refer to it.',
+            'passreset_nocode' => 'Sorry but we couldn\'t find any user for this code. Please try copying and pasting the code from email in below.',
         ],
     ],
 

@@ -28,7 +28,7 @@ class IndexController
      *
      * @throws Exception
      */
-    public function __construct(Site $config, string $method, string $site)
+    public function __construct (Site $config, string $method, string $site)
     {
         $this->config = $config;
         $this->method = $method;
@@ -44,7 +44,7 @@ class IndexController
             throw new Exception('Method "' . $m . '" not found');
     }
 
-    private function getLogin()
+    private function getLogin ()
     {
         if (Route::getFakePathWay(1) == 'pass_rec')
             return $this->getPassRec();
@@ -55,25 +55,26 @@ class IndexController
         $this->config->config->output->display($this->config->getTplFile());
     }
 
-    private function postLogin()
+    private function postLogin ()
     {
         if (Route::getFakePathWay(1) == 'pass_rec')
             return $this->postPassRec();
     }
 
-    private function postPassRec()
+    private function postPassRec ()
     {
-        /*TODO: if ($this->config->validateFormAuth())*/ {
+        if ($this->config->validateFormAuth()) {
             $d = $this->config->config->getDb();
             $user = $d->prepare("SELECT id, username, passreset_code as code, passreset_until as until FROM {$this->config->config->dbPrefix}_webadmins WHERE email=?");
             $user->execute([trim($_POST['email'])]);
 
             if ($user->rowCount() == 1) {
+                $t = new DateTime();
                 $user = $user->fetchObject();
-               /*TODO: if ($user->code && (new DateTime($user->until) > new DateTime()))
+                if ($user->code && (new DateTime($user->until) > $t))
                     $msg[] = ['type' => 'warning', 'text' => __LANG__['index']['login']['passcode_exist']];
-                else*/ {
-                    $code = md5($user->id . $user->username . time());
+                else {
+                    $code = md5($user->id . $user->username . $t->format('U'));
                     db_log('Password Recovery', 'Unset password', $user->username);
                     $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_code=?, passreset_until=? WHERE id=?");
                     $q->execute([$code, (new DateTime('+1 day'))->format('Y-m-d H:i:s'), $user->id]);
@@ -81,7 +82,7 @@ class IndexController
                     $msg = new Templating($this->config->config);
                     $msg->assign('replace', [
                         ':username' => $user->username,
-                        ':now' => (new DateTime())->format(__LANG__['date_format']),
+                        ':now' => $t->format(__LANG__['date_format']),
                     ]);
                     $msg->assign('code', $code);
 
@@ -91,28 +92,44 @@ class IndexController
                         'Content-type' => 'text/html; charset=utf-8',
                         'To' => $user->username . '<' . trim($_POST['email']) . '>',
                     ];
-                    $mail = Smarty::$_MBSTRING? 'mb_send_mail' : 'mail';
+                    $mail = Smarty::$_MBSTRING ? 'mb_send_mail' : 'mail';
                     $mail(trim($_POST['email']), __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
-                    $msg[] = ['type' => 'info', 'text' => __LANG__['index']['login']['passcode_sent']];
+                    $msg[] = ['type' => 'info', 'text' => str_replace(':email', $_POST['email'], __LANG__['index']['login']['passcode_sent'])];
                 }
             }
         }
 
     }
 
-    private function getPassRec()
+    private function getPassRec ()
     {
         if (isset($_GET['code'])) {
             $c = trim($_GET['code']);
 
             if ($c) {
                 $d = $this->config->config->getDb();
-                $u = $d->prepare("SELECT id, passreset_until as until, username,  FROM `{$this->config->config->dbPrefix}_webadmins`"); // TODO: HERE
-            }
+                $u = $d->prepare("SELECT id, passreset_until as until, username, email FROM `{$this->config->config->dbPrefix}_webadmins` WHERE passreset_code=?");
+                $u->execute([$c]);
 
+                if ($u->rowCount() == 1) {
+                    $u = $u->fetchObject();
+                    $t = new DateTime();
+
+                    if ($t < new DateTime($u->until))
+                        return $this->config->config->output->display('index.login.pass_change.tpl');
+                    /* $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_until=null, passreset_code=null, try=0 WHERE id=?");
+                         $q->execute([$u->id]);*/
+                }
+            }
+            $this->config->config->output->assign('messages', [['type' => 'warning', 'text' => __LANG__['login']['passreset_nocode']]]);
             return $this->config->config->output->display('index.login.pass_rec.tpl');
         }
 
         $this->config->config->output->display('index.login.lost_pass.tpl');
+    }
+
+    protected function passwordRecovery (string $code = null) // TODO: move getPassRec code retrieval to here and add check if password changing
+    {
+
     }
 }
