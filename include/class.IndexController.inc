@@ -104,23 +104,8 @@ class IndexController
     private function getPassRec ()
     {
         if (isset($_GET['code'])) {
-            $c = trim($_GET['code']);
-
-            if ($c) {
-                $d = $this->config->config->getDb();
-                $u = $d->prepare("SELECT id, passreset_until as until, username, email FROM `{$this->config->config->dbPrefix}_webadmins` WHERE passreset_code=?");
-                $u->execute([$c]);
-
-                if ($u->rowCount() == 1) {
-                    $u = $u->fetchObject();
-                    $t = new DateTime();
-
-                    if ($t < new DateTime($u->until))
-                        return $this->config->config->output->display('index.login.pass_change.tpl');
-                    /* $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_until=null, passreset_code=null, try=0 WHERE id=?");
-                         $q->execute([$u->id]);*/
-                }
-            }
+            if ($this->passwordRecovery(trim($_GET['code'])))
+                return;
             $this->config->config->output->assign('messages', [['type' => 'warning', 'text' => __LANG__['login']['passreset_nocode']]]);
             return $this->config->config->output->display('index.login.pass_rec.tpl');
         }
@@ -128,8 +113,39 @@ class IndexController
         $this->config->config->output->display('index.login.lost_pass.tpl');
     }
 
-    protected function passwordRecovery (string $code = null) // TODO: move getPassRec code retrieval to here and add check if password changing
+    protected function passwordRecovery (string $code = null, $pw = NULL)
     {
+        if ($code) {
+            $d = $this->config->config->getDb();
+            $u = $d->prepare("SELECT id, passreset_until as until, username, email FROM `{$this->config->config->dbPrefix}_webadmins` WHERE passreset_code=?");
+            $u->execute([$code]);
 
+            if ($u->rowCount() == 1) {
+                $u = $u->fetchObject();
+                $t = new DateTime();
+
+                if ($t < new DateTime($u->until)) {
+                    if ($pw) {
+                        $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_until=null, passreset_code=null, try=0, password=? WHERE id=?");
+                        $q->execute([password_hash($pw, PASSWORD_DEFAULT), $u->id]);
+                    }
+                    $this->config->config->output->display('index.login.pass_change.tpl');
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
+    }
+
+    private function putLogin () {
+        if ($this->config->validateFormAuth() && isset($_GET['code'])) {
+            $err = new FormErrors($_POST, __LANG__['validation_errors']);
+            $err->validate([
+                __LANG__['index']['login']['pass'] => 'required',
+                __LANG__['index']['login']['pass'] . '_2' => 'required|same:' . __LANG__['index']['login']['pass'],
+            ]);
+            if ($this->passwordRecovery(trim($_GET['code']), $_POST['pw']))
+                return;
+        }
     }
 }

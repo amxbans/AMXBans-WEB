@@ -29,6 +29,8 @@ return [
             'lost_pass' => 'Forgot password?',
             'pass_rec'  => 'Password recovery',
             'rec_code'  => 'Code from email',
+            'new_pass' => 'New Password',
+            'new_pass_2' => 'Repeat password',
 
             'passcode_exist' => 'Account with this email already requested password change. Please check email for further instructions',
             'passcode_sent' => 'Password change instructions sent to :email. Please refer to it.',
@@ -87,7 +89,14 @@ return [
     'next' => 'Next',
     'back' => 'Back',
     'send' => 'Send',
-    'date_format' => 'Y-m-d H:i:s'
+    'save' => 'Save',
+    'date_format' => 'Y-m-d H:i:s',
+
+    'validation_errors' => [
+        'required' => 'The :attribute field is required',
+        'same' => 'The :attribute field needs to be the same as :0',
+        'min' => 'The :attribute field needs to be at least :0',
+    ]
 ];
 
 //default
