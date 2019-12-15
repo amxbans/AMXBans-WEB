@@ -13,7 +13,8 @@
     You should have received a copy of the cc-nC-SA along with AMXBans.  
     If not, see <http://creativecommons.org/licenses/by-nc-sa/2.0/>.
 */
- 
+
+/** @var mysqli $mysql */
 session_start();
 require_once("include/config.inc.php");
 require_once("include/access.inc.php");

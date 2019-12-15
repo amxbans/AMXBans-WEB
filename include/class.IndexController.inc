@@ -106,8 +106,8 @@ class IndexController
         if (isset($_GET['code'])) {
             if ($this->passwordRecovery(trim($_GET['code'])))
                 return;
-            $this->config->config->output->assign('messages', [['type' => 'warning', 'text' => __LANG__['login']['passreset_nocode']]]);
-            return $this->config->config->output->display('index.login.pass_rec.tpl');
+            return $this->config->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['index']['login']['passreset_nocode']])
+                                                ->display('index.login.pass_rec.tpl');
         }
 
         $this->config->config->output->display('index.login.lost_pass.tpl');
@@ -129,6 +129,7 @@ class IndexController
                         $q = $d->prepare("UPDATE `{$this->config->config->dbPrefix}_webadmins` SET passreset_until=null, passreset_code=null, try=0, password=? WHERE id=?");
                         $q->execute([password_hash($pw, PASSWORD_DEFAULT), $u->id]);
                     }
+                    $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['index']['login']['pass']])->display();
                     $this->config->config->output->display('index.login.pass_change.tpl');
                     return TRUE;
                 }
@@ -147,5 +148,28 @@ class IndexController
             if ($this->passwordRecovery(trim($_GET['code']), $_POST['pw']))
                 return;
         }
+    }
+
+    private function getBans () {
+        $page = (int)(Route::getFakePathWay(1) ?? 0);
+        $page = $page < 1? 0 : $page - 1;
+        $offset = $page * $this->config->config->per_page;
+        $offset = $offset? $offset - 1 : 0;
+
+        $bans = $this->config->config->getDb()->prepare("SELECT  FROM `{$this->config->config->dbPrefix}_bans` b 
+                LEFT JOIN `{$this->config->config->dbPrefix}_serverinfo` s ON s.address = b.server_ip
+                LEFT JOIN `{$this->config->config->dbPrefix}_amxadmins` a ON (a.steamid = b.admin_nick OR a.steamid = b.admin_ip OR a.steamid = b.admin_id)
+                ORDER BY b.ban_created LIMIT ?,?");
+        $bans->execute([$offset, $this->config->config->per_page]);
+        //TODO: I was here
+
+
+        $this->config->config->output->assign([
+            'page' => $page+1,
+            'page_prev' => !($page < 1),
+            'page_next' => $bans->rowCount() == $this->config->config->per_page,
+            'bans' => $bans->fetchAll(PDO::FETCH_ASSOC),
+        ]);
+        $this->config->config->output->display($this->config->getTplFile());
     }
 }
