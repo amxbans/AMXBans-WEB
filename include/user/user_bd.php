@@ -33,18 +33,7 @@ $site=(int)$_POST["site"];
 if(!$site) $site=1;
 
 //generate captcha
-function new_captcha() {
-	$rand = mt_rand(1000000,9999999); 
-	$rand = base64_encode($rand); 
-	$rand = substr($rand, 0, 7).""; 
-	$rand = str_replace("J", "Z", $rand); 
-	$rand = str_replace("I", "Y", $rand); 
-	$rand = str_replace("j", "z", $rand); 
-	$rand = str_replace("i", "y", $rand); 
-	$rand = str_replace("0", "B", $rand);
-	$rand = str_replace("O", "C", $rand);
-	$_SESSION["captcha_code"] = "$rand"; 
-}
+
 //create new captcha if needed
 if(!(isset($_POST["add_comment"]) || isset($_POST["add_demo"]))){
 	new_captcha();

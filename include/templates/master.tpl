@@ -41,12 +41,12 @@
             <div class="navbar-nav dropdown">
                 <a class="nav-item nav-link dropdown-toggle" href="#" id="langDD" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">{$smarty.session.lang|ucfirst}</a>
-                <form class="dropdown-menu" aria-labelledby="langDD" method="post">
+                <div class="dropdown-menu" aria-labelledby="langDD">
                     {foreach $availLangs as $l}
-                        <button name="lang" value="{$l|escape}"
-                                class="dropdown-item{if $smarty.session.lang == $l} active{/if}">{$l|escape|ucfirst}</button>
+                        <a href="?lang={$l|escape}"
+                                class="dropdown-item{if $smarty.session.lang == $l} active{/if}">{$l|escape|ucfirst}</a>
                     {/foreach}
-                </form>
+                </div>
             </div>
         </div>
     </nav>

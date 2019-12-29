@@ -24,7 +24,7 @@
  * @property-read int    $uploaded_file_size
  * @property-read array  $uploaded_file_types
  * @property-read string $allow_unregistered_comments
- * @property-read int    $delete_expired_bans
+ * @property-read int    $prune_bans
  * @property-read int    $max_login_tries
  */
 class Config
@@ -53,7 +53,7 @@ class Config
         'uploaded_file_size'          => 2000000,
         'uploaded_file_types'         => [ 'dem', 'zip', 'rar', 'jpg', 'png', 'gif' ],
         'allow_unregistered_comments' => FALSE,
-        'delete_expired_bans'         => 5,
+        'prune_bans'                  => 5,
         'max_login_tries'             => 5,
     ];
 
@@ -85,6 +85,12 @@ class Config
         // All the initial things
         spl_autoload_register(function ($cls) {
             if (file_exists(__DIR__ . '/class.' . $cls . '.inc')) require_once __DIR__ . '/class.' . $cls . '.inc';
+            else {
+                $cls = explode("\\", $cls);
+                $c = array_pop($cls);
+                $ns = implode('.', $cls);
+                if (file_exists(__DIR__ . "/$ns.$c.module")) require_once __DIR__ . "/$ns.$c.module";
+            }
             return;
         });
 
@@ -112,7 +118,9 @@ class Config
 
         //save current language to session
         if (!isset($_SESSION["lang"])) $_SESSION["lang"] = ($install ? 'english' : $this->default_lang);
-        if (isset($_POST['lang'])) $_SESSION['lang'] = $_POST['lang'];
+        if (isset($_GET['lang'])) $_SESSION['lang'] = $_GET['lang'];
+
+        //TODO: Prune bans if config value asks it...
 
         //Setup language strings
         $lang = Route::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION['lang'] . '.php';

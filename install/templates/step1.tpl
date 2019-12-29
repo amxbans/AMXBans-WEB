@@ -1,4 +1,4 @@
-<form method="post" class="form-inline">
+<form method="get" class="form-inline">
 	<select name="lang" onchange="this.form.submit()" class="form-control">
 		{foreach from=$languages item="lng"}
 			<option value="{$lng|escape}" {if $smarty.session.lang == $lng}selected{/if}>{$lng|ucfirst}</option>

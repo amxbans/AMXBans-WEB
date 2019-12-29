@@ -37,6 +37,18 @@ return [
             'passreset_nocode' => 'Sorry but we couldn\'t find any user for this code. Please try copying and pasting the code from email in below.',
             'pass_changed' => 'Password changed successfully! You can now go to login panel and try again.',
         ],
+        
+        'bans' => [
+            'permanent' => 'permanent',
+            'date' => 'date',
+            'player' => 'player',
+            'admin' => 'admin',
+            'reason' => 'reason',
+            'length' => 'length',
+            'comments' => 'comments',
+            'files' => 'files',
+            'kicks' => 'kicks',
+        ],
     ],
 
     'admin' => [
