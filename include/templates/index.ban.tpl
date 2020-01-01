@@ -1,569 +1,365 @@
-<div class="main">
+{extends 'master.tpl'}
+{block name="head-title" prepend}{$lang.index.titles.ban} | {/block}
+
+{block name="BODY"}
+    {if isset($errors)}{include "messages.tpl"}{/if}
+
+    <div class="card mb-4" id="ban-details">
+        <div class="card-header">
+            {$lang.index.ban.details}
+            <a href="#" class="float-right" data-toggle="modal" data-target="#shareModal">#{$ban.bid}</a>
+        </div>
+        <div class="card-body">
+            {if User::$logged}
+                <div class="text-right">
+                    {if $can_user.edit_bans || ($can_user.edit_own_bans && $ban.username == User::get('username'))}
+                        <a href="{['ban', $ban.bid, 'edit']|url}" class="btn btn-outline-primary">{$lang.admin.edit|ucfirst}</a>
+                    {/if}
+                    {if $can_user.unban || ($can_user.unban_own && $ban.username == User::get('username'))}
+                        <a href="{['ban', $ban.bid, 'unban']|url}" class="btn btn-outline-warning do-confirm">{$lang.admin.unban|ucfirst}</a>
+                    {/if}
+                    {if $can_user.delete_bans || ($can_user.delete_own_bans && $ban.username == User::get('username'))}
+                        <a href="{['ban', $ban.bid, 'delete']|url}" class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</a>
+                    {/if}
+                </div>
+            {/if}
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.nickname|ucfirst}</div>
+                <div class="col">{$ban.player_nick|escape}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.ban.steamid|ucfirst}</div>
+                <div class="col">{$ban.player_id}</div>
+            </div>
+            {if $ban.com_id}
+                <div class="row">
+                    <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.ban.steamcomid|ucfirst}</div>
+                    <div class="col"><a href="http://steamcommunity.com/profiles/{$ban.com_id}">{$ban.com_id}</a></div>
+                </div>
+            {/if}
+            {if $can_user.view_ips && $ban.player_ip}
+                <div class="row">
+                    <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.ip}</div>
+                    <div class="col">{$ban.player_ip}</div>
+                </div>
+            {/if}
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.ban.type}</div>
+                <div class="col">{$lang.index.ban.types[$ban.ban_type]}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.bans.reason|ucfirst}</div>
+                <div class="col">{$ban.ban_reason}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.ban.invoked|ucfirst}</div>
+                <div class="col">{$lang.date_format|date:$ban.ban_created}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.bans.length|ucfirst}</div>
+                <div class="col"><span class="timeleft">{$ban.ban_length * 60}</span> {if $ban.expired}<i>[{$lang.index.ban.expired}]</i>{/if}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.bans.admin|ucfirst}</div>
+                <div class="col">{$ban.admin_nick} {if $can_user.view_admins}({$ban.nickname}{if $can_user.view_ips}, {$ban.admin_id}{/if}){/if}</div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.server|ucfirst}</div>
+                <div class="col">{if $ban.server_name == 'website'}{$lang.website|ucfirst}{else}{$ban.server_name}{/if}</div>
+            </div>
+        </div>
+        {*{include file="layer_banedit.tpl"}*}
+    </div>
 
-	<div class="post">
+    <div class="card">
+        <div class="card-header">{$lang.index.ban.comments_files}</div>
+        <div class="card-body">
+            {if  $vars.use_demo == 1}
+                <div class="post">
 
-		<table frame="box" rules="groups" summary=""> 
+                    <table frame="box" rules="groups" summary="">
 
-			<thead> 
+                        <thead>
 
-				<tr>
+                        <tr>
 
-					<th style="width:150px;">{"_BANDETAILS"|lang}</th> 
+                            <th colspan="8">{"_BL_FILES"|lang}</th>
 
-					<th class="_right">
-						{if $ban_detail.bid != "62175"}
-						<form method="POST" style="display:inline;">
+                        </tr>
 
-						{if $smarty.session.bans_edit=="yes" || ($smarty.session.bans_edit=="own" && $smarty.session.uname == $ban_detail.username)}
+                        <tr>
 
-							<img src="templates/{$design}_gfx/page_edit.png" border="0" onclick="NewToggleLayer('banedit_{$ban_detail.bid}')" title="{"_TIP_EDIT"|lang}" style="cursor:pointer;border:0;" />
+                            <th style="width:130px;">{"_DATE"|lang}</th>
 
-						{/if}
+                            <th style="width:100px;">{"_FILE"|lang}</th>
 
-						{if $smarty.session.bans_delete=="yes" || ($smarty.session.bans_delete=="own" && $smarty.session.uname == $ban_detail.username)}
+                            <th style="width:50px;">{"_SIZE"|lang}</th>
 
-							<input name="del_ban" type="image" src="templates/{$design}_gfx/page_delete.png" onclick="return confirm('{"_DELBAN"|lang}{"_DATALOSS"|lang}');" border="0" title="{"_TIP_DEL"|lang}" />
+                            <th>{"_COMMENT"|lang}</th>
 
-							<input type="hidden" name="site" value="{$site}" />
+                            <th style="width:100px;">{"_BY"|lang}</th>
 
-							<input type="hidden" name="bid" value="{$ban_detail.bid}" />
+                            <th style="width:150px;">{"_IP"|lang}</th>
 
-							<input type="hidden" name="details_x" value="1" />
+                            <th style="width:20px;">{"_DOWNLOADS"|lang}</th>
 
-						{/if}
+                            <th style="width:80px;">&nbsp;</th>
 
-						</form>
-						{/if}
-					</th> 
+                        </tr>
 
-				</tr>
+                        </thead>
 
-			</thead> 
+                        <tbody>
 
-			<tbody> 
+                        {foreach from=$demos item=dmeo}
+                            <form method="post">
 
-				<tr>
+                                <input type="hidden" name="bid" value="{$ban_detail.bid}" />
 
-					<td class="fat">{"_NICKNAME"|lang}</td><td>{$ban_detail.player_nick}</td>
+                                <input type="hidden" name="site" value="{$site}" />
 
-				</tr>
+                                <input type="hidden" name="did" value="{$dmeo.id}" />
 
-				<tr>
+                                <input type="hidden" name="details_x" value="1" />
 
-					<td class="fat">{"_STEAMID"|lang}</td><td>{$ban_detail.player_id}</td>
+                                <tr>
 
-				</tr>
+                                    <td>{$dmeo.upload_time|date_format:"%d. %b %Y - %T"}</td>
 
-				<tr>
+                                    <td>{$dmeo.demo_real}</td>
 
-					<td class="fat">{"_STEAMCOMID"|lang}</td>
+                                    <td>{$dmeo.file_size} (MODIFIER: FILE_SIZE)</td>
 
-					<td>
+                                    <td>{if $dmeo.comment}{$dmeo.comment|nl2br}{else}{"_NOCOMMENT"|lang}{/if}</td>
 
-					{if $ban_detail.player_id <> ""}
+                                    <td>{$dmeo.name}</td>
 
-						<a target="_blank" href="http://steamcommunity.com/profiles/{$ban_detail.player_comid}">{$ban_detail.player_comid}</a>
+                                    <td>{if $smarty.session.ip_view=="yes"}{$dmeo.addr}{/if}</td>
 
-					{else}
+                                    <td class="_center">{$dmeo.down_count}</td>
 
-						{"_NOTAVAILABLE"|lang}
+                                    <td class="_right">
 
-					{/if}
+                                        <form method="POST" style="display:inline;">
 
-				</tr>
+                                            <a href="mailto:{$dmeo.email}"><img src="images/email_go.png" border="0"
+                                                                                title="{"_TIP_SENDMAIL"|lang}" /></a>
 
-				<tr>
+                                            <input name="down_demo" type="image" src="images/disk.png" border="0"
+                                                   title="{"_TIP_DOWNLOAD"|lang}" />
 
-					<td class="fat">{"_IP"|lang}</td>
+                                            {if $smarty.session.bans_edit=="yes" || ($smarty.session.bans_edit=="own" && $smarty.session.uname == $dmeo.name)}
+                                                <img src="images/page_edit.png" border="0"
+                                                     onClick="NewToggleLayer('demedit_{$dmeo.id}');" title="{"_TIP_EDIT"|lang}"
+                                                     style="cursor:pointer;" />
+                                            {/if}
 
-					<td>
+                                            {if $smarty.session.bans_delete=="yes" || ($smarty.session.bans_delete=="own" && $smarty.session.uname == $dmeo.name)}
+                                                <input name="del_demo" type="image"
+                                                       src="templates/{$design}_gfx/page_delete.png" border="0"
+                                                       onclick="return confirm('{"_DELDEMO"|lang}{"_DATALOSS"|lang}');"
+                                                       title="{"_TIP_DEL"|lang}" />
+                                            {/if}
 
-					{if $smarty.session.ip_view=="yes"}
+                                            <input type="hidden" name="site" value="{$site}" />
 
-						{if $ban_detail.player_ip}
+                                            <input type="hidden" name="bid" value="{$ban_detail.bid}" />
 
-							{$ban_detail.player_ip}
+                                            <input type="hidden" name="details_x" value="1" />
 
-						{else}
+                                        </form>
 
-							<i>{"_NOTAVAILABLE"|lang}</i>
+                                    </td>
 
-						{/if}
+                                </tr>
 
-					{else}
+                                <tr id="demedit_{$dmeo.id}" style="display: none">
 
-						<span style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>
+                                    {*	{include file="layer_demedit.tpl"}*}
 
-					{/if}
+                                </tr>
 
-					</td> 
+                            </form>
+                            {foreachelse}
+                            <td class="_center" colspan="8">{"_NOFILES"|lang}</td>
+                        {/foreach}
 
-				</tr>
+                        </tbody>
 
-				<tr>
+                    </table>
 
-					<td class="fat">{"_BANTYPE"|lang}</td>
+                    <div class="clearer">&nbsp;</div>
 
-					<td>
+                </div>
+                {if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
+                    <div class="post _center">
 
-						{if $ban_detail.ban_type=="S"}
+                        <form method="post" action="">
 
-							{"_STEAMID"|lang}
+                            <input type="button" class="button" name="newfile" value="{"_NEWFILE"|lang}"
+                                   onclick="$('#add_file').slideToggle('slow');" /><br /><br />
 
-						{elseif $ban_detail.ban_type=="SI"}
+                        </form>
 
-							{"_STEAMID&IP"|lang}
+                    </div>
+                    <div id="add_file" class="post" style="display:none;">
 
-						{else}
+                        {*{include file="layer_demadd.tpl"}*}
 
-							{"_NOTAVAILABLE"|lang}
+                    </div>
+                {/if}
 
-						{/if}
+            {/if}
+            {if  $vars.use_comment == 1}
+                <div class="post">
 
-					</td>
+                    <table frame="box" rules="groups">
 
-				</tr>
+                        <thead>
 
-				<tr>
+                        <tr>
 
-					<td class="fat">{"_REASON"|lang}</td><td>{$ban_detail.ban_reason}</td>
+                            <th colspan="5">{"_BL_COMMENTS"|lang}</th>
 
-				</tr>
+                        </tr>
 
-				<tr>
+                        <tr>
 
-					<td class="fat">{"_INVOKED"|lang}</td><td>{$ban_detail.ban_created|date_format:"%d. %b %Y - %T"}</td>
+                            <th style="width:130px;">{"_DATE"|lang}</th>
 
-				</tr>
+                            <th>{"_COMMENT"|lang}</th>
 
-				<tr>
+                            <th style="width:100px;">{"_BY"|lang}</th>
 
-					<td class="fat">{"_BANLENGHT"|lang}</td>
+                            <th style="width:150px;">{"_IP"|lang}</th>
 
-					<td>
+                            <th style="width:80px;">&nbsp;</th>
 
-						{if $ban_detail.ban_length==0}
+                        </tr>
 
-							{"_PERMANENT"|lang}
+                        </thead>
 
-						{elseif $ban_detail.ban_length==-1}
+                    </table>
 
-							{"_UNBANNED"|lang}
+                    {foreach from=$comments item=comment}
+                        <form method="POST">
 
-						{else}
+                            <input type="hidden" name="bid" value="{$ban_detail.bid}" />
 
-							{$ban_detail.ban_length*60} ({$ban_detail.ban_length} {"_MINS"|lang})
+                            <input type="hidden" name="site" value="{$site}" />
 
-						{/if}
+                            <input type="hidden" name="cid" value="{$comment.id}" />
 
-					</td>
+                            <input type="hidden" name="details_x" value="1" />
 
-				</tr>
+                            <table frame="box" rules="groups" summary="">
 
-				<tr>
+                                <tbody>
 
-					<td class="fat">{"_EXPIRES"|lang}</td>
+                                <!-- Comment List -->
 
-					<td>
+                                <tr>
 
-						{if $ban_detail.ban_length <= 0}
+                                    <td style="width:130px;">{$comment.date|date_format:"%d. %b %Y - %T"}</td>
 
-							<i>{"_NOTAPPLICABLE"|lang}</i>
+                                    <td>{$comment.comment}</td>
 
-						{else}
+                                    <td style="width:100px;">{$comment.name}</td>
 
-							{$ban_detail.ban_end|date_format:"%d. %b %Y - %T"}
+                                    <td style="width:150px;">{if $smarty.session.ip_view=="yes"}{$comment.addr}{else}<span
+                                                style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>{/if}</td>
 
-							{if $ban_detail.ban_end < $smarty.now}
+                                    <td class="_right" style="width:80px;">
 
-								({"_ALREADYEXP"|lang})
+                                        {if $smarty.session.bans_edit=="yes"}
+                                            <img src="images/page_edit.png" title="{"_EDIT"|lang}" border="0"
+                                                 style="cursor:pointer;" onClick="NewToggleLayer('comedit_{$comment.id}');" />
+                                            <input name="del_comment" type="image" src="templates/{$design}_gfx/page_delete.png"
+                                                   border="0"
+                                                   onclick="return confirm('{"_DELCOMMENT"|lang}{"_DATALOSS"|lang}');"
+                                                   title="{"_DELETE"|lang}" />
+                                        {/if}
 
-							{else}
+                                    </td>
 
-								<i>({$ban_detail.ban_end-$smarty.now} {"_REMAINING"|lang})</i>
+                                    <!-- Comment List -->
 
-							{/if}
+                        </form>
+                        {foreachelse}
+                        <div class="_center">{"_NOCOMMENTS"|lang}</div>
+                        </tr>
 
-						{/if}
+                    {/foreach}
 
-					</td>
+                    </tbody>
 
-				</tr>
+                    </table>
 
-				<tr>
+                    <div class="clearer">&nbsp;</div>
 
-					<td class="fat">{"_BANBY"|lang}</td><td>{$ban_detail.admin_nick}{if $ban_detail.nickname} <i>({$ban_detail.nickname})</i>{/if}</td>
+                </div>
+                {if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
+                    <div class="post _center">
 
-				</tr>
+                        <form method="post" action="">
 
-				<tr>
+                            <input type="button" class="button" name="newcomment" value="{"_NEWCOMMENT"|lang}"
+                                   onclick="$('#add_comment').slideToggle('slow');" /><br /><br />
 
-					<td class="fat">{"_ADMINID"|lang}</td>
+                        </form>
 
-					<td>
+                    </div>
+                    <div id="add_comment" class="post" style="display:none;">
 
-					{if $smarty.session.ip_view=="yes"}
+                        <tr id="comadd_{$ban_detail.bid}" {if $comment_layer!="1"}style="display: none"{/if}>
 
-						{if $ban_detail.admin_id}
+                            {*{include file="layer_comadd.tpl"}*}
 
-							{$ban_detail.admin_id}
+                        </tr>
 
-						{else}
+                    </div>
+                    <tr id="comedit_{$comments.id}" style="display: none">
 
-							<i>{"_NOTAVAILABLE"|lang}</i>
+                        {*{include file="layer_comedit.tpl"}*}
 
-						{/if}
+                    </tr>
+                {/if}
 
-					{else}
+            {/if}
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareLabel">{$lang.index.ban.share}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <pre>{$ban|var_dump}</pre>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">URL:</div>
+                        <div class="col"><input class="form-control" readonly value="{['ban', $ban.bid]|full_url}"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">HTML:</div>
+                        <div class="col"><input class="form-control" readonly value="<a href=&quot;{['ban', $ban.bid]|full_url}&quot;>{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})</a>"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">BBCode:</div>
+                        <div class="col"><input class="form-control" readonly value="[url=&quot;{['ban', $ban.bid]|full_url}&quot;]{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})[/url]"></div>
+                    </div>
+                </div>
+        </div>
+    </div>
 
-						<span style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>
-
-					{/if}
-
-					</td> 
-
-				</tr>
-
-				<tr>
-
-					<td class="fat">{"_BANON"|lang}</td><td>{if $ban_detail.server_name == "website"}{"_WEB"|lang}{else}{$ban_detail.server_name}{/if}</td>
-
-				</tr>
-
-				<tr>
-
-					<td class="fat">{"_TRACKBACK"|lang}</td><td><a href="http://{$smarty.server.HTTP_HOST}{$smarty.server.PHP_SELF}?bid={$ban_detail.bid}">http://{$smarty.server.HTTP_HOST}{$smarty.server.PHP_SELF}?bid={$ban_detail.bid}</a></td>
-
-				</tr>
-
-				<tr id="banedit_{$ban_detail.bid}" style="display:none;">
-
-					{*{include file="layer_banedit.tpl"}*}
-
-				</tr>
-
-				{if $banedit_error!=""}<br /><div class="_center"><span class="error">{"_ERROR"|lang}: {foreach from=$banedit_error item=error}{$error|lang}{/foreach}</span></div><br />{/if}
-
-			</tbody> 
-
-		</table> 
-
-		<div class="clearer">&nbsp;</div>
-
-	</div>
-
-
-
-	{if $activ_count>0 || $exp_count>0}
-
-	<div class="post">
-
-		<div class="clearer">&nbsp;</div>
-
-		<table width="90%" cellspacing="0">
-
-			<tr class="htable" style="cursor:pointer;" onClick="NewToggleLayer('layer_banhistory');" class="list">
-
-				<td class="table_details_head" colspan="3"><b>{"_BANHISTORY"|lang} ({$activ_count+$exp_count})</b></td>
-
-			</tr>
-
-			<tr id="layer_banhistory" style="display: none">
-
-				{*{include file="layer_banhistory.tpl"}*}
-
-			</tr>
-
-		</table>
-
-	</div>
-
-	{/if}
-
-	
-
-{if  $vars.use_demo == 1}
-
-		{if $upload_error!=""}<div class="_center"><span class="error">{"_ERROR"|lang}: {foreach from=$upload_error item=error}{$error|lang}{/foreach}</span></div><br />{/if}
-
-		{if $msg_demo}<div class="_center"><span class="success">{$msg_demo|lang}</span></div><br />{/if}
-
-	<div class="spacer">&nbsp;</div>
-
-	<div class="post">
-
-		<table frame="box" rules="groups" summary=""> 
-
-			<thead> 
-
-				<tr>
-
-					<th colspan="8">{"_BL_FILES"|lang}</th> 
-
-				</tr>
-
-				<tr>
-
-					<th style="width:130px;">{"_DATE"|lang}</th> 
-
-					<th style="width:100px;">{"_FILE"|lang}</th> 
-
-					<th style="width:50px;">{"_SIZE"|lang}</th> 
-
-					<th>{"_COMMENT"|lang}</th> 
-
-					<th style="width:100px;">{"_BY"|lang}</th> 
-
-					<th style="width:150px;">{"_IP"|lang}</th> 
-
-					<th style="width:20px;">{"_DOWNLOADS"|lang}</th> 
-
-					<th style="width:80px;">&nbsp;</th> 
-
-				</tr>
-
-			</thead> 
-
-			<tbody> 
-
-				{foreach from=$demos item=dmeo}
-
-					<form method="post">
-
-						<input type="hidden" name="bid" value="{$ban_detail.bid}" />
-
-						<input type="hidden" name="site" value="{$site}" />
-
-						<input type="hidden" name="did" value="{$dmeo.id}" />
-
-						<input type="hidden" name="details_x" value="1" />
-
-						<tr>
-
-							<td>{$dmeo.upload_time|date_format:"%d. %b %Y - %T"}</td>
-
-							<td>{$dmeo.demo_real}</td>
-
-							<td>{$dmeo.file_size} (MODIFIER: FILE_SIZE)</td>
-
-							<td>{if $dmeo.comment}{$dmeo.comment|nl2br}{else}{"_NOCOMMENT"|lang}{/if}</td>
-
-							<td>{$dmeo.name}</td>
-
-							<td>{if $smarty.session.ip_view=="yes"}{$dmeo.addr}{/if}</td>
-
-							<td class="_center">{$dmeo.down_count}</td>
-
-							<td class="_right">
-
-									<form method="POST" style="display:inline;">
-
-										<a href="mailto:{$dmeo.email}"><img src="images/email_go.png" border="0" title="{"_TIP_SENDMAIL"|lang}" /></a>
-
-										<input name="down_demo" type="image" src="images/disk.png" border="0" title="{"_TIP_DOWNLOAD"|lang}" />
-
-										{if $smarty.session.bans_edit=="yes" || ($smarty.session.bans_edit=="own" && $smarty.session.uname == $dmeo.name)}
-
-											<img src="images/page_edit.png" border="0" onClick="NewToggleLayer('demedit_{$dmeo.id}');" title="{"_TIP_EDIT"|lang}" style="cursor:pointer;"/>
-
-										{/if}
-
-										{if $smarty.session.bans_delete=="yes" || ($smarty.session.bans_delete=="own" && $smarty.session.uname == $dmeo.name)}
-
-											<input name="del_demo" type="image" src="templates/{$design}_gfx/page_delete.png" border="0" onclick="return confirm('{"_DELDEMO"|lang}{"_DATALOSS"|lang}');" title="{"_TIP_DEL"|lang}" />
-
-										{/if}
-
-										<input type="hidden" name="site" value="{$site}" />
-
-										<input type="hidden" name="bid" value="{$ban_detail.bid}" />
-
-										<input type="hidden" name="details_x" value="1" />
-
-									</form>
-
-							</td> 
-
-						</tr>
-
-						<tr id="demedit_{$dmeo.id}" style="display: none">
-
-						{*	{include file="layer_demedit.tpl"}*}
-
-						</tr>
-
-					</form>
-
-				{foreachelse}
-
-					<td class="_center" colspan="8">{"_NOFILES"|lang}</td> 
-
-				{/foreach}
-
-			</tbody> 
-
-		</table> 
-
-		<div class="clearer">&nbsp;</div>
-
-	</div>
-
-	{if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
-
-		<div class="post _center">
-
-			<form method="post" action="">
-
-				<input type="button" class="button" name="newfile" value="{"_NEWFILE"|lang}" onclick="$('#add_file').slideToggle('slow');"/><br/><br/>
-
-			</form>
-
-		</div>
-
-
-
-		<div id="add_file" class="post" style="display:none;">
-
-			{*{include file="layer_demadd.tpl"}*}
-
-		</div>
-
-	{/if}
-
-{/if}
-
-
-
-	{if  $vars.use_comment == 1}
-
-		{if $comment_error!=""}<div class="_center"><span class="error">{"_ERROR"|lang}: {foreach from=$comment_error item=error}{$error|lang}{/foreach}</span></div><br />{/if}
-
-		{if $msg_comment}<div class="_center"><span class="success">{$msg_comment|lang}</span></div><br />{/if}
-
-		<div class="spacer">&nbsp;</div>
-
-	<div class="post">
-
-		<table frame="box" rules="groups">
-
-			<thead>
-
-				<tr>
-
-					<th colspan="5">{"_BL_COMMENTS"|lang}</th> 
-
-				</tr>
-
-				<tr>
-
-					<th style="width:130px;">{"_DATE"|lang}</th> 
-
-					<th>{"_COMMENT"|lang}</th> 
-
-					<th style="width:100px;">{"_BY"|lang}</th> 
-
-					<th style="width:150px;">{"_IP"|lang}</th> 
-
-					<th style="width:80px;">&nbsp;</th> 
-
-				</tr>
-
-			</thead>
-
-		</table>
-
-		{foreach from=$comments item=comment}
-
-			<form method="POST">
-
-				<input type="hidden" name="bid" value="{$ban_detail.bid}" />
-
-				<input type="hidden" name="site" value="{$site}" />
-
-				<input type="hidden" name="cid" value="{$comment.id}" />
-
-				<input type="hidden" name="details_x" value="1" />
-
-					<table frame="box" rules="groups" summary=""> 
-
-						<tbody> 
-
-							<!-- Comment List -->
-
-							<tr> 
-
-								<td style="width:130px;">{$comment.date|date_format:"%d. %b %Y - %T"}</td>
-
-								<td>{$comment.comment}</td>
-
-								<td style="width:100px;">{$comment.name}</td>
-
-								<td style="width:150px;">{if $smarty.session.ip_view=="yes"}{$comment.addr}{else}<span style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>{/if}</td>
-
-								<td class="_right" style="width:80px;">
-
-									{if $smarty.session.bans_edit=="yes"}
-
-										<img src="images/page_edit.png" title="{"_EDIT"|lang}" border="0" style="cursor:pointer;" onClick="NewToggleLayer('comedit_{$comment.id}');" />
-
-										<input name="del_comment" type="image" src="templates/{$design}_gfx/page_delete.png" border="0" onclick="return confirm('{"_DELCOMMENT"|lang}{"_DATALOSS"|lang}');" title="{"_DELETE"|lang}" />
-
-									{/if}
-
-								</td>
-
-							<!-- Comment List -->
-
-			</form>
-
-		{foreachelse}
-
-								<div class="_center">{"_NOCOMMENTS"|lang}</div> 
-
-							</tr>
-
-		{/foreach}
-
-						</tbody> 
-
-					</table> 
-
-				<div class="clearer">&nbsp;</div>
-
-	</div>
-
-		{if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
-
-			<div class="post _center">
-
-				<form method="post" action="">
-
-					<input type="button" class="button" name="newcomment" value="{"_NEWCOMMENT"|lang}" onclick="$('#add_comment').slideToggle('slow');"/><br/><br/>
-
-				</form>
-
-			</div>
-
-			<div id="add_comment" class="post" style="display:none;">
-
-				<tr id="comadd_{$ban_detail.bid}" {if $comment_layer!="1"}style="display: none"{/if}>
-
-					{*{include file="layer_comadd.tpl"}*}
-
-				</tr>
-
-			</div>
-
-			<tr id="comedit_{$comments.id}" style="display: none">
-
-				{*{include file="layer_comedit.tpl"}*}
-
-			</tr>
-
-		{/if}
-
-{/if}
-
-	<div class="clearer">&nbsp;</div>
-
-</div>
+    <script>
+        timer($('.timeleft').text() + '000', '.timeleft');
+		$('.do-confirm').click(function () {
+			return confirm('{$lang.admin.confirm_message}');
+		});
+    </script>
+{/block}

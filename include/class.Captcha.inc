@@ -3,7 +3,7 @@
 
 class Captcha
 {
-    public static function generateCodeAndImage () {
+    public static function generateCode () {
         $rand = mt_rand(1000000, 9999999);
         $rand = base64_encode($rand);
         $rand = substr($rand, -7);
@@ -13,7 +13,7 @@ class Captcha
     }
 
     public static function isValid (string $code): bool {
-        return $code == self::getSessionCode();
+        return $code && $code == self::getSessionCode();
     }
 
     private static function getSessionCode (): string {

@@ -215,10 +215,21 @@ class IndexController
             return $this->editBan();
         }
         $ban = $this->config->config->getDb()
-                                    ->prepare("SELECT * FROM `{$this->config->config->dbPrefix}_bans` WHERE bid=" . (int)Route::getFakePathWay(1));
+                                    ->prepare("SELECT b.*, s.gametype, s.timezone_fixx, a.nickname,a.username FROM ((`{$this->config->config->dbPrefix}_bans` b
+    LEFT JOIN `{$this->config->config->dbPrefix}_serverinfo` s ON b.server_ip = s.address)
+    LEFT JOIN `{$this->config->config->dbPrefix}_amxadmins` a ON (a.steamid = b.admin_nick OR a.steamid = admin_ip OR a.steamid = b.admin_id))
+    WHERE bid=" . (int)Route::getFakePathWay(1));
         $ban->execute();
         if ($ban->rowCount() != 1)
             die(header('HTTP/1.1 404'));
+
+        $ban = $ban->fetch(PDO::FETCH_ASSOC);
+        $ban['ban_created'] = $ban['ban_created'] + ($ban['timezone_fixx'] * 3600);
+        $ban['expired'] = ($ban['ban_length'] > 0 && ($ban['ban_created'] + ($ban['ban_length'] * 60)) < time());
+        $ban['com_id'] = $ban['player_id']? GetFriendID($ban['player_id']) : FALSE;
+
+        $comments = $this->config->config->getDb()->prepare('');
+
 
         $this->config->config->output->assign('ban', $ban);
         $this->config->config->output->assign('can_user', [
@@ -226,14 +237,16 @@ class IndexController
             'edit_bans'       => User::hasPermission('bans_edit', 2),
             'delete_own_bans' => User::hasPermission('bans_delete') || User::hasPermission('bans_delete', 2),
             'delete_bans'     => User::hasPermission('bans_delete', 2),
-            'unban_self'      => User::hasPermission('bans_unban') || User::hasPermission('bans_unban', 2),
+            'unban_own'      => User::hasPermission('bans_unban') || User::hasPermission('bans_unban', 2),
             'unban'           => User::hasPermission('bans_unban', 2),
             'view_admins'     => User::hasPermission('amxadmins_view'),
             'view_ips'        => User::hasPermission('ip_view'),
             'write_comments'  => $this->config->config->allow_unregistered_comments || User::get(),
             'nocaptca'        => User::$logged,
         ]);
-        Captcha::generateCodeAndImage();
+        $this->config->config->output->assign('comments', $comments);
+
+        Captcha::generateCode();
         $this->config->config->output->display('index.ban.tpl');
     }
 }

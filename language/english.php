@@ -26,28 +26,45 @@ return [
             'remember' => 'Remember my login',
             'blocked'  => 'Blocked login',
 
-            'lost_pass' => 'Forgot password?',
-            'pass_rec'  => 'Password recovery',
-            'rec_code'  => 'Code from email',
-            'new_pass' => 'New Password',
+            'lost_pass'  => 'Forgot password?',
+            'pass_rec'   => 'Password recovery',
+            'rec_code'   => 'Code from email',
+            'new_pass'   => 'New Password',
             'new_pass_2' => 'Repeat password',
 
-            'passcode_exist' => 'Account with this email already requested password change. Please check email for further instructions',
-            'passcode_sent' => 'Password change instructions sent to :email. Please refer to it.',
+            'passcode_exist'   => 'Account with this email already requested password change. Please check email for further instructions',
+            'passcode_sent'    => 'Password change instructions sent to :email. Please refer to it.',
             'passreset_nocode' => 'Sorry but we couldn\'t find any user for this code. Please try copying and pasting the code from email in below.',
-            'pass_changed' => 'Password changed successfully! You can now go to login panel and try again.',
+            'pass_changed'     => 'Password changed successfully! You can now go to login panel and try again.',
         ],
-        
+
         'bans' => [
             'permanent' => 'permanent',
-            'date' => 'date',
-            'player' => 'player',
-            'admin' => 'admin',
-            'reason' => 'reason',
-            'length' => 'length',
-            'comments' => 'comments',
-            'files' => 'files',
-            'kicks' => 'kicks',
+            'date'      => 'date',
+            'player'    => 'player',
+            'admin'     => 'admin',
+            'reason'    => 'reason',
+            'length'    => 'length',
+            'comments'  => 'comments',
+            'files'     => 'files',
+            'kicks'     => 'kicks',
+        ],
+
+        'ban' => [
+            'details'    => 'Ban details',
+            'share'      => 'Share ban details',
+            'steamid'    => 'SteamID',
+            'steamcomid' => 'Steam Community ID',
+            'type'       => 'Ban type',
+            'types'      => [
+                'S'  => 'SteamID',
+                'SI' => 'SteamID & IP',
+                'I'  => 'IP',
+                ''   => 'Not defined',
+            ],
+            'invoked' => 'Invoked on',
+            'expired' => 'expired',
+            'comments_files' => 'Comments & Files',
         ],
     ],
 
@@ -83,33 +100,42 @@ return [
                 'sys_logs'   => 'Action history (logs)',
             ],
         ],
+
+        'edit' => 'edit',
+        'unban' => 'unban',
+        'delete' => 'delete',
+        'confirm_message' => 'Are You sure You want to do this action?',
     ],
 
     'email' => [
         'subject' => 'Password reset',
-        'greet' => 'Hello :username,',
-        'intro' => 'Somebody just tried to reset your accounts password. For security reasons we sent this email to ensure its You.<br />
+        'greet'   => 'Hello :username,',
+        'intro'   => 'Somebody just tried to reset your accounts password. For security reasons we sent this email to ensure its You.<br />
  If you cannot remember your previous password - below there is link to change password to new one.
  Click on it and You will be prompted to provide new password.<br />
  Link and code is valid only for 24h counting from :now.
  If this was not You just sit back and relax, link will become invalid afterwards.',
-        'site' => 'Click below to change the password',
-        'code' => 'If link is not letting You to change password then write the code written below to the site opened in link',
+        'site'    => 'Click below to change the password',
+        'code'    => 'If link is not letting You to change password then write the code written below to the site opened in link',
 
 
     ],
 
-    'next' => 'Next',
-    'back' => 'Back',
-    'send' => 'Send',
-    'save' => 'Save',
+    'next'        => 'Next',
+    'back'        => 'Back',
+    'send'        => 'Send',
+    'save'        => 'Save',
     'date_format' => 'Y-m-d H:i:s',
+    'nickname'    => 'nickname',
+    'ip'          => 'IP',
+    'server'      => 'server',
+    'web'         => 'wesbite',
 
     'validation_errors' => [
         'required' => 'The :attribute field is required',
-        'same' => 'The :attribute field needs to be the same as :0',
-        'min' => 'The :attribute field needs to be at least :0',
-    ]
+        'same'     => 'The :attribute field needs to be the same as :0',
+        'min'      => 'The :attribute field needs to be at least :0',
+    ],
 ];
 
 //default
