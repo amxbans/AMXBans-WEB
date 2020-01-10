@@ -1,4 +1,4 @@
-{if User::get()}
+{if User::$logged}
     <ul class="navbar-nav mr-auto">
         {foreach $lang.admin.menu as $val}
             <li class="nav-item{if $val == $site->getSite()} active{/if} dropdown">
@@ -6,7 +6,7 @@
                    aria-haspopup="true" aria-expanded="false">{$lang.admin.titles.$val}</a>
                 <div class="dropdown-menu" aria-labelledby="admin{$val@index}">
                     {foreach $lang.admin.subtitles.$val as $url}
-                        <a href="{[$val,$url@key]|url:"admin.php"}" class="dropdown-item">{$url}</a>
+                        <a href="{array($val,$url@key)|url:"admin.php"}" class="dropdown-item">{$url}</a>
                     {/foreach}
                 </div>
             </li>

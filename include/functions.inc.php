@@ -21,3 +21,28 @@ function db_log(string $action, string $context, $user = NULL): void
     $q = $config->getDb()->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
     $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
 }
+
+
+function db_size() {
+    global $config;
+    $db_size = 0;
+
+    $q = $config->getDb()->prepare("SHOW TABLE STATUS FROM `{$config->getDb(true)}` LIKE '{$config->dbPrefix}_%'");
+    if (!$q->execute())
+        return FALSE;
+
+    while ($value = $q->fetch(PDO::FETCH_ASSOC))
+        $db_size += $value["Data_length"] + $value['Index_length'];
+    return $db_size;
+}
+
+function format_size($size) {
+    if($size >= 1073741824)
+        return round(($size / 1073741824), 2) . "GiB";
+    if($size >= 1048576)
+        return round(($size / 1048576), 2) . "MiB";
+    if($size >= 1024)
+        return round(($size / 1024), 2) . " KiB";
+
+    return $size ? $size . " B" : FALSE;
+}

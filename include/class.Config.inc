@@ -70,10 +70,10 @@ class Config
     public $dbPrefix = '';
 
     /**
-     * @return PDO
+     * @return PDO|string
      */
-    public function getDb (): PDO {
-        return $this->db;
+    public function getDb ($name = false) {
+        return $name? $this->dbData->name : $this->db;
     }
 
     /**

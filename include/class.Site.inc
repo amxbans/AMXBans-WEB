@@ -20,7 +20,7 @@ class Site
     /** @var array */
     protected $routes = [
         'index' => [ 'bans', 'ban', 'servers', 'admins', 'search', 'login' ],
-        'admin' => [ '', 'logout' ],
+        'admin' => [ 'index', 'server', 'web', 'other', 'logout' ],
     ];
     /** @var string */
     private $tpl = '';
@@ -32,6 +32,7 @@ class Site
     /**
      * @param Config $config
      *
+     * @return Site
      * @uses IndexController, Route
      */
     public static function build (Config $config) {
@@ -54,6 +55,7 @@ class Site
         $controller = ucfirst($s->getGroup()) . 'Controller';
         $cMethod = $s->getSite();
         new $controller($s, $method, $cMethod);
+        return $s;
     }
 
     public function parseComment (string $text): string {
@@ -132,6 +134,6 @@ class Site
         if (strtolower($_SERVER['REQUEST_METHOD']) == 'get')
             return 'get';
         else
-            return $_POST['_method_'] ?? 'post';
+            return strtolower($_POST['_method_'] ?? 'post');
     }
 }

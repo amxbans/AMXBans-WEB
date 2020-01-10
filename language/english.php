@@ -105,6 +105,11 @@ return [
         'unban' => 'unban',
         'delete' => 'delete',
         'confirm_message' => 'Are You sure You want to do this action?',
+
+
+        'sys_info' => [
+            'tables_not_optimised' => 'Tables were not optimised'
+        ]
     ],
 
     'email' => [
