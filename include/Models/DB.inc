@@ -10,15 +10,24 @@ class DB
 {
     protected $table = '';
     protected $primary = 'id';
+    public $relations = [];
 
     protected $wheres = [];
     protected $limits;
+    protected $with = [];
 
     /**
      * @return static
      */
     public static function query () {
         return new static();
+    }
+
+    public static function with ($relations) {
+        /** @var static $this */
+        $m = $this ?? new static();
+        $m->relations = is_array($relations) ? $relations : func_get_args();
+        return $m;
     }
 
 
@@ -34,20 +43,41 @@ class DB
     /**
      * @param string|array $columns
      * @param int|null     $type
+     * @param mixed        $type_argument
      * @return array
      */
-    public function get ($columns = '*', $type = NULL): array {
+    public function get ($columns = '*', $type = NULL, $type_argument = NULL): array {
         if (is_null($type))
             $type = PDO::FETCH_CLASS;
         if ($columns != '*' OR is_array($columns))
             $columns = '`' . implode('`, `', is_array($columns) ? $columns : [ $columns ]) . '`';
 
         $sql = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
-        var_dump($sql);
         $sql = $this->db($sql);
         $sql->execute(empty($this->wheres) ? NULL : $this->wheres);
 
-        return $sql->fetchAll($type, static::class);
+        $out = $sql->fetchAll($type, !isset($type_argument) ? static::class : $type_argument);
+        if (!empty($this->with)) {
+            $keys = array_flip(array_keys($out[0]));
+            foreach ($this->with as $prop => $item) {
+                /** @var DB $instance */
+                $instance = $item[1];
+                $instance = $instance::query();
+                if (!$item[0])
+                    $instance->limit(1);
+
+                foreach (is_array($item[2]) ? $item[2] : [ $item[2] ] as $value)
+                    $values[] = array_keys($sql->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP, $keys[$value]));
+
+                foreach (is_array($item[3]) ? $item[3] : [ $item[3] ] as $value)
+                    $instance->where(function (DB $DB) use ($values, $value) {
+                        foreach ($values as $val)
+                            $DB->where($value, 'IN', $val);
+                        return $DB;
+                    });
+            }
+        }
+        return $out;
     }
 
     /**
@@ -56,7 +86,7 @@ class DB
      * @param null   $type
      * @return mixed
      */
-    public static function find ($id, $columns = '*', $type = NULL) {
+    public static function find ($id, $columns = '*', $type = NULL) { // TODO: restructure static fn-s to __callStatic method
         $q = new static();
         $qq = $q->where($q->primary, $id)->limit(1)->get($columns, $type);
         return $qq[0] ?? new static();
@@ -110,14 +140,21 @@ class DB
         foreach ($wheres as $where) {
             if (is_array($where[1]))
                 $w .= "$where[0] (" . substr($this->processWhere($where[1]), 6) . ')';
-            if (is_null($where[3]))
+            elseif (is_null($where[3]))
                 $w .= "$where[0] `$where[1]` $where[2] $where[3]";
+            elseif (strpos('IN', $where[2]) !== FALSE) {
+                foreach ($where[3] as $value) {
+                    $word = 'w_' . substr(uniqid(), -3);
+                    $this->wheres[$word] = $value;
+                    $words[] = ":$word";
+                }
+                $w .= "$where[0] `$where[1]` $where[2] (" . implode(', ', $words) . ")";
+            }
             else {
                 $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = $where[3];
                 $w .= "$where[0] `$where[1]` $where[2] :$word";
             }
         }
-        var_dump($this->wheres);
         return "WHERE" . substr($w, strpos($w, ' '));
     }
 
