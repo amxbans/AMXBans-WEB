@@ -83,16 +83,8 @@ class Config
      */
     public function __construct ($install = FALSE) {
         // All the initial things
-        spl_autoload_register(function ($cls) {
-            if (file_exists(__DIR__ . '/class.' . $cls . '.inc')) require_once __DIR__ . '/class.' . $cls . '.inc';
-            else {
-                $cls = explode("\\", $cls);
-                $c = array_pop($cls);
-                $ns = implode('.', $cls);
-                if (file_exists(__DIR__ . "/$ns.$c.module")) require_once __DIR__ . "/$ns.$c.module";
-            }
-            return;
-        });
+        include_once 'functions.inc.php';
+        spl_autoload_register('init_autoload');
 
 
         if ($install) ;
@@ -113,7 +105,6 @@ class Config
 
             $this->setupWebConfig();
             User::init($this);
-            include_once 'functions.inc.php';
         }
 
         //save current language to session

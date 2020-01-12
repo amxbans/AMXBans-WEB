@@ -9,6 +9,8 @@
  * You should have received a copy of the cc-nC-SA along with AMXBans.
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
+//TODO: Move controllers to Controllers directory
+use Models\Ban;
 
 /**
  * Class IndexController
@@ -249,4 +251,6 @@ class IndexController
         Captcha::generateCode();
         $this->config->config->output->display('index.ban.tpl');
     }
+
+
 }

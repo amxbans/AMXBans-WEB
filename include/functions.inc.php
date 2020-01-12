@@ -11,23 +11,23 @@
  */
 
 /**
- * @param string $action
- * @param string $context
- * @param string|null   $user
+ * @param string      $action
+ * @param string      $context
+ * @param string|null $user
  */
-function db_log(string $action, string $context, $user = NULL): void
-{
+function db_log (string $action, string $context, $user = NULL): void {
     global $config;
-    $q = $config->getDb()->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
-    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
+    $q = $config->getDb()
+                ->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
+    $q->execute([ $_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context ]);
 }
 
 
-function db_size() {
+function db_size () {
     global $config;
     $db_size = 0;
 
-    $q = $config->getDb()->prepare("SHOW TABLE STATUS FROM `{$config->getDb(true)}` LIKE '{$config->dbPrefix}_%'");
+    $q = $config->getDb()->prepare("SHOW TABLE STATUS FROM `{$config->getDb(TRUE)}` LIKE '{$config->dbPrefix}_%'");
     if (!$q->execute())
         return FALSE;
 
@@ -36,13 +36,43 @@ function db_size() {
     return $db_size;
 }
 
-function format_size($size) {
-    if($size >= 1073741824)
+function format_size ($size) {
+    if ($size >= 1073741824)
         return round(($size / 1073741824), 2) . "GiB";
-    if($size >= 1048576)
+    if ($size >= 1048576)
         return round(($size / 1048576), 2) . "MiB";
-    if($size >= 1024)
+    if ($size >= 1024)
         return round(($size / 1024), 2) . " KiB";
 
     return $size ? $size . " B" : FALSE;
+}
+
+function init_autoload ($class) {
+    $in_folders = [
+        'Controllers' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%2$s.%3$s.inc',
+        'Models'      => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
+    ];
+    if (file_exists(__DIR__ . '/class.' . $class . '.inc')) require_once __DIR__ . DIRECTORY_SEPARATOR . "class.$class.inc";
+    else {
+        $class = explode("\\", $class);
+        $c = array_pop($class);
+        $ns = implode(DIRECTORY_SEPARATOR, $class);
+
+        $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
+        $php = substr($php, is_numeric(strpos($php, '/')) ? strpos($php, '/') + 1 : 0);
+
+        if (in_array($ns, array_keys($in_folders))) {
+            $tpl = sprintf($in_folders[$ns], $ns, $php, $c);
+            if (!file_exists($tpl))
+                die(header('HTTP/1.1 500'));
+            require_once $tpl;
+        }
+        elseif (file_exists(__DIR__ . "/$ns/$php.$c.inc")) require_once __DIR__ . "/$ns/$php.$c.inc";
+    }
+    return;
+}
+
+function sql_operators () {
+    return [ '=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'like', 'like binary', 'not like', 'ilike', '&', '|', '^', '<<', '>>', 'rlike', 'not rlike', 'regexp', 'not regexp', '~', '~*', '!~', '!~*', 'similar to', 'not similar to', 'not ilike', '~~*', '!~~*', ];
+
 }
