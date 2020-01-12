@@ -216,6 +216,8 @@ class IndexController
         if (Route::getFakePathWay(2)) {
             return $this->editBan();
         }
+
+        $ban = Ban::find(1);
         $ban = $this->config->config->getDb()
                                     ->prepare("SELECT b.*, s.gametype, s.timezone_fixx, a.nickname,a.username FROM ((`{$this->config->config->dbPrefix}_bans` b
     LEFT JOIN `{$this->config->config->dbPrefix}_serverinfo` s ON b.server_ip = s.address)
