@@ -15,15 +15,17 @@
  * @param string      $context
  * @param string|null $user
  */
-function db_log (string $action, string $context, $user = NULL): void {
+function db_log (string $action, string $context, $user = NULL): void
+{
     global $config;
     $q = $config->getDb()
-                ->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
-    $q->execute([ $_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context ]);
+        ->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
+    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
 }
 
 
-function db_size () {
+function db_size ()
+{
     global $config;
     $db_size = 0;
 
@@ -36,7 +38,8 @@ function db_size () {
     return $db_size;
 }
 
-function format_size ($size) {
+function format_size ($size)
+{
     if ($size >= 1073741824)
         return round(($size / 1073741824), 2) . "GiB";
     if ($size >= 1048576)
@@ -47,7 +50,8 @@ function format_size ($size) {
     return $size ? $size . " B" : FALSE;
 }
 
-function init_autoload ($class) {
+function init_autoload ($class)
+{
     $in_folders = [
         'Controllers' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%2$s.%3$s.inc',
         'Models'      => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
@@ -72,7 +76,7 @@ function init_autoload ($class) {
     return;
 }
 
-function sql_operators () {
-    return [ '=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN' ];
-
+function sql_operators ()
+{
+    return ['=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'];
 }

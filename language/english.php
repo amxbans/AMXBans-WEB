@@ -108,7 +108,8 @@ return [
 
 
         'sys_info' => [
-            'tables_not_optimised' => 'Tables were not optimised'
+            'tables_not_optimised' => 'Tables were not optimised!',
+            'tables_optimised' => 'Tables optimised successfully!',
         ]
     ],
 

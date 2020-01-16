@@ -111,8 +111,6 @@ class Config
         if (!isset($_SESSION["lang"])) $_SESSION["lang"] = ($install ? 'english' : $this->default_lang);
         if (isset($_GET['lang'])) $_SESSION['lang'] = $_GET['lang'];
 
-        //TODO: Prune bans if config value asks it...
-
         //Setup language strings
         $lang = Route::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION['lang'] . '.php';
         if (file_exists($lang)) $lang = require $lang;

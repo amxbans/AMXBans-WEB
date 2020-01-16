@@ -46,14 +46,20 @@ class AdminController
                     $tables = implode('`, `', $tables);
 
                     $tables = $this->config->config->getDb()->prepare("OPTIMIZE TABLES `$tables`");
-                    if (!$tables->execute())
-                        $this->config->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['']]);
-                    $user_msg="_DBOPTIMIZED";
+                    if (!$tables->execute()) {
+                        $this->config->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
+                        db_log('Web config', 'Optimised tables');
+                    }
+                    else
+                        $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
                 }
 
                 //prune db
-                $prunecount=-1;
-                if(isset($_POST["prunedb"]) && $_SESSION["loggedin"]) {
+                if(isset($_GET["prune"]) && User::hasPermission('prune_db')) {
+                    $bans = \Models\Ban::with('server')->where('expired', 0)->get(['bid', 'ban_created', 'ban_length']);
+                    foreach ($bans as $ban) {
+                        // TODO: depends on DB::get() function finishing
+                    }
                     $tables=$mysql->query("SELECT ba.bid,ba.ban_created,ba.ban_length,se.timezone_fixx FROM ".$config->db_prefix."_bans as ba 
 							LEFT JOIN ".$config->db_prefix."_serverinfo AS se ON ba.server_ip=se.address WHERE ba.expired=0");
                     $prunecount=0;
