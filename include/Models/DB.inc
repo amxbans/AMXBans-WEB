@@ -3,33 +3,29 @@
 
 namespace Models;
 
-
 use PDO;
 
-class DB
+class DB //TODO: restructure simpler
 {
+    protected $model;
     protected $table = '';
     protected $primary = 'id';
-    public $relations = [];
 
     protected $wheres = [];
     protected $limits;
-    protected $with = [];
 
-    /**
-     * @return static
-     */
-    public static function query ()
+    public static function asModel ($model)
     {
-        return new static();
+        $t = new self();
+        $t->model = $model;
+        return $t;
     }
 
-    public static function with ($relations)
+    public static function table ($table)
     {
-        /** @var static $this */
-        $m = $this ?? new static();
-        $m->relations = is_array($relations) ? $relations : func_get_args();
-        return $m;
+        $c = new self();
+        $c->table = $table;
+        return $c;
     }
 
 
@@ -37,10 +33,13 @@ class DB
      * @param string|array $columns
      * @param int|null     $type
      *
-     * @return array
+     * @return static[]
      */
-    public static function all ($columns = '*', $type = NULL): array
+    public function select ($columns = '*'): array
     {
+        if ($columns != '*' OR is_array($columns))
+            $columns = '`' . implode('`, `', is_array($columns) ? $columns : [$columns]) . '`';
+        $q = "SELECT $columns FROM `" . $this->getTableName() . "` ";
         return static::query()->get($columns, $type);
     }
 
@@ -55,39 +54,51 @@ class DB
     {
         if (is_null($type))
             $type = PDO::FETCH_CLASS;
-        if ($columns != '*' OR is_array($columns))
-            $columns = '`' . implode('`, `', is_array($columns) ? $columns : [$columns]) . '`';
+
 
         $sql = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
         $sql = $this->db($sql);
+        var_dump($sql);
         $sql->execute(empty($this->wheres) ? NULL : $this->wheres);
 
         $out = $sql->fetchAll($type, !isset($type_argument) ? static::class : $type_argument);
         if (!empty($this->with)) {
-            $keys = array_flip(array_keys($out[0]));
-            foreach ($this->with as $prop => $item) {
+            $column_indexes = array_flip(array_keys($out[0]));
+            $with = array_filter($this->relations, function ($key) {
+                return in_array($key, $this->with);
+            }, ARRAY_FILTER_USE_KEY);
+
+            foreach ($with as $prop => $item) {
                 /** @var DB $instance */
-                $instance = $item[1];
+                [$multiple, $instance, $local_cols, $foreign_cols] = $item;
+                $local_cols = is_array($local_cols) ? $local_cols : [$local_cols];
+                $foreign_cols = is_array($foreign_cols) ? $foreign_cols : [$foreign_cols];
                 $instance = $instance::query();
-                if (!$item[0])
+                if (!$multiple)
                     $instance->limit(1);
 
-                foreach (is_array($item[2]) ? $item[2] : [$item[2]] as $value)
-                    $values[] = array_keys($sql->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP, $keys[$value]));
+                foreach ($local_cols as $value)
+                    $local_vals[] = array_keys($sql->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP, $column_indexes[$value]));
 
-                foreach (is_array($item[3]) ? $item[3] : [$item[3]] as $value)
-                    $instance->where(function (DB $DB) use ($values, $value) {
-                        foreach ($values as $val)
+                foreach ($foreign_cols as $value)
+                    $instance->where(function (DB $DB) use ($local_vals, $value) {
+                        foreach ($local_vals as $val)
                             $DB->where($value, 'IN', $val);
                         return $DB;
                     });
 
-                $instance = $instance->get();
+                $instances = $instance->get();
                 foreach ($out as $value) {
-                    $a = array_filter($instance, function ($vel) use ($item) {
+                    $a = array_filter($instances, function (DB $val) use ($foreign_cols) {
                         //TODO: $values un $item[3] jāmēģina izvilkt
+                        foreach ($foreign_cols as $col) {
+
+                        }
                     });
-                    $value->$prop = 0; //TOOD: Finish this
+                    if (is_array($value))
+                        $value[$prop] = $a;
+                    else
+                        $value->$prop = $a;
                 }
             }
         }
@@ -101,11 +112,10 @@ class DB
      *
      * @return mixed
      */
-    public static function find ($id, $columns = '*', $type = NULL)
-    { // TODO: restructure static fn-s to __callStatic method
-        $q = new static();
-        $qq = $q->where($q->primary, $id)->limit(1)->get($columns, $type);
-        return $qq[0] ?? new static();
+    public function find ($id, $columns = '*')
+    {
+        $qq = $this->where($this->primary, $id)->limit(1)->get($columns, $type);
+        return $qq[0] ?? $this;
     }
 
     private function getTableName ()
@@ -142,6 +152,14 @@ class DB
             $operator = $operator == '=' ? 'IS' : 'IS NOT';
         $this->wheres[] = [$pre, $field, $operator, $value];
         return $this;
+    }
+
+    public static function rawSQL (string $sql, array $values = null, $asModel = null, $fetch_style = null)
+    {
+        $i = new self();
+        $q = $i->db($sql);
+        $q->execute($values);
+        return $q->fetchAll($fetch_style ?? PDO::FETCH_CLASS, $asModel);
     }
 
     /**
@@ -195,6 +213,6 @@ class DB
 
     private function processLimit (): string
     {
-        return $this->limits;
+        return $this->limits ?? '';
     }
 }
