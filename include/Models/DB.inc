@@ -11,111 +11,63 @@ class DB //TODO: restructure simpler
     protected $table = '';
     protected $primary = 'id';
 
-    protected $wheres = [];
+    /** @var array|null $wheres Variable storing all WHERE clauses */
+    protected $wheres;
+    /** @var string $limits Stores a string of LIMIT and OFFSET clauses */
     protected $limits;
 
-    public static function asModel ($model)
-    {
-        $t = new self();
-        $t->model = $model;
-        return $t;
-    }
-
-    public static function table ($table)
+    public static function table ($table, $model = null)
     {
         $c = new self();
         $c->table = $table;
+        $c->model = $model;
         return $c;
     }
 
-
     /**
      * @param string|array $columns
-     * @param int|null     $type
+     * @param int          $fetch_type
      *
      * @return static[]
      */
-    public function select ($columns = '*'): array
+    public function select ($columns = '*', int $fetch_type = null): array
     {
         if ($columns != '*' OR is_array($columns))
             $columns = '`' . implode('`, `', is_array($columns) ? $columns : [$columns]) . '`';
-        $q = "SELECT $columns FROM `" . $this->getTableName() . "` ";
-        return static::query()->get($columns, $type);
+        $q = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
+        $q = $this->db($q);
+        $q->execute($this->wheres);
+        if ($this->model)
+            return $q->fetchAll(PDO::FETCH_CLASS, $this->model);
+        return $fetch_type? $q->fetchAll($fetch_type) : $q->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * @param string|array $columns
-     * @param int|null     $type
-     * @param mixed        $type_argument
+     * @param array $data
      *
-     * @return static[]
+     * @return bool
      */
-    public function get ($columns = '*', $type = NULL, $type_argument = NULL): array
+    public function update (array $data = []): bool
     {
-        if (is_null($type))
-            $type = PDO::FETCH_CLASS;
-
-
-        $sql = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
-        $sql = $this->db($sql);
-        var_dump($sql);
-        $sql->execute(empty($this->wheres) ? NULL : $this->wheres);
-
-        $out = $sql->fetchAll($type, !isset($type_argument) ? static::class : $type_argument);
-        if (!empty($this->with)) {
-            $column_indexes = array_flip(array_keys($out[0]));
-            $with = array_filter($this->relations, function ($key) {
-                return in_array($key, $this->with);
-            }, ARRAY_FILTER_USE_KEY);
-
-            foreach ($with as $prop => $item) {
-                /** @var DB $instance */
-                [$multiple, $instance, $local_cols, $foreign_cols] = $item;
-                $local_cols = is_array($local_cols) ? $local_cols : [$local_cols];
-                $foreign_cols = is_array($foreign_cols) ? $foreign_cols : [$foreign_cols];
-                $instance = $instance::query();
-                if (!$multiple)
-                    $instance->limit(1);
-
-                foreach ($local_cols as $value)
-                    $local_vals[] = array_keys($sql->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP, $column_indexes[$value]));
-
-                foreach ($foreign_cols as $value)
-                    $instance->where(function (DB $DB) use ($local_vals, $value) {
-                        foreach ($local_vals as $val)
-                            $DB->where($value, 'IN', $val);
-                        return $DB;
-                    });
-
-                $instances = $instance->get();
-                foreach ($out as $value) {
-                    $a = array_filter($instances, function (DB $val) use ($foreign_cols) {
-                        //TODO: $values un $item[3] jāmēģina izvilkt
-                        foreach ($foreign_cols as $col) {
-
-                        }
-                    });
-                    if (is_array($value))
-                        $value[$prop] = $a;
-                    else
-                        $value->$prop = $a;
-                }
-            }
-        }
-        return $out;
+        if (empty($data))
+            return FALSE;
+        foreach ($data as $k => $datum)
+            $pieces[] = "`$k` = ?";
+        $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ', $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
+        return $this->db($q)->execute(array_merge(array_values($data), $this->wheres ?? []));
     }
 
     /**
-     * @param        $id
-     * @param string $columns
-     * @param null   $type
+     * Handful method to get single column from SELECT type
+     * @param string   $columns
+     * @param int|null $fetch_type
      *
-     * @return mixed
+     * @return mixed|bool
      */
-    public function find ($id, $columns = '*')
+    public function selectOne ($columns = '*', int $fetch_type = null)
     {
-        $qq = $this->where($this->primary, $id)->limit(1)->get($columns, $type);
-        return $qq[0] ?? $this;
+        $q = $this->select($columns, $fetch_type);
+        return $q[0] ?? false;
     }
 
     private function getTableName ()
@@ -130,8 +82,9 @@ class DB //TODO: restructure simpler
         return $config->getDb()->prepare($query);
     }
 
-
     /**
+     * Adds WHERE clause to query
+     *
      * @param callable|string $field
      * @param string|null     $operator
      * @param string|null     $value
@@ -154,7 +107,17 @@ class DB //TODO: restructure simpler
         return $this;
     }
 
-    public static function rawSQL (string $sql, array $values = null, $asModel = null, $fetch_style = null)
+    /**
+     * Perform a raw SELECT SQL string with optional values and returning in wanted $fetch_style
+     *
+     * @param string     $sql
+     * @param array|null $values
+     * @param mixed|null $asModel
+     * @param int|null   $fetch_style
+     *
+     * @return array
+     */
+    public static function selectRaw (string $sql, array $values = null, $asModel = null, $fetch_style = null)
     {
         $i = new self();
         $q = $i->db($sql);
@@ -163,15 +126,23 @@ class DB //TODO: restructure simpler
     }
 
     /**
-     * @param array|null $wheres
+     * Perform a raw SQL string with optional values and returning whether sql execution was success
      *
-     * @return string
+     * @param string     $sql
+     * @param array|null $values
+     *
+     * @return bool
      */
+    public static function rawSQL (string $sql, array $values = null)
+    {
+        return (new self())->db($sql)->execute($values);
+    }
+
     private function processWhere ($wheres = NULL): string
     {
         if (!$wheres) {
             $wheres = $this->wheres;
-            $this->wheres = [];
+            $this->wheres = NULL;
         }
         if (empty($wheres))
             return '';
@@ -197,22 +168,25 @@ class DB //TODO: restructure simpler
         return "WHERE" . substr($w, strpos($w, ' '));
     }
 
-    /**
-     * @return array
-     */
-    public function getWheres (): array
-    {
-        return $this->wheres;
-    }
+    public function getWheres (): array { return $this->wheres; }
 
-    public function limit (int $limit, int $offset = NULL)
+    /**
+     * Adds (if set), changes or removes (if not set) LIMIT and OFFSET clauses
+     *
+     * @param int|NULL $limit
+     * @param int|NULL $offset
+     *
+     * @return $this
+     */
+    public function limit (int $limit = NULL, int $offset = NULL)
     {
-        $this->limits = "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
+        if (is_null($limit)) {
+            global $config;
+            $limit = $config->per_page;
+        }
+        $this->limits = !$limit? '' : "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
         return $this;
     }
 
-    private function processLimit (): string
-    {
-        return $this->limits ?? '';
-    }
+    private function processLimit (): string { return $this->limits ?? ''; }
 }
