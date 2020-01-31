@@ -22,8 +22,10 @@ namespace Models;
  * @property int|null    $reasons
  * @property int         $timezone_fixx
  */
-class Server extends DB
+class Server extends Model
 {
     protected $table = 'serverinfo';
-
+    protected const relations = [
+        'bans' => [1, 'Models\Ban', 'address', 'server_ip'],
+    ];
 }

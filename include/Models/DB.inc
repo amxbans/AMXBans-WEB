@@ -5,7 +5,7 @@ namespace Models;
 
 use PDO;
 
-class DB //TODO: restructure simpler
+class DB
 {
     protected $model;
     protected $table = '';
@@ -58,6 +58,27 @@ class DB //TODO: restructure simpler
     }
 
     /**
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function insert (array $data): bool
+    {
+        if (empty($data))
+            return FALSE;
+        if (func_num_args() > 1) {
+            foreach (func_get_args() as $arg)
+                $return[] = $this->insert((array)$arg);
+            return in_array(false);
+        }
+        // TODO: FINISH INSERT METHOD -------------================---------------------==============------------------
+        /*foreach ($data as $k => $datum)
+            $pieces[] = "`$k` = ?";
+        $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ', $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
+        return $this->db($q)->execute(array_merge(array_values($data), $this->wheres ?? []));*/
+    }
+
+    /**
      * Handful method to get single column from SELECT type
      * @param string   $columns
      * @param int|null $fetch_type
@@ -66,7 +87,7 @@ class DB //TODO: restructure simpler
      */
     public function selectOne ($columns = '*', int $fetch_type = null)
     {
-        $q = $this->select($columns, $fetch_type);
+        $q = $this->limit(1)->select($columns, $fetch_type);
         return $q[0] ?? false;
     }
 

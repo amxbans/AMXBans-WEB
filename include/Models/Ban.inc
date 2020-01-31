@@ -25,12 +25,12 @@ namespace Models;
  * @property bool|int    $expired
  * @property bool|int    $imported
  */
-class Ban extends DB
+class Ban extends Model
 {
  protected $table = 'bans';
  protected $primary = 'bid';
- public $relations = [
+ protected const relations = [
      'server' => [0, 'Models\Server', 'server_ip', 'address'],
-     'admin' => [0, 'Models\AMXAdmin', ['admin_nick', 'admin_ip', 'admin_id'], 'steamid'], //TODO: make AMXAdmins model
+     'admin' => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'], //TODO: make AMXAdmins model
  ];
 }
