@@ -1,6 +1,7 @@
 <?php
 
 
+use Models\Ban;
 use Models\DB;
 
 class AdminController
@@ -53,44 +54,25 @@ class AdminController
                         $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
                     db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
                 }
-            //TODO: I WAS HERE -----------------------------------------------------------------------------------------
+
                 //prune db
                 if (isset($_GET["prune"]) && User::hasPermission('prune_db')) {
-                    $bans = \Models\Ban::with('server')->where('expired', 0)->get(['bid', 'ban_created', 'ban_length']);
-                    foreach ($bans as $ban) {
-                        // TODO: depends on DB::get() function finishing
-                    }
+                    $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
                     $tables = $mysql->query("SELECT ba.bid,ba.ban_created,ba.ban_length,se.timezone_fixx FROM " . $config->db_prefix . "_bans as ba 
 							LEFT JOIN " . $config->db_prefix . "_serverinfo AS se ON ba.server_ip=se.address WHERE ba.expired=0");
-                    $prunecount = 0;
-                    while ($result = $tables->fetch_object()) {
-                        //prune expired bans
-                        if (($result->ban_created + ($result->timezone_fixx * 60 * 60) + ($result->ban_length * 60)) < time() && $result->ban_length != "0") {
-                            $prunecount++;
-                            $prune_query = $mysql->query("UPDATE `" . $config->db_prefix . "_bans` SET `expired`=1 WHERE `bid`=" . $result->bid);
-                            $prune_query = $mysql->query("INSERT INTO `" . $config->db_prefix . "_bans_edit` (`bid`,`edit_time`,`admin_nick`,`edit_reason`) VALUES (
+                    $pruned = 0;
+                    foreach ($bans as $ban) {
+                        //TODO: Get timezone-fix and do calculations as below
+                            //prune expired bans
+                            if (($result->ban_created + ($result->timezone_fixx * 60 * 60) + ($result->ban_length * 60)) < time() && $result->ban_length != "0") {
+                                $pruned++;
+                                $prune_query = $mysql->query("UPDATE `" . $config->db_prefix . "_bans` SET `expired`=1 WHERE `bid`=" . $result->bid);
+                                $prune_query = $mysql->query("INSERT INTO `" . $config->db_prefix . "_bans_edit` (`bid`,`edit_time`,`admin_nick`,`edit_reason`) VALUES (
 								'" . $result->bid . "','" . ($result->ban_created + ($result->timezone_fixx * 60 * 60) + ($result->ban_length * 60)) . "','amxbans','Bantime expired')");
-                        }
+                            }
+                        $smarty->assign("prunecount", $pruned);
+                        $user_msg = "_DBPRUNED";
                     }
-                    $smarty->assign("prunecount", $prunecount);
-                    $user_msg = "_DBPRUNED";
-                }
-
-                function return_bytes ($val)
-                {
-                    $val = trim($val);
-                    $last = strtolower($val[strlen($val) - 1]);
-                    switch ($last) {
-                        // The 'G' modifier is available since PHP 5.1.0
-                        case 'g':
-                            $val *= 1024;
-                        case 'm':
-                            $val *= 1024;
-                        case 'k':
-                            $val *= 1024;
-                    }
-
-                    return $val;
                 }
 
                 @$gd = gd_info();

@@ -27,10 +27,10 @@ namespace Models;
  */
 class Ban extends Model
 {
- protected $table = 'bans';
- protected $primary = 'bid';
- protected const relations = [
-     'server' => [0, 'Models\Server', 'server_ip', 'address'],
-     'admin' => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'], //TODO: make AMXAdmins model
- ];
+    protected $table = 'bans';
+    protected $primary = 'bid';
+    protected const relations = [
+        'server' => [0, 'Models\Server', 'server_ip', 'address'],
+        'admin' => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'],
+    ];
 }

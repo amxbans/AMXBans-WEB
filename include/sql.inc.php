@@ -51,15 +51,6 @@ function sql_get_server($serverid=0) {
 	if(!$serverid) return $servers;
 	return $server;
 }
-function sql_get_server_ids() {
-	global $config, $mysql;
-	$query = $mysql->query("SELECT `id` FROM `".$config->db_prefix."_serverinfo` ORDER BY `address` ASC") or die ($mysql->error);
-	$serverids=array();
-	while($result = $query->fetch_object()) {
-		$serverids[]=$result->id;
-	}
-	return $serverids;
-}
 function sql_get_reasons_set() {
 	global $config, $mysql;
 	$query = $mysql->query("SELECT * FROM `".$config->db_prefix."_reasons_set` ORDER BY `setname` ASC") or die ($mysql->error);

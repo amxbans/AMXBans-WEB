@@ -80,3 +80,27 @@ function sql_operators ()
 {
     return ['=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'];
 }
+
+function snakeToCamel ($string) {
+    $string = ucwords(str_replace('_', ' ', $string));
+    $string = str_replace(' ', '', $string);
+    return lcfirst($string);
+}
+
+function return_bytes ($val)
+{
+    // https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+    $last = strtolower(substr($val, -1));
+    $val = (int)trim($val);
+    switch ($last) {
+        // The 'G' modifier is available since PHP 5.1.0
+        case 'g':
+            $val *= 1024;
+        case 'm':
+            $val *= 1024;
+        case 'k':
+            $val *= 1024;
+    }
+
+    return $val;
+}

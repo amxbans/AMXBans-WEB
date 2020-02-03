@@ -39,7 +39,7 @@ class DB
         $q->execute($this->wheres);
         if ($this->model)
             return $q->fetchAll(PDO::FETCH_CLASS, $this->model);
-        return $fetch_type? $q->fetchAll($fetch_type) : $q->fetchAll(PDO::FETCH_ASSOC);
+        return $fetch_type ? $q->fetchAll($fetch_type) : $q->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -69,19 +69,19 @@ class DB
         if (func_num_args() > 1) {
             foreach (func_get_args() as $arg)
                 $return[] = $this->insert((array)$arg);
-            return in_array(false);
+            return in_array(false, $return);
         }
-        // TODO: FINISH INSERT METHOD -------------================---------------------==============------------------
-        /*foreach ($data as $k => $datum)
-            $pieces[] = "`$k` = ?";
-        $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ', $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
-        return $this->db($q)->execute(array_merge(array_values($data), $this->wheres ?? []));*/
+        $pieces = array_fill(0, count($data), '?');
+        $q = 'INSERT INTO `' . $this->getTableName() . '` (`' . implode('`, `', array_keys($data)) . '`) VALUES (' . implode(',', $pieces) . ')';
+
+        return $this->db($q)->execute(array_values($data));
     }
 
     /**
      * Handful method to get single column from SELECT type
-     * @param string   $columns
-     * @param int|null $fetch_type
+     *
+     * @param string|array $columns
+     * @param int|null     $fetch_type
      *
      * @return mixed|bool
      */
@@ -205,9 +205,15 @@ class DB
             global $config;
             $limit = $config->per_page;
         }
-        $this->limits = !$limit? '' : "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
+        $this->limits = !$limit ? '' : "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
         return $this;
     }
 
     private function processLimit (): string { return $this->limits ?? ''; }
+
+    public static function lastInsertId ()
+    {
+        global $config;
+        return $config->getDb()->lastInsertId();
+    }
 }
