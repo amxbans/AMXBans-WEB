@@ -23,6 +23,23 @@ function db_log (string $action, string $context, $user = NULL): void
     $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
 }
 
+/**
+ * @param \Models\Ban|mixed $ban_id
+ * @param string|null       $admin
+ * @param string|null       $reason
+ * @param int|null          $time
+ */
+function db_bans_log ($ban_id, string $admin = null, string $reason = NULL, int $time = null): void
+{
+    $log = new \Models\BansLog();
+    $log->bid = $ban_id instanceof \Models\Ban ? $ban_id->bid : $ban_id;
+    $log->admin_nick = $admin ?? User::get('username');
+    $log->edit_reason = $reason;
+    if ($time)
+        $log->created_at = new DateTime('@' . $time);
+    $log->save();
+}
+
 
 function db_size ()
 {
@@ -54,7 +71,7 @@ function init_autoload ($class)
 {
     $in_folders = [
         'Controllers' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%2$s.%3$s.inc',
-        'Models'      => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
+        'Models' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
     ];
     if (file_exists(__DIR__ . '/class.' . $class . '.inc')) require_once __DIR__ . DIRECTORY_SEPARATOR . "class.$class.inc";
     else {
@@ -70,8 +87,7 @@ function init_autoload ($class)
             if (!file_exists($tpl))
                 die(header('HTTP/1.1 500'));
             require_once $tpl;
-        }
-        elseif (file_exists(__DIR__ . "/$ns/$php.$c.inc")) require_once __DIR__ . "/$ns/$php.$c.inc";
+        } elseif (file_exists(__DIR__ . "/$ns/$php.$c.inc")) require_once __DIR__ . "/$ns/$php.$c.inc";
     }
     return;
 }
@@ -81,7 +97,8 @@ function sql_operators ()
     return ['=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'];
 }
 
-function snakeToCamel ($string) {
+function snakeToCamel ($string)
+{
     $string = ucwords(str_replace('_', ' ', $string));
     $string = str_replace(' ', '', $string);
     return lcfirst($string);
