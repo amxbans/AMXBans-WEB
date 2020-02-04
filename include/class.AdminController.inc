@@ -57,22 +57,26 @@ class AdminController
 
                 //prune db
                 if (isset($_GET["prune"]) && User::hasPermission('prune_db')) {
+                    /** @var Ban[] $bans */
                     $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
                     $tables = $mysql->query("SELECT ba.bid,ba.ban_created,ba.ban_length,se.timezone_fixx FROM " . $config->db_prefix . "_bans as ba 
 							LEFT JOIN " . $config->db_prefix . "_serverinfo AS se ON ba.server_ip=se.address WHERE ba.expired=0");
                     $pruned = 0;
                     foreach ($bans as $ban) {
-                        //TODO: Get timezone-fix and do calculations as below
+                        $tz = $ban->server->timezone_fixx * 3600;
+                        $bl = $ban->ban_length * 60;
                             //prune expired bans
-                            if (($result->ban_created + ($result->timezone_fixx * 60 * 60) + ($result->ban_length * 60)) < time() && $result->ban_length != "0") {
-                                $pruned++;
-                                $prune_query = $mysql->query("UPDATE `" . $config->db_prefix . "_bans` SET `expired`=1 WHERE `bid`=" . $result->bid);
-                                $prune_query = $mysql->query("INSERT INTO `" . $config->db_prefix . "_bans_edit` (`bid`,`edit_time`,`admin_nick`,`edit_reason`) VALUES (
-								'" . $result->bid . "','" . ($result->ban_created + ($result->timezone_fixx * 60 * 60) + ($result->ban_length * 60)) . "','amxbans','Bantime expired')");
-                            }
-                        $smarty->assign("prunecount", $pruned);
-                        $user_msg = "_DBPRUNED";
+                        if ($ban->ban_created + $tz + $bl < time() && $bl) {
+                            $pruned++;
+                            $ban->expired = true;
+                            $ban->save();
+
+                            db_bans_log($ban, '--SYSTEM--', 'Bantime expired', $ban->ban_created + $tz + $bl);
+                        }
                     }
+                    // TODO: I WAS HERE ============================================================================
+                    $smarty->assign("prunecount", $pruned);
+                    $user_msg = "_DBPRUNED";
                 }
 
                 @$gd = gd_info();

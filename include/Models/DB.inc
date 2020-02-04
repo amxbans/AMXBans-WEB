@@ -28,7 +28,7 @@ class DB
      * @param string|array $columns
      * @param int          $fetch_type
      *
-     * @return static[]
+     * @return mixed
      */
     public function select ($columns = '*', int $fetch_type = null): array
     {
