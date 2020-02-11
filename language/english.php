@@ -57,9 +57,9 @@ return [
             'steamcomid' => 'Steam Community ID',
             'type'       => 'Ban type',
             'types'      => [
+                'I'  => 'IP',
                 'S'  => 'SteamID',
                 'SI' => 'SteamID & IP',
-                'I'  => 'IP',
                 ''   => 'Not defined',
             ],
             'invoked' => 'Invoked on',
@@ -124,7 +124,14 @@ return [
             'prune' => 'prune',
             'comments' => 'comments',
             'files' => 'files',
-        ]
+        ],
+        'ban_add' => [
+            'username' => 'username',
+            'mins' => 'minutes',
+        ],
+
+
+        'no_access' => 'You have insufficient permissions to view this page!', // _NOACCESS
     ],
 
     'email' => [

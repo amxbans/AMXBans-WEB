@@ -61,6 +61,7 @@ class User
     }
 
     /**
+     * TODO: adjust LOGIN method
      * @param string $name Username
      * @param string $pass Password
      * @param bool   $rem  Remember (as cookie) or not

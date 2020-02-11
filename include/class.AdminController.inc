@@ -117,7 +117,8 @@ class AdminController
                 $this->config->config->output->display('admin.index.sys_info');
                 break;
             case 'ban_add':
-
+                $this->config->config->output->assign('reasons', Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
+                $this->config->config->output->display('admin.index.ban_add');
                 break;
         }
     }

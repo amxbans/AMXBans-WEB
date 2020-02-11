@@ -85,13 +85,7 @@ function sql_get_reasons() {
 	return $reasons;
 }
 function sql_get_reasons_list() {
-	global $config, $mysql;
-	$reasons = array();
-	$query = $mysql->query("SELECT reason FROM `".$config->db_prefix."_reasons` ORDER BY `id` ASC") or die ($mysql->error);
-	while($result = $query->fetch_object()) {
-		$reasons[]=$result->reason;
-	}
-	return $reasons;
+    return Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR);
 }
 function sql_get_amxadmins() {
 	global $config, $mysql;

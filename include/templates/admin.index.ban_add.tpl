@@ -1,58 +1,64 @@
-<div class="main">
-	<div class="post">
-	{if $smarty.session.bans_add=="yes"}
-	<form method="post">
-		<table frame="box" rules="groups" summary=""> 
-			<thead> 
-				<tr>
-					<th style="width:200px;">{"_ADDBAN"|lang}</th> 
-					<th>&nbsp;</th>
-				</tr>
-			</thead> 
-			<tbody> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_NICKNAME"|lang}</td> 
-					<td><input type="text" size="40" name="name" {if $inputs.name != ""}value="{$inputs.name}"{/if}/></td> 
-				</tr> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_STEAMID"|lang}</td> 
-					<td><input type="text" size="40" name="steamid" {if $inputs.steamid != ""}value="{$inputs.steamid}"{else}value="STEAM_0:"{/if}/></td> 
-				</tr> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_IP"|lang}</td> 
-					<td><input type="text" size="40" name="ip" {if $inputs.ip != ""}value="{$inputs.ip}"{/if}/></td>  
-				</tr> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_BANTYPE"|lang}</td> 
-					<td>
-						<select name="ban_type">{html_options output=$banby_output values=$banby_values selected=$inputs.type}</select>
-					</td> 
-				</tr> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_REASON"|lang}</td> 
-					<td>
-						<select name="ban_reason">{html_options output=$reasons values=$reasons selected=$inputs.reason}</select>
-							{"_OR"|lang} <br /><input type="checkbox" name="reasoncheck" {if $inputs.reason_custom == 1}checked{/if}/>
-							{"_REASON"|lang}: <input type="text" size="30" name="user_reason" {if $inputs.reason_custom == 1}value="{$inputs.reason}"{/if}/>
-					</td> 
-				</tr> 
-				<tr class="settings_line"> 
-					<td class="fat">{"_BANLENGHT"|lang}</td> 
-					<td>
-						<input type="text" size="8" name="ban_length" {if $inputs.length > 0}value="{$inputs.length}"{/if}/> {"_MINS"|lang} 
-							{"_OR"|lang} <br /><input type="checkbox" name="perm" {if $inputs.length == 0}checked{/if}/> {"_PERMANENT"|lang}
-					</td> 
-				</tr> 
-			</tbody> 
-		</table>
-		<div class="_right"><input type="submit" class="button" name="save" value="{"_ADD"|lang}" /></div> 
-	</form>
-		{else}
-			<center><div class="admin_msg">{"_NOACCESS"|lang}</div></center>
-		{/if}
-		</td>
-		<div class="clearer">&nbsp;</div>
-	</div>
+{extends file="master.tpl"}
+{block name="head-title" prepend}{$lang.admin.subtitles.index.ban_add} - {$lang.admin.titles.index} | {/block}
 
-	<div class="clearer">&nbsp;</div>
-</div>
+{block name="BODY"}
+    {include file="messages.tpl"}
+
+    {if User::hasPermission('bans_add')}
+        <form method="post">
+            {Site::makeFormAuth()}
+            <h2>{$lang.admin.subtitles.index.ban_add}</h2>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.admin.ban_add.username|ucfirst}</span>
+                <span class="col"><input name="username" class="form-control" value="{'username'|input}"
+                                         autocomplete="off"></span>
+            </label>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.index.ban.steamid}</span>
+                <span class="col"><input name="SteamID" class="form-control" value="{'SteamID'|input}"
+                                         autocomplete="off"></span>
+            </label>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.ip}</span>
+                <span class="col"><input name="IP" class="form-control" value="{'IP'|input}" autocomplete="off"></span>
+            </label>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.index.ban.type}</span>
+                <span class="col">
+				<select name="ban_type" class="form-control">
+					{html_options options=$lang.index.ban.types|array_reverse selected='ban_type'|input}
+				</select>
+			</span>
+            </label>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.index.bans.reason|ucfirst}</span>
+                <span class="col">
+				<span class="input-group">
+				<select name="reason" class="form-control">
+					{html_options options=$reasons selected='reason'|input}
+				</select>
+					<span class="input-group-prepend input-group-append"><span
+                                class="input-group-text">{$lang['or']}</span></span>
+					<input name="custom_reason" class="form-control"/>
+				</span>
+			</span>
+            </label>
+            <label class="row align-items-center">
+                <span class="col-lg-3 col-md-4 col-sm text-right font-weight-bold">{$lang.index.bans.length|ucfirst}</span>
+                <span class="col form-inline">
+					<input name="length" class="form-control"/> {$lang.admin.ban_add.mins} {$lang['or']}
+					<label class="ml-3"><input name="permanent" type="checkbox"
+                                               class="custom-checkbox mr-1"/> {$lang.index.bans.permanent|ucfirst}</label>
+			</span>
+            </label>
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm"></div>
+                <div class="col">
+                    <button class="btn btn-block btn-primary">{$lang.save}</button>
+                </div>
+            </div>
+        </form>
+    {else}
+		<div class="alert alert-danger">{$lang.admin.no_access}</div>
+    {/if}
+{/block}
