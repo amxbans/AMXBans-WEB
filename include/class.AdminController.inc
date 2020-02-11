@@ -116,6 +116,9 @@ class AdminController
                 ]);
                 $this->config->config->output->display('admin.index.sys_info');
                 break;
+            case 'ban_add':
+
+                break;
         }
     }
 
