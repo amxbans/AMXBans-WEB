@@ -42,8 +42,8 @@ class AdminController
 
         switch (Route::getFakePathWay(1)) {
             case 'sys_info':
-                //optimize tables
-                if (isset($_GET["optimize"])) {
+                //optimise tables
+                if (isset($_GET["optimise"])) {
                     $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->config->config->getDb(TRUE) . "` LIKE ?", [$this->config->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
                     $tables = implode('`, `', $tables);
 
@@ -59,13 +59,11 @@ class AdminController
                 if (isset($_GET["prune"]) && User::hasPermission('prune_db')) {
                     /** @var Ban[] $bans */
                     $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
-                    $tables = $mysql->query("SELECT ba.bid,ba.ban_created,ba.ban_length,se.timezone_fixx FROM " . $config->db_prefix . "_bans as ba 
-							LEFT JOIN " . $config->db_prefix . "_serverinfo AS se ON ba.server_ip=se.address WHERE ba.expired=0");
                     $pruned = 0;
                     foreach ($bans as $ban) {
                         $tz = $ban->server->timezone_fixx * 3600;
                         $bl = $ban->ban_length * 60;
-                            //prune expired bans
+                        //prune expired bans
                         if ($ban->ban_created + $tz + $bl < time() && $bl) {
                             $pruned++;
                             $ban->expired = true;
@@ -74,53 +72,49 @@ class AdminController
                             db_bans_log($ban, '--SYSTEM--', 'Bantime expired', $ban->ban_created + $tz + $bl);
                         }
                     }
-                    // TODO: I WAS HERE ============================================================================
-                    $smarty->assign("prunecount", $pruned);
-                    $user_msg = "_DBPRUNED";
+                    $this->config->config->output->assign(compact('pruned'));
+                    $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
+                    db_log('Web config', 'Pruned bans');
                 }
 
-                @$gd = gd_info();
-                $gd_version = $gd["GD Version"];
-                $php_settings = array(
-                    "display_errors" => (ini_get('display_errors') == "") ? "off" : ini_get('display_errors'),
-                    "register_globals" => (ini_get('register_globals') == 1 || ini_get('register_globals') == "on") ? "_ON" : "_OFF",
-                    "magic_quotes_gpc" => (get_magic_quotes_gpc() == true) ? "_ON" : "_OFF",
-                    "safe_mode" => (ini_get('safe_mode') == 1 || ini_get('safe_mode') == "on") ? "_ON" : "_OFF",
+                $php = [
+                    "display_errors" => toBool(ini_get('display_errors')),
                     "post_max_size" => ini_get('post_max_size') . " (" . return_bytes(ini_get('post_max_size')) . " bytes)",
-                    "upload_max_filesize" => ini_get('upload_max_filesize') . " (" . return_bytes(ini_get('upload_max_filesize')) . " bytes)",
+                    "upload_max_filesize" => ini_get('upload_max_filesize') . " (" . return_bytes(ini_get('upload_max_filesize')) . " B)",
                     "max_execution_time" => ini_get('max_execution_time'),
                     "version_php" => phpversion(),
-                    "version_amxbans_web" => $config->v_web,
+                    'version_mysql' => DB::selectRaw('SELECT VERSION();', null, null, PDO::FETCH_COLUMN)[0],
                     "server_software" => $_SERVER["SERVER_SOFTWARE"],
-                    "mysql_version" => mysqli_get_client_info(),
-                    "bcmath" => (extension_loaded('bcmath') == "1") ? "_YES" : "_NO",
-                    "gmp" => (extension_loaded('gmp') == "1") ? "_YES" : "_NO",
-                    "gd" => (extension_loaded('gd') == "1") ? "_YES" : "_NO",
-                    "version_gd" => $gd_version
-                );
-                $smarty->assign("php_settings", $php_settings);
+                    "bc-gmp" => (extension_loaded('bcmath') OR extension_loaded('gmp'))? __LANG__['yes'] : __LANG__['no'],
+                    "gd" => extension_loaded('gd') ? gd_info()['GD Version'] : false,
+                ];
+                $this->config->config->output->assign(compact('php'));
 
-                //clear smarty cache
-                if (isset($_POST["clear"]) && $_SESSION["loggedin"]) {
-                    //special function available from smarty
-                    $smarty->clear_compiled_tpl();
-                    $user_msg = "_CACHEDELETED";
-                }
-                //repair files db
-                if (isset($_POST["file_repair"]) && $_SESSION["loggedin"]) {
-                    $repaired = sql_get_files_count_fail(1);
-                }
-                //repair comments db
-                if (isset($_POST["comment_repair"]) && $_SESSION["loggedin"]) {
-                    $repaired = sql_get_comments_count_fail(1);
-                }
-                $smarty->assign("bans", array("count" => sql_get_bans_count(0), "activ" => sql_get_bans_count(1)));
-                $smarty->assign("db_size", format_size(db_size()));
-                $smarty->assign("auto_prune", $config->auto_prune);
-                $smarty->assign("comment_count", array("count" => sql_get_comments_count(0), "fail" => sql_get_comments_count_fail(0)));
-                $smarty->assign("file_count", array("count" => sql_get_files_count(0), "fail" => sql_get_files_count_fail(0)));
-                $smarty->assign("msg", $user_msg);
-                $this->config->config->output->assign('');
+                /* TODO WEBSITE SETTINGS (web/settings): move this action to there
+                        //clear smarty cache
+                        if (isset($_POST["clear"]) && $_SESSION["loggedin"]) {
+                            //special function available from smarty
+                            $smarty->clear_compiled_tpl();
+                            $user_msg = "_CACHEDELETED";
+                        }*/
+                /* TODO: v7.1
+                        //repair files db
+                        if (isset($_POST["file_repair"]) && $_SESSION["loggedin"]) {
+                            $repaired = sql_get_files_count_fail(1);
+                        }
+                        //repair comments db
+                        if (isset($_POST["comment_repair"]) && $_SESSION["loggedin"]) {
+                            $repaired = sql_get_comments_count_fail(1);
+                        }*/
+
+                $this->config->config->output->assign([
+                    'bans' => ['total' => Ban::query()->count('bid'), 'active' => Ban::query()->where('expired', false)->count('bid')],
+                    'db_size' => format_size(db_size()),
+                    'prune' => $this->config->config->prune_bans,
+                    'comment_count' =>\Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
+                    'file_count' => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
+                ]);
+                $this->config->config->output->display('admin.index.sys_info');
                 break;
         }
     }

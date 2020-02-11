@@ -116,14 +116,16 @@ class DB
     public function where ($field, $operator = NULL, $value = NULL, $pre = 'AND'): self
     {
         $pre = strtoupper($pre);
-        if (is_callable($field)) {
-            $this->wheres[] = [$pre, $field(new DB())->getWheres()];
+        if ($field instanceof \Closure) {
+            $this->wheres[] = [
+                $pre,
+                $field(new DB())->getWheres()
+            ];
             return $this;
         }
-        if (!in_array($operator, sql_operators()))
-            [$value, $operator] = [$operator, '='];
-        if (is_null($value) && in_array($operator, sql_operators()) && !in_array($operator, ['=', '<>', '!=']))
-            $operator = $operator == '=' ? 'IS' : 'IS NOT';
+        if (!in_array((string)$operator, sql_operators()))
+            [$value, $operator] = [$operator, (is_null($operator) ? 'IS' : '=')];
+
         $this->wheres[] = [$pre, $field, $operator, $value];
         return $this;
     }
@@ -173,16 +175,16 @@ class DB
             if (is_array($where[1]))
                 $w .= "$where[0] (" . substr($this->processWhere($where[1]), 6) . ')';
             elseif (is_null($where[3]))
-                $w .= "$where[0] `$where[1]` $where[2] $where[3]";
+                $w .= "$where[0] `$where[1]` $where[2] NULL";
             elseif (strpos('IN', $where[2]) !== FALSE) {
                 foreach ($where[3] as $value) {
                     $word = 'w_' . substr(uniqid(), -3);
-                    $this->wheres[$word] = $value;
+                    $this->wheres[$word] = is_bool($value)? (int)$value : $value;
                     $words[] = ":$word";
                 }
                 $w .= "$where[0] `$where[1]` $where[2] (" . implode(', ', $words) . ")";
             } else {
-                $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = $where[3];
+                $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = is_bool($where[3])? (int)$where[3] : $where[3];
                 $w .= "$where[0] `$where[1]` $where[2] :$word";
             }
         }
@@ -215,5 +217,14 @@ class DB
     {
         global $config;
         return $config->getDb()->lastInsertId();
+    }
+
+    public function count (string $column, $distinct = false)
+    {
+        $column = $distinct? "DISTINCT `$column`" : "`$column`";
+        $q = "SELECT COUNT($column) FROM " . $this->getTableName() . " " . $this->processWhere();
+        $q = $this->db($q);
+        $q->execute($this->wheres);
+        return $q->fetchColumn()[0];
     }
 }

@@ -19,29 +19,30 @@ class Templating extends Smarty
 {
 
 
-	/**
-	 * Templating constructor.
-	 */
-	public function __construct(Config $config) {
-		parent::__construct();
+    /**
+     * Templating constructor.
+     */
+    public function __construct (Config $config)
+    {
+        parent::__construct();
 
-		$this->setTemplateDir([
-			Route::getRootPath() . '/include/templates',
-			Route::getRootPath() . '/install/templates',
-		]);
+        $this->setTemplateDir([
+            Route::getRootPath() . '/include/templates',
+            Route::getRootPath() . '/install/templates',
+        ]);
 
-		$this->setCompileDir(Route::getRootPath() . '/include/templates/compiled');
-		$this->setForceCompile(FALSE);
+        $this->setCompileDir(Route::getRootPath() . '/include/templates/compiled');
+        $this->setForceCompile(FALSE);
 
-		$this->assign('lang', __LANG__);
-		$this->assign('availLangs', $this->getAvailableLanguages());
-		$this->assign('app_name', 'AMXBans v' . Config::version);
-		$this->assign('version', Config::version);
-		$this->assign(compact('config'));
+        $this->assign('lang', __LANG__);
+        $this->assign('availLangs', $this->getAvailableLanguages());
+        $this->assign('app_name', 'AMXBans v' . Config::version);
+        $this->assign('version', Config::version);
+        $this->assign(compact('config'));
 
-	}
+    }
 
-    private function getAvailableLanguages()
+    private function getAvailableLanguages ()
     {
 
         $langs = scandir('language');
@@ -50,5 +51,12 @@ class Templating extends Smarty
                 $lang[] = explode('.', $file)[0];
 
         return $lang;
-	}
+    }
+
+    public function display ($template = null, $cache_id = null, $compile_id = null, $parent = null)
+    {
+        if (!strpos($template, '.tpl', 1))
+            $template .= '.tpl';
+        parent::display($template, $cache_id, $compile_id, $parent);
+    }
 }

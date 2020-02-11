@@ -58,11 +58,11 @@ function db_size ()
 function format_size ($size)
 {
     if ($size >= 1073741824)
-        return round(($size / 1073741824), 2) . "GiB";
+        return round(($size / 1073741824), 2) . "GB";
     if ($size >= 1048576)
-        return round(($size / 1048576), 2) . "MiB";
+        return round(($size / 1048576), 2) . "MB";
     if ($size >= 1024)
-        return round(($size / 1024), 2) . " KiB";
+        return round(($size / 1024), 2) . " KB";
 
     return $size ? $size . " B" : FALSE;
 }
@@ -94,7 +94,7 @@ function init_autoload ($class)
 
 function sql_operators ()
 {
-    return ['=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'];
+    return ['=', '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT'];
 }
 
 function snakeToCamel ($string)
@@ -120,4 +120,9 @@ function return_bytes ($val)
     }
 
     return $val;
+}
+
+function toBool($value): bool
+{
+    return ($value === 'on' OR $value === 'On' OR $value == 'Yes' OR $value == 'yes' OR $value > 0 or $value == TRUE);
 }

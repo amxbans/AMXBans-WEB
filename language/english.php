@@ -108,8 +108,22 @@ return [
 
 
         'sys_info' => [
-            'tables_not_optimised' => 'Tables were not optimised!',
-            'tables_optimised' => 'Tables optimised successfully!',
+            'tables_not_optimised' => 'Database were not optimised!',
+            'tables_optimised' => 'Database optimised successfully!',
+            'bans_pruned' => 'Bans pruned successfully!',
+
+            'server' => 'Server properties',
+            'webserver' => 'Webserver',
+            'module'=> 'Module',
+            'stats' => 'Statistics',
+            'db_size' => 'DB size',
+            'optimise' => 'Optimise',
+            'active' => 'active',
+            'total' => 'total',
+            'bans' => 'bans',
+            'prune' => 'prune',
+            'comments' => 'comments',
+            'files' => 'files',
         ]
     ],
 
@@ -136,6 +150,10 @@ return [
     'ip'          => 'IP',
     'server'      => 'server',
     'web'         => 'wesbite',
+    'and' => 'and',
+    'or' => 'or',
+    'yes' => 'yes',
+    'no' => 'no',
 
     'validation_errors' => [
         'required' => 'The :attribute field is required',

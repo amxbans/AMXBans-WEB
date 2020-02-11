@@ -44,11 +44,11 @@ class Model
                 $v = $this->$method($v);
             return $v != $this->original[$k];
         }, ARRAY_FILTER_USE_BOTH);
-/*
-//        TODO Model: process and remove relations from $this->attributes when saving
-        echo "<b>" . get_called_class() . "::save() :</b><br /> <pre>";
-        var_dump($diff);
-        die;*/
+        /*
+        // TODO Model: process and remove relations from $this->attributes when saving
+                echo "<b>" . get_called_class() . "::save() :</b><br /> <pre>";
+                var_dump($diff);
+                die;*/
 
         if (!isset($this->{$this->primary})) {
             static::query()->insert($diff);
@@ -63,7 +63,7 @@ class Model
         if (array_key_exists($name, $this->attributes))
             return $this->attributes[$name];
         if (!array_key_exists($name, static::relations))
-            return null;
+            return method_exists($this, snakeToCamel('get_' . $name)) ? $this->{snakeToCamel('get_' . $name)} : null;
         $this->loadRelation($name);
         return $this->attributes[$name];
     }
