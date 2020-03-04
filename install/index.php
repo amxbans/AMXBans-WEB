@@ -13,7 +13,6 @@
 session_start();
 
 require_once "../include/class.Config.inc";
-require_once("functions.inc");
 $config = new Config(TRUE);
 
 
@@ -126,3 +125,26 @@ $smarty->assign("site", $site);
 $smarty->assign("version", $config::version);
 
 $smarty->display('setup.tpl');
+
+
+function sql_has_all_privileges(PDO $db): bool
+{
+	//global privileges
+	$query = $db->prepare("SHOW GRANTS FOR CURRENT_USER()");
+	$query->execute();
+	$db_db = $_SESSION["db_name"];
+	foreach ($query->fetchAll() as $v)
+	{
+		$v = $v[0];
+		if (stristr($v, $db_db) || stristr($v, "*.*"))
+		{
+			if (stristr($v, "ALL PRIVILEGES"))
+				return TRUE;
+			elseif (stristr($v, "SELECT") && stristr($v, "INSERT") && stristr($v, "UPDATE") &&
+				stristr($v, "DELETE") && stristr($v, "CREATE"))
+				return TRUE;
+		}
+	}
+
+	return FALSE;
+}
