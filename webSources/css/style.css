@@ -17,24 +17,25 @@ footer.footer {
 }
 
 /* Image Buttons */
-.icons-stats {
+.stat-icon {
+	content: " ";
 	display: inline-block;
-	background-image: url(../../include/templates/_gfx/stats.png);
+	background-image: url(../images/gfx/stats.png);
 	background-repeat: no-repeat;
 	width: 16px;
 	height: 16px;
-	margin: 0;
+	margin-bottom: -4px;
 }
 
-.icon-stats {
+.stats {
 	background-position: 0 0;
 }
 
-.icon-clock {
+.clock {
 	background-position: -16px 0;
 }
 
-.icon-kicks {
+.kicks {
 	background-position: -32px 0;
 }
 
@@ -67,69 +68,4 @@ footer.footer {
 
 .icon-download {
 	background-position: -61px 0;
-}
-
-.icons-connect {
-	display: inline-block;
-	background-image: url(../../include/templates/_gfx/connect.png);
-	background-repeat: no-repeat;
-	width: 80px;
-	height: 15px;
-	cursor: pointer;
-	margin: 0;
-}
-
-.icon-steam {
-	background-position: 0 0;
-}
-
-.icon-hlsw {
-	background-position: -80px 0;
-}
-
-.icons-page {
-	display: inline-block;
-	background-image: url(../../include/templates/_gfx/pagenation.png);
-	background-repeat: no-repeat;
-	width: 16px;
-	height: 16px;
-	margin: 0;
-}
-
-.icon-left-valid {
-	background-position: 0 0;
-	cursor: pointer;
-}
-
-.icon-left-notvalid {
-	background-position: -32px 0;
-}
-
-.icon-left-end {
-	background-position: -64px 0;
-	cursor: pointer;
-}
-
-.icon-right-valid {
-	background-position: -16px 0;
-	cursor: pointer;
-}
-
-.icon-right-notvalid {
-	background-position: -48px 0;
-}
-
-.icon-right-end {
-	background-position: -80px 0;
-	cursor: pointer;
-}
-
-.icon-access {
-	display: inline-block;
-	background-image: url(../_gfx/access.png);
-	background-repeat: no-repeat;
-	width: 16px;
-	height: 16px;
-	cursor: pointer;
-	margin: 0;
 }
