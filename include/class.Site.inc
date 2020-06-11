@@ -19,8 +19,8 @@ class Site
     public $config;
     /** @var array */
     protected $routes = [
-        'index' => [ 'bans', 'ban', 'servers', 'admins', 'search', 'login' ],
-        'admin' => [ 'index', 'server', 'web', 'other', 'logout' ],
+        'index' => ['bans', 'ban', 'servers', 'admins', 'search', 'login'],
+        'admin' => ['index', 'server', 'web', 'other', 'logout'],
     ];
     /** @var string */
     private $tpl = '';
@@ -35,19 +35,20 @@ class Site
      * @return Site
      * @uses IndexController, Route
      */
-    public static function build (Config $config) {
+    public static function build(Config $config)
+    {
         $s = new self();
         $s->config = $config;
         $s->method = $method = $s->resolveMethod();
 
-        if (!Route::getFakePathWay())
-            $s->tpl = 'index.' . Config::start_pages[$config->start_page];
-        else {
-            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
-            $php = substr($php, is_numeric(strpos($php, '/'))? strpos($php, '/')+1 : 0);
-            $s->tpl = in_array(Route::getFakePathWay(), $s->routes[$php] ?? []) ?
+        if (!Route::getFakePathWay()) {
+            $s->tpl = 'index.' . Config::start_pages[ $config->start_page ];
+        } else {
+            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[ 0 ];
+            $php = substr($php, is_numeric(strpos($php, '/')) ? strpos($php, '/') + 1 : 0);
+            $s->tpl = in_array(Route::getFakePathWay(), $s->routes[ $php ] ?? []) ?
                 $php . '.' . Route::getFakePathWay() :
-                'index.' . Config::start_pages[$config->start_page];
+                'index.' . Config::start_pages[ $config->start_page ];
         }
 
         $config->output->assign('site', $s);
@@ -58,7 +59,8 @@ class Site
         return $s;
     }
 
-    public function parseComment (string $text): string {
+    public function parseComment(string $text): string
+    {
         $s = $this->config->smilies;
         foreach ($s as $smiley => $data) {
             $r = "<img src='" . Route::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$smiley}' title='{$data[1]}' />";
@@ -73,67 +75,77 @@ class Site
      *
      * @return mixed
      */
-    public function getTpl () { return $this->tpl; }
+    public function getTpl() { return $this->tpl; }
 
     /** Get the file of template
      *
      * @return mixed
      */
-    public function getTplFile () { return $this->tpl . '.tpl'; }
+    public function getTplFile() { return $this->tpl . '.tpl'; }
 
     /** Get the site name
      *
      * @return mixed
      */
-    public function getSite () { return explode('.', $this->tpl)[1]; }
+    public function getSite() { return explode('.', $this->tpl)[ 1 ]; }
 
     /** Get the site group
      *
      * @return mixed
      */
-    public function getGroup () { return explode('.', $this->tpl)[0]; }
+    public function getGroup() { return explode('.', $this->tpl)[ 0 ]; }
 
-    public static function hasCookie ($what = 'unID'): bool {
-        if (!is_array($what))
-            $what = [ $what ];
+    public static function hasCookie($what = 'unID'): bool
+    {
+        if (!is_array($what)) {
+            $what = [$what];
+        }
 
         foreach ($what as $value) {
-            if (!isset($_COOKIE[$value]))
-                return FALSE;
+            if (!isset($_COOKIE[ $value ])) {
+                return false;
+            }
         }
-        return TRUE;
+        return true;
     }
 
-    public static function makeFormAuth ($method = 'post') {
-        if (strtolower($method) == 'get')
+    public static function makeFormAuth($method = 'post')
+    {
+        if (strtolower($method) == 'get') {
             return '';
-        $_SESSION['TOKEN_V'] = uniqid();
-        $_SESSION['TOKEN_T'] = time();
-        $_SESSION['TOKEN_M'] = $method;
+        }
+        $_SESSION[ 'TOKEN_V' ] = uniqid();
+        $_SESSION[ 'TOKEN_T' ] = time();
+        $_SESSION[ 'TOKEN_M' ] = $method;
 
         $o = strtolower($method) == 'post' ? '' : "<input type='hidden' name='_method_' value='{$method}' />";
         return $o . "<input type='hidden' name='f_v_t' value='{$_SESSION['TOKEN_V']}' />";
     }
 
-    public function validateFormAuth () {
-        $t = $_SESSION['TOKEN_T'] ?? 0;
-        if ((time() - $this->form) > $t)
+    public function validateFormAuth()
+    {
+        $t = $_SESSION[ 'TOKEN_T' ] ?? 0;
+        if ((time() - $this->form) > $t) {
             return $this->destroyFormAuth();
-        $m = $_SESSION['TOKEN_M'];
-        $v = $_SESSION['TOKEN_V'];
+        }
+        $m = $_SESSION[ 'TOKEN_M' ];
+        $v = $_SESSION[ 'TOKEN_V' ];
         $this->destroyFormAuth();
-        return ($v == $_POST['f_v_t'] && $this->method == $m);
+        return ($v == $_POST[ 'f_v_t' ] && $this->method == $m);
     }
 
-    protected function destroyFormAuth () {
-        unset($_SESSION['TOKEN_T'], $_SESSION['TOKEN_M'], $_SESSION['TOKEN_V']);
-        return FALSE;
+    protected function destroyFormAuth()
+    {
+        unset($_SESSION[ 'TOKEN_T' ], $_SESSION[ 'TOKEN_M' ], $_SESSION[ 'TOKEN_V' ]);
+        return false;
     }
 
-    private function resolveMethod () {
-        if (strtolower($_SERVER['REQUEST_METHOD']) == 'get')
+    private function resolveMethod()
+    {
+        if (strtolower($_SERVER[ 'REQUEST_METHOD' ]) == 'get') {
             return 'get';
-        else
-            return strtolower($_POST['_method_'] ?? 'post');
+        } else {
+            return strtolower($_POST[ '_method_' ] ?? 'post');
+        }
     }
 }
