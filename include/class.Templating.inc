@@ -21,6 +21,8 @@ class Templating extends Smarty
 
     /**
      * Templating constructor.
+     *
+     * @param Config $config
      */
     public function __construct (Config $config)
     {

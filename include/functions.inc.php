@@ -20,7 +20,7 @@ function db_log (string $action, string $context, $user = NULL): void
     global $config;
     $q = $config->getDb()
         ->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
-    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? User::get('username'), $action, $context]);
+    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? Auth::get('username'), $action, $context]);
 }
 
 /**
@@ -33,7 +33,7 @@ function db_bans_log ($ban_id, string $admin = null, string $reason = NULL, int 
 {
     $log = new \Models\BansLog();
     $log->bid = $ban_id instanceof \Models\Ban ? $ban_id->bid : $ban_id;
-    $log->admin_nick = $admin ?? User::get('username');
+    $log->admin_nick = $admin ?? Auth::get('username');
     $log->edit_reason = $reason;
     if ($time)
         $log->created_at = new DateTime('@' . $time);

@@ -6,33 +6,33 @@ use Models\DB;
 
 class AdminController
 {
-    private $site;
+    private $section;
     private $method;
-    protected $config;
+    protected $site;
 
     /**
      * AdminController constructor.
      *
-     * @param Site   $config
+     * @param Site   $site
      * @param string $method
-     * @param string $site
+     * @param string $section
      *
      * @throws Exception
      */
-    public function __construct (Site $config, string $method, string $site)
+    public function __construct (Site $site, string $method, string $section)
     {
-        $this->config = $config;
-        $this->method = $method;
         $this->site = $site;
+        $this->method = $method;
+        $this->section = $section;
 
         // If there's any extra action needed, it has to be placed here for all the 'admin' sites
 
         ////////////
 
-        if (method_exists($this, $site))
-            $this->$site();
+        if (method_exists($this, $section))
+            $this->$section();
         else
-            throw new Exception('Site "' . $site . '" not found');
+            throw new Exception('Site "' . $section . '" not found');
     }
 
     private function index ()
@@ -44,19 +44,19 @@ class AdminController
             case 'sys_info':
                 //optimise tables
                 if (isset($_GET["optimise"])) {
-                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->config->config->getDb(TRUE) . "` LIKE ?", [$this->config->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
+                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb(TRUE) . "` LIKE ?", [$this->site->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
                     $tables = implode('`, `', $tables);
 
                     $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
                     if (!$tables)
-                        $this->config->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
+                        $this->site->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
                     else
-                        $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
+                        $this->site->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
                     db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
                 }
 
                 //prune db
-                if (isset($_GET["prune"]) && User::hasPermission('prune_db')) {
+                if (isset($_GET["prune"]) && Auth::hasPermission('prune_db')) {
                     /** @var Ban[] $bans */
                     $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
                     $pruned = 0;
@@ -72,8 +72,8 @@ class AdminController
                             db_bans_log($ban, '--SYSTEM--', 'Bantime expired', $ban->ban_created + $tz + $bl);
                         }
                     }
-                    $this->config->config->output->assign(compact('pruned'));
-                    $this->config->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
+                    $this->site->config->output->assign(compact('pruned'));
+                    $this->site->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
                     db_log('Web config', 'Pruned bans');
                 }
 
@@ -88,7 +88,7 @@ class AdminController
                     "bc-gmp" => (extension_loaded('bcmath') OR extension_loaded('gmp'))? __LANG__['yes'] : __LANG__['no'],
                     "gd" => extension_loaded('gd') ? gd_info()['GD Version'] : false,
                 ];
-                $this->config->config->output->assign(compact('php'));
+                $this->site->config->output->assign(compact('php'));
 
                 /* TODO WEBSITE SETTINGS (web/settings): move this action to there
                         //clear smarty cache
@@ -107,24 +107,24 @@ class AdminController
                             $repaired = sql_get_comments_count_fail(1);
                         }*/
 
-                $this->config->config->output->assign([
+                $this->site->config->output->assign([
                     'bans' => ['total' => Ban::query()->count('bid'), 'active' => Ban::query()->where('expired', false)->count('bid')],
                     'db_size' => format_size(db_size()),
-                    'prune' => $this->config->config->prune_bans,
+                    'prune' => $this->site->config->prune_bans,
                     'comment_count' =>\Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
                     'file_count' => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
                 ]);
-                $this->config->config->output->display('admin.index.sys_info');
+                $this->site->config->output->display('admin.index.sys_info');
                 break;
             case 'ban_add':
-                $this->config->config->output->assign('reasons', Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
-                $this->config->config->output->display('admin.index.ban_add');
+                $this->site->config->output->assign('reasons', Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
+                $this->site->config->output->display('admin.index.ban_add');
                 break;
         }
     }
 
     private function navigateTo ($class, $site)
     {
-        new $class($this->config, $this->method, $site);
+        new $class($this->site, $this->method, $site);
     }
 }

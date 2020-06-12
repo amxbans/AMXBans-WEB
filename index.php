@@ -11,8 +11,7 @@
  */
 
 session_start();
-require_once "include/class.Config.inc";
-$config = new Config;
+require_once "include/class.Site.inc";
 
 
-Site::build($config);
+Site::build();

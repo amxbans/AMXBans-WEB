@@ -32,7 +32,7 @@ class Config
     /**
      * @var array
      */
-    const start_pages = [ 'bans', 'servers', 'admins' ];
+    public const start_pages = ['bans', 'servers', 'admins'];
 
     /**
      * @var string
@@ -48,106 +48,103 @@ class Config
         'banner_url'                  => '//forum.amxbans.net',
         'default_lang'                => 'english',
         'start_page'                  => 0,
-        'bans_show_kicks'             => TRUE,
-        'bans_show_comments'          => TRUE,
+        'bans_show_kicks'             => true,
+        'bans_show_comments'          => true,
         'uploaded_file_size'          => 2000000,
-        'uploaded_file_types'         => [ 'dem', 'zip', 'rar', 'jpg', 'png', 'gif' ],
-        'allow_unregistered_comments' => FALSE,
+        'uploaded_file_types'         => ['dem', 'zip', 'rar', 'jpg', 'png', 'gif'],
+        'allow_unregistered_comments' => false,
         'prune_bans'                  => 5,
         'max_login_tries'             => 5,
     ];
 
-    /** @var Templating */
-    public $output;
-
-    /** @var PDO */
+    /** @var DB */
     protected $db;
 
-    /** @var stdClass */
-    protected $dbData;
+    public function __construct(bool $install = false)
+    {
+        if (!$install) {
+            if (!file_exists(__DIR__ . "/db.Config.inc")) {
+                if (is_dir(Route::getRootPath() . '/install')) {
+                    header('Location: ' . Route::getBaseURL() . '/install');
+                }
+                die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER[ 'SERVER_ADMIN' ] . "</p><hr />" . @$_SERVER[ 'SERVER_SIGNATURE' ]);
+            } else {
+                $this->db = new DB();
 
-    /** @var string */
-    public $dbPrefix = '';
-
-    /**
-     * @return PDO|string
-     */
-    public function getDb ($name = false) {
-        return $name? $this->dbData->name : $this->db;
-    }
-
-    /**
-     * Configuration constructor.
-     *
-     * @param bool $install
-     */
-    public function __construct ($install = FALSE) {
-        // All the initial things
-        include_once 'functions.inc.php';
-        spl_autoload_register('init_autoload');
-
-
-        if ($install) ;
-        elseif (!file_exists(__DIR__ . "/db.Config.inc")) {
-            if (is_dir(Route::getRootPath() . '/install'))
-                header('Location: ' . Route::getBaseURL() . '/install');
-            die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER['SERVER_ADMIN'] . "</p><hr />" . @$_SERVER['SERVER_SIGNATURE']);
-        }
-        else {
-            $this->dbData = require "db.Config.inc";
-            $this->dbPrefix = $this->dbData->prefix;
-            try {
-                $this->db = new PDO("mysql:dbname={$this->dbData->name};host={$this->dbData->host}", $this->dbData->user, $this->dbData->pass);
-                $this->db->exec("SET CHARSET utf8");
-            } catch (PDOException $e) {
-                trigger_error($e->getMessage());
+                $this->setupWebConfig();
             }
-
-            $this->setupWebConfig();
-            User::init($this);
         }
 
         //save current language to session
-        if (!isset($_SESSION["lang"])) $_SESSION["lang"] = ($install ? 'english' : $this->default_lang);
-        if (isset($_GET['lang'])) $_SESSION['lang'] = $_GET['lang'];
+        if (!isset($_SESSION[ "lang" ])) {
+            $_SESSION[ "lang" ] = ($install ? 'english' : $this->default_lang);
+        }
+        if (isset($_GET[ 'lang' ])) {
+            $_SESSION[ 'lang' ] = $_GET[ 'lang' ];
+        }
 
         //Setup language strings
-        $lang = Route::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION['lang'] . '.php';
-        if (file_exists($lang)) $lang = require $lang;
-        else
-            $lang = require str_ireplace($_SESSION['lang'], 'english', $lang);
+        $lang = Route::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION[ 'lang' ] . '.php';
+        if (file_exists($lang)) {
+            $lang = require $lang;
+        } else {
+            $lang = require str_ireplace($_SESSION[ 'lang' ], 'english', $lang);
+        }
         define('__LANG__', $lang);
-        $this->output = new Templating($this);
     }
 
-    public function __get ($name) {
+    /**
+     * @param bool $name
+     *
+     * @return DB
+     */
+    public function getDb(): DB { return $this->db; }
+
+    /**
+     * @param $name
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function __get($name)
+    {
         if (isset($this->variables[$name])) return $this->variables[$name];
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+        throw new Exception("Configuration variable '$name' was not found [L$caller[line] @ $caller[file]]");
     }
 
 
     /**
      *
      */
-    private function setupWebConfig () {
+    private function setupWebConfig()
+    {
         // webConfig
-        $query = $this->db->prepare("SELECT `name`, `value` FROM `{$this->dbPrefix}_webconfig`");
+        $query = $this->db->prepare("SELECT `name`, `value` FROM `{$this->db->prefix}_webconfig`");
         $query->execute();
         $query = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 
         foreach ($query as $k => $v) {
-            if (!isset($this->variables[$k])) $this->variables[$k] = $v;
-            elseif (is_string($this->variables[$k])) $this->variables[$k] = $v;
-            elseif (is_int($this->variables[$k]) && $v != '') $this->variables[$k] = (int)$v;
-            elseif (is_array($this->variables[$k])) $this->variables[$k] = explode(', ', $v);
-            elseif (is_bool($this->variables[$k])) $this->variables[$k] = (bool)$v;
-            elseif (is_int($this->variables[$k]) && $v == '') $this->variables[$k] = NULL;
+            if (!isset($this->variables[ $k ])) {
+                $this->variables[ $k ] = $v;
+            } elseif (is_string($this->variables[ $k ])) {
+                $this->variables[ $k ] = $v;
+            } elseif (is_int($this->variables[ $k ]) && $v != '') {
+                $this->variables[ $k ] = (int)$v;
+            } elseif (is_array($this->variables[ $k ])) {
+                $this->variables[ $k ] = explode(', ', $v);
+            } elseif (is_bool($this->variables[ $k ])) {
+                $this->variables[ $k ] = (bool)$v;
+            } elseif (is_int($this->variables[ $k ]) && $v == '') {
+                $this->variables[ $k ] = null;
+            }
         }
 
 
         // Smilies
-        $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->dbPrefix}_smilies`");
+        $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->db->prefix}_smilies`");
         $query->execute();
 
-        $this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_NUM|PDO::FETCH_UNIQUE);
+        $this->variables[ 'smilies' ] = $query->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_NUM | PDO::FETCH_UNIQUE);
     }
 }

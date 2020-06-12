@@ -64,7 +64,7 @@
     </main>
 </div>
 <footer class="footer">
-    {if !User::get()}<a href="{"login"|url}">{$lang.index.titles.login}</a>{/if}
+    {if !$site->user->get() }<a href="{"login"|url}">{$lang.index.titles.login}</a>{/if}
 </footer>
 </body>
 </html>

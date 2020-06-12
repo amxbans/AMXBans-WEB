@@ -16,7 +16,7 @@ class DB
     /** @var string $limits Stores a string of LIMIT and OFFSET clauses */
     protected $limits;
 
-    public static function table ($table, $model = null)
+    public static function table($table, $model = null)
     {
         $c = new self();
         $c->table = $table;
@@ -30,15 +30,17 @@ class DB
      *
      * @return mixed
      */
-    public function select ($columns = '*', int $fetch_type = null): array
+    public function select($columns = '*', int $fetch_type = null): array
     {
-        if ($columns != '*' OR is_array($columns))
+        if ($columns != '*' OR is_array($columns)) {
             $columns = '`' . implode('`, `', is_array($columns) ? $columns : [$columns]) . '`';
+        }
         $q = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
         $q = $this->db($q);
         $q->execute($this->wheres);
-        if ($this->model)
+        if ($this->model) {
             return $q->fetchAll(PDO::FETCH_CLASS, $this->model);
+        }
         return $fetch_type ? $q->fetchAll($fetch_type) : $q->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -47,13 +49,16 @@ class DB
      *
      * @return bool
      */
-    public function update (array $data = []): bool
+    public function update(array $data = []): bool
     {
-        if (empty($data))
-            return FALSE;
-        foreach ($data as $k => $datum)
+        if (empty($data)) {
+            return false;
+        }
+        foreach ($data as $k => $datum) {
             $pieces[] = "`$k` = ?";
-        $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ', $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
+        }
+        $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ',
+                $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
         return $this->db($q)->execute(array_merge(array_values($data), $this->wheres ?? []));
     }
 
@@ -62,17 +67,20 @@ class DB
      *
      * @return bool
      */
-    public function insert (array $data): bool
+    public function insert(array $data): bool
     {
-        if (empty($data))
-            return FALSE;
+        if (empty($data)) {
+            return false;
+        }
         if (func_num_args() > 1) {
-            foreach (func_get_args() as $arg)
+            foreach (func_get_args() as $arg) {
                 $return[] = $this->insert((array)$arg);
+            }
             return in_array(false, $return);
         }
         $pieces = array_fill(0, count($data), '?');
-        $q = 'INSERT INTO `' . $this->getTableName() . '` (`' . implode('`, `', array_keys($data)) . '`) VALUES (' . implode(',', $pieces) . ')';
+        $q = 'INSERT INTO `' . $this->getTableName() . '` (`' . implode('`, `',
+                array_keys($data)) . '`) VALUES (' . implode(',', $pieces) . ')';
 
         return $this->db($q)->execute(array_values($data));
     }
@@ -85,23 +93,15 @@ class DB
      *
      * @return mixed|bool
      */
-    public function selectOne ($columns = '*', int $fetch_type = null)
+    public function selectOne($columns = '*', int $fetch_type = null)
     {
         $q = $this->limit(1)->select($columns, $fetch_type);
         return $q[0] ?? false;
     }
 
-    private function getTableName ()
-    {
-        global $config;
-        return $config->dbPrefix . '_' . $this->table;
-    }
+    private function getTableName() { return \Site::$instance->config->getDb()->prefix . '_' . $this->table; }
 
-    protected function db ($query)
-    {
-        global $config;
-        return $config->getDb()->prepare($query);
-    }
+    protected function db($query) { return \Site::$instance->config->getDb()->prepare($query); }
 
     /**
      * Adds WHERE clause to query
@@ -113,18 +113,19 @@ class DB
      *
      * @return $this
      */
-    public function where ($field, $operator = NULL, $value = NULL, $pre = 'AND'): self
+    public function where($field, $operator = null, $value = null, $pre = 'AND'): self
     {
         $pre = strtoupper($pre);
         if ($field instanceof \Closure) {
             $this->wheres[] = [
                 $pre,
-                $field(new DB())->getWheres()
+                $field(new DB())->getWheres(),
             ];
             return $this;
         }
-        if (!in_array((string)$operator, sql_operators()))
+        if (!in_array((string)$operator, sql_operators())) {
             [$value, $operator] = [$operator, (is_null($operator) ? 'IS' : '=')];
+        }
 
         $this->wheres[] = [$pre, $field, $operator, $value];
         return $this;
@@ -140,7 +141,7 @@ class DB
      *
      * @return array
      */
-    public static function selectRaw (string $sql, array $values = null, $asModel = null, $fetch_style = null)
+    public static function selectRaw(string $sql, array $values = null, $asModel = null, $fetch_style = null)
     {
         $i = new self();
         $q = $i->db($sql);
@@ -156,72 +157,66 @@ class DB
      *
      * @return bool
      */
-    public static function rawSQL (string $sql, array $values = null)
+    public static function rawSQL(string $sql, array $values = null)
     {
         return (new self())->db($sql)->execute($values);
     }
 
-    private function processWhere ($wheres = NULL): string
+    private function processWhere($wheres = null): string
     {
         if (!$wheres) {
             $wheres = $this->wheres;
-            $this->wheres = NULL;
+            $this->wheres = null;
         }
-        if (empty($wheres))
+        if (empty($wheres)) {
             return '';
+        }
 
         $w = '';
         foreach ($wheres as $where) {
-            if (is_array($where[1]))
+            if (is_array($where[1])) {
                 $w .= "$where[0] (" . substr($this->processWhere($where[1]), 6) . ')';
-            elseif (is_null($where[3]))
+            } elseif (is_null($where[3])) {
                 $w .= "$where[0] `$where[1]` $where[2] NULL";
-            elseif (strpos('IN', $where[2]) !== FALSE) {
+            } elseif (strpos('IN', $where[2]) !== false) {
                 foreach ($where[3] as $value) {
                     $word = 'w_' . substr(uniqid(), -3);
-                    $this->wheres[$word] = is_bool($value)? (int)$value : $value;
+                    $this->wheres[$word] = is_bool($value) ? (int)$value : $value;
                     $words[] = ":$word";
                 }
                 $w .= "$where[0] `$where[1]` $where[2] (" . implode(', ', $words) . ")";
             } else {
-                $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = is_bool($where[3])? (int)$where[3] : $where[3];
+                $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = is_bool($where[3]) ? (int)$where[3] : $where[3];
                 $w .= "$where[0] `$where[1]` $where[2] :$word";
             }
         }
         return "WHERE" . substr($w, strpos($w, ' '));
     }
 
-    public function getWheres (): array { return $this->wheres; }
+    public function getWheres(): array { return $this->wheres; }
 
     /**
-     * Adds (if set), changes or removes (if not set) LIMIT and OFFSET clauses
+     * Adds (if not set), changes or removes LIMIT and OFFSET clauses
      *
      * @param int|NULL $limit
      * @param int|NULL $offset
      *
      * @return $this
      */
-    public function limit (int $limit = NULL, int $offset = NULL)
+    public function limit(int $limit = null, int $offset = null)
     {
-        if (is_null($limit)) {
-            global $config;
-            $limit = $config->per_page;
-        }
+        $limit = is_null($limit)? \Site::$instance->config->per_page : $limit;
         $this->limits = !$limit ? '' : "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
         return $this;
     }
 
-    private function processLimit (): string { return $this->limits ?? ''; }
+    private function processLimit(): string { return $this->limits ?? ''; }
 
-    public static function lastInsertId ()
-    {
-        global $config;
-        return $config->getDb()->lastInsertId();
-    }
+    public static function lastInsertId() { return \Site::$instance->config->getDb()->lastInsertId(); }
 
-    public function count (string $column, $distinct = false)
+    public function count(string $column, $distinct = false)
     {
-        $column = $distinct? "DISTINCT `$column`" : "`$column`";
+        $column = $distinct ? "DISTINCT `$column`" : "`$column`";
         $q = "SELECT COUNT($column) FROM " . $this->getTableName() . " " . $this->processWhere();
         $q = $this->db($q);
         $q->execute($this->wheres);
