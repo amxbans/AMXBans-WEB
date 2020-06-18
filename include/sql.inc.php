@@ -116,7 +116,7 @@ function sql_get_amxadmins_list() {
 	while($result = $query->fetch_object()) {
 		if(!empty($result->steamid)) {
 			$steamid = htmlentities($result->steamid, ENT_QUOTES);
-			$steamcomid = GetFriendId($steamid);
+			$steamcomid = Steam::GetFriendId($steamid);
 		}
 		$admin=array(
 			"aid"=>$result->id,
@@ -486,7 +486,7 @@ function sql_get_search_bans($search,$active=1,&$count=0) {
 	while($result = $query->fetch_object()) {
 		if(!empty($result->player_id)) {
 			$steamid = htmlentities($result->player_id, ENT_QUOTES);
-			$steamcomid = GetFriendId($steamid);
+			$steamcomid = Steam::GetFriendId($steamid);
 			$query2 = $mysql->query("SELECT COUNT(*) FROM `".$config->db_prefix."_bans` WHERE `player_id`='".$result->player_id."' AND `expired`=1");
 			$bancount=$query2->fetch_row()[0];
 		}

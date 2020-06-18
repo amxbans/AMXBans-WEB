@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Support\Path;
+
 require_once 'smarty/Smarty.class.php';
 
 /**
@@ -24,17 +26,17 @@ class Templating extends Smarty
      *
      * @param Config $config
      */
-    public function __construct (Config $config)
+    public function __construct(Config $config)
     {
         parent::__construct();
 
         $this->setTemplateDir([
-            Route::getRootPath() . '/include/templates',
-            Route::getRootPath() . '/install/templates',
+            Path::getRootPath() . '/include/templates',
+            Path::getRootPath() . '/install/templates',
         ]);
 
-        $this->setCompileDir(Route::getRootPath() . '/include/templates/compiled');
-        $this->setForceCompile(FALSE);
+        $this->setCompileDir(Path::getRootPath() . '/include/templates/compiled');
+        $this->setForceCompile(false);
 
         $this->assign('lang', __LANG__);
         $this->assign('availLangs', $this->getAvailableLanguages());
@@ -44,21 +46,24 @@ class Templating extends Smarty
 
     }
 
-    private function getAvailableLanguages ()
+    private function getAvailableLanguages()
     {
 
         $langs = scandir('language');
-        foreach ($langs as $file)
-            if ($file != "." && $file != ".." && substr($file, 0, 4) != "lang")
+        foreach ($langs as $file) {
+            if ($file != "." && $file != ".." && substr($file, 0, 4) != "lang") {
                 $lang[] = explode('.', $file)[0];
+            }
+        }
 
         return $lang;
     }
 
-    public function display ($template = null, $cache_id = null, $compile_id = null, $parent = null)
+    public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
     {
-        if (!strpos($template, '.tpl', 1))
+        if (!strpos($template, '.tpl', 1)) {
             $template .= '.tpl';
+        }
         parent::display($template, $cache_id, $compile_id, $parent);
     }
 }

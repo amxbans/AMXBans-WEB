@@ -14,6 +14,7 @@
  * @author indianiso1 <indianiso1 at gmail dot com>
  *
  */
-function smarty_modifier_url ($string, string $php = NULL, string $real_path = NULL) {
-    return Route::makeURL(is_array($string)? implode('/', $string) : $string, $php, $real_path);
+function smarty_modifier_url($string, string $php = null, string $real_path = null)
+{
+    return \Support\Path::makeURL(is_array($string) ? implode('/', $string) : $string, $php, $real_path);
 }

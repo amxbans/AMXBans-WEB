@@ -6,16 +6,21 @@ namespace Models;
 
 /**
  * Class Comment
+ *
  * @package Models
  *
- * @property-read int $id
- * @property string $name
- * @property string|null $comment
- * @property string|null $file
- * @property string $email
- * @property string $addr IP Address
+ * @property-read int         $id
+ * @property string           $name
+ * @property string|null      $comment
+ * @property string|null      $file
+ * @property string           $email
+ * @property string           $addr IP Address
  * @property \DateTime|string $created_at
- * @property 
+ * @property int              $bid
+ * @property int              $admin_id
+ * @property int              $hidden_by
+ *
+ * @property-read Ban         $ban
  */
 class Comment extends Model
 {
@@ -29,14 +34,17 @@ class Comment extends Model
     ];
     protected $table = 'comments';
 
-    public static function query (int $type = self::ALL)
+    public static function query(int $type = self::ALL)
     {
-        if ($type == self::FILES)
+        if ($type == self::FILES) {
             return parent::query()->where('file', 'IS NOT');
-        if ($type == self::COMMENTS)
+        }
+        if ($type == self::COMMENTS) {
             return parent::query()->where('comment', 'IS NOT');
-        if ($type == self::BOTH)
+        }
+        if ($type == self::BOTH) {
             return parent::query()->where('file', 'IS NOT')->where('comment', 'IS NOT');
+        }
         return parent::query();
     }
 

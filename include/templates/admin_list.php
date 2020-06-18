@@ -25,7 +25,7 @@ session_start();
 require_once("include/config.inc.php");
 require_once("include/access.inc.php");
 require_once("include/menu.inc.php");
-require_once("include/steam.inc.php");
+require_once("include/class.Steam.inc");
 require_once("include/sql.inc.php");
 require_once("include/logfunc.inc.php");
 require_once("include/functions.inc.php");

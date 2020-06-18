@@ -293,7 +293,7 @@ while($row=$query->fetch_assoc()) {
 }
 //generate steamcomid
 if(!empty($ban_details["player_id"])) {
-	$ban_details["player_comid"]=GetFriendId($ban_details["player_id"]);;
+	$ban_details["player_comid"]=Steam::GetFriendId($ban_details["player_id"]);;
 }
 
 $smarty->assign("ban_detail",$ban_details);

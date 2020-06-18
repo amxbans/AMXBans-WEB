@@ -1,7 +1,7 @@
 <?php
 /**
  *    AMXBans v7
- * Copyright 2009, 2010 by SeToY & |PJ|ShOrTy, 2019 by indianiso1
+ * Copyright 2018 by SeToY & |PJ|ShOrTy, indianiso1
  * This file is part of AMXBans.
  *
  * AMXBans is free software, but it's licensed under the Creative Commons - Attribution-NonCommercial-ShareAlike 2.0
@@ -10,7 +10,17 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
-session_start();
-require_once "include/class.Site.inc";
+/**  */
 
-Site::build();
+namespace Controllers;
+
+use Config;
+use Support\BaseController;
+
+class StartController extends BaseController
+{
+    public function index()
+    {
+        header('Location: ' . \Support\Path::makeURL(Config::start_pages[$this->site->config->start_page]));
+    }
+}

@@ -3,6 +3,7 @@
 
 use Models\Ban;
 use Models\DB;
+use Support\Path;
 
 class AdminController
 {
@@ -19,7 +20,7 @@ class AdminController
      *
      * @throws Exception
      */
-    public function __construct (Site $site, string $method, string $section)
+    public function __construct(Site $site, string $method, string $section)
     {
         $this->site = $site;
         $this->method = $method;
@@ -29,29 +30,35 @@ class AdminController
 
         ////////////
 
-        if (method_exists($this, $section))
+        if (method_exists($this, $section)) {
             $this->$section();
-        else
+        } else {
             throw new Exception('Site "' . $section . '" not found');
+        }
     }
 
-    private function index ()
+    private function index()
     {
-        if ($this->method !== 'get')
-            $this->navigateTo(AdminIndexController::class, Route::getFakePathWay(1));
+        if ($this->method !== 'get') {
+            $this->navigateTo(AdminIndexController::class, Path::getFakePathWay(1));
+        }
 
-        switch (Route::getFakePathWay(1)) {
+        switch (Path::getFakePathWay(1)) {
             case 'sys_info':
                 //optimise tables
                 if (isset($_GET["optimise"])) {
-                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb(TRUE) . "` LIKE ?", [$this->site->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
+                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb(true) . "` LIKE ?",
+                        [$this->site->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
                     $tables = implode('`, `', $tables);
 
                     $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
-                    if (!$tables)
-                        $this->site->config->output->append('messages', ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
-                    else
-                        $this->site->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
+                    if (!$tables) {
+                        $this->site->config->output->append('messages',
+                            ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
+                    } else {
+                        $this->site->config->output->append('messages',
+                            ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
+                    }
                     db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
                 }
 
@@ -73,20 +80,21 @@ class AdminController
                         }
                     }
                     $this->site->config->output->assign(compact('pruned'));
-                    $this->site->config->output->append('messages', ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
+                    $this->site->config->output->append('messages',
+                        ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
                     db_log('Web config', 'Pruned bans');
                 }
 
                 $php = [
-                    "display_errors" => toBool(ini_get('display_errors')),
-                    "post_max_size" => ini_get('post_max_size') . " (" . return_bytes(ini_get('post_max_size')) . " bytes)",
+                    "display_errors"      => toBool(ini_get('display_errors')),
+                    "post_max_size"       => ini_get('post_max_size') . " (" . return_bytes(ini_get('post_max_size')) . " bytes)",
                     "upload_max_filesize" => ini_get('upload_max_filesize') . " (" . return_bytes(ini_get('upload_max_filesize')) . " B)",
-                    "max_execution_time" => ini_get('max_execution_time'),
-                    "version_php" => phpversion(),
-                    'version_mysql' => DB::selectRaw('SELECT VERSION();', null, null, PDO::FETCH_COLUMN)[0],
-                    "server_software" => $_SERVER["SERVER_SOFTWARE"],
-                    "bc-gmp" => (extension_loaded('bcmath') OR extension_loaded('gmp'))? __LANG__['yes'] : __LANG__['no'],
-                    "gd" => extension_loaded('gd') ? gd_info()['GD Version'] : false,
+                    "max_execution_time"  => ini_get('max_execution_time'),
+                    "version_php"         => phpversion(),
+                    'version_mysql'       => DB::selectRaw('SELECT VERSION();', null, null, PDO::FETCH_COLUMN)[0],
+                    "server_software"     => $_SERVER["SERVER_SOFTWARE"],
+                    "bc-gmp"              => (extension_loaded('bcmath') OR extension_loaded('gmp')) ? __LANG__['yes'] : __LANG__['no'],
+                    "gd"                  => extension_loaded('gd') ? gd_info()['GD Version'] : false,
                 ];
                 $this->site->config->output->assign(compact('php'));
 
@@ -108,22 +116,26 @@ class AdminController
                         }*/
 
                 $this->site->config->output->assign([
-                    'bans' => ['total' => Ban::query()->count('bid'), 'active' => Ban::query()->where('expired', false)->count('bid')],
-                    'db_size' => format_size(db_size()),
-                    'prune' => $this->site->config->prune_bans,
-                    'comment_count' =>\Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
-                    'file_count' => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
+                    'bans'          => [
+                        'total'  => Ban::query()->count('bid'),
+                        'active' => Ban::query()->where('expired', false)->count('bid'),
+                    ],
+                    'db_size'       => format_size(db_size()),
+                    'prune'         => $this->site->config->prune_bans,
+                    'comment_count' => \Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
+                    'file_count'    => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
                 ]);
                 $this->site->config->output->display('admin.index.sys_info');
                 break;
             case 'ban_add':
-                $this->site->config->output->assign('reasons', Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
+                $this->site->config->output->assign('reasons',
+                    Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
                 $this->site->config->output->display('admin.index.ban_add');
                 break;
         }
     }
 
-    private function navigateTo ($class, $site)
+    private function navigateTo($class, $site)
     {
         new $class($this->site, $this->method, $site);
     }

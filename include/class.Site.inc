@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Support\Path;
+
 /**
  * Class Site
  */
@@ -27,15 +29,16 @@ class Site
     /** @var Templating */
     public $output;
 
-    /** @var array */
-    protected $routes = [
-        'index' => ['bans', 'ban', 'servers', 'admins', 'search', 'login'],
-        'admin' => ['index', 'server', 'web', 'other', 'logout'],
-    ];
+    /** @var Route */
+    public $route;
 
     /** @var string */
-    private $tpl = '';
     private $method;
+
+    /** @var array|Closure */
+    private $site;
+    /** @var array */
+    private $siteArgs;
 
     protected $form = 600; // 10 minutes
 
@@ -54,24 +57,20 @@ class Site
         $this->config = new Config($install);
         $this->output = new Templating($this->config);
         $this->user = Auth::init($this->config);
+        $this->route = new Route(basename($_SERVER['SCRIPT_FILENAME']));
 
-        $this->method = $method = $this->resolveMethod();
-
-        if (!Route::getFakePathWay()) {
-            $this->tpl = 'index.' . Config::start_pages[$this->config->start_page];
-        } else {
-            $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
-            $php = substr($php, is_numeric(strpos($php, '/')) ? strpos($php, '/') + 1 : 0);
-            $this->tpl = in_array(Route::getFakePathWay(), $this->routes[$php] ?? []) ?
-                $php . '.' . Route::getFakePathWay() :
-                'index.' . Config::start_pages[$this->config->start_page];
-        }
+        $this->method = $this->resolveMethod();
+        [$this->site, $this->siteArgs] = $this->route->getSite($this->method);
 
         $this->output->assign('site', $this);
 
-        $controller = ucfirst($this->getGroup()) . 'Controller';
-        $cMethod = $this->getSite();
-        new $controller($this, $method, $cMethod);
+        $callable = $this->site;
+        if ($callable instanceof Closure) {
+            $callable(...$this->siteArgs);
+        } else {
+            $callable = $callable[0];
+            new $callable($this, $this->method, $this->site[1], $this->siteArgs);
+        }
     }
 
     /**
@@ -83,39 +82,14 @@ class Site
 
     public function parseComment(string $text): string
     {
-        $s = $this->config->smilies;
-        foreach ($s as $smiley => $data) {
-            $r = "<img src='" . Route::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$smiley}' title='{$data[1]}' />";
+        foreach ($this->config->smilies as $smiley => $data) {
+            $r = "<img src='" . Path::getBaseURL() . "/webSources/images/emoticons/{$data[0]}' alt='{$smiley}' title='{$data[1]}' />";
             $text = str_replace($smiley, $r, $text);
         }
 
         $text = nl2br($text);
         return $text;
     }
-
-    /** Get the name of template
-     *
-     * @return mixed
-     */
-    public function getTpl() { return $this->tpl; }
-
-    /** Get the file of template
-     *
-     * @return mixed
-     */
-    public function getTplFile() { return $this->tpl . '.tpl'; }
-
-    /** Get the site name
-     *
-     * @return mixed
-     */
-    public function getSite() { return explode('.', $this->tpl)[1]; }
-
-    /** Get the site group
-     *
-     * @return mixed
-     */
-    public function getGroup() { return explode('.', $this->tpl)[0]; }
 
     public static function hasCookie($what = 'unID'): bool
     {

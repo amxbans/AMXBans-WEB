@@ -1,11 +1,20 @@
 <?php
-
+/**
+ *    AMXBans v7
+ * Copyright 2018 by indianiso1
+ * This file is part of AMXBans.
+ *
+ * AMXBans is free software, but it's licensed under the Creative Commons - Attribution-NonCommercial-ShareAlike 2.0
+ * AMXBans is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * You should have received a copy of the cc-nC-SA along with AMXBans.
+ * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
+ */
 
 namespace Models;
 
-
 /**
  * Class Ban
+ *
  * @package Models
  *
  * @property-read int       $bid
@@ -34,8 +43,9 @@ class Ban extends Model
     protected $table = 'bans';
     protected $primary = 'bid';
     protected const relations = [
-        'server' => [0, 'Models\Server', 'server_ip', 'address'],
-        'admin' => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'],
-        'logs' => [1, 'Models\BansLog', 'bid', 'bid'],
+        'server'   => [0, 'Models\Server', 'server_ip', 'address'],
+        'admin'    => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'],
+        'logs'     => [1, 'Models\BansLog', 'bid', 'bid'],
+        'comments' => [1, 'Models\Comment', 'bid', ''],
     ];
 }

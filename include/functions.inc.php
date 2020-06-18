@@ -28,6 +28,8 @@ function db_log (string $action, string $context, $user = NULL): void
  * @param string|null       $admin
  * @param string|null       $reason
  * @param int|null          $time
+ *
+ * @throws Exception
  */
 function db_bans_log ($ban_id, string $admin = null, string $reason = NULL, int $time = null): void
 {
@@ -72,6 +74,7 @@ function init_autoload ($class)
     $in_folders = [
         'Controllers' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%2$s.%3$s.inc',
         'Models' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
+        'Support' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
     ];
     if (file_exists(__DIR__ . '/class.' . $class . '.inc')) require_once __DIR__ . DIRECTORY_SEPARATOR . "class.$class.inc";
     else {
@@ -79,7 +82,7 @@ function init_autoload ($class)
         $c = array_pop($class);
         $ns = implode(DIRECTORY_SEPARATOR, $class);
 
-        $php = explode('.', substr(Route::getURL(), strlen(Route::getBaseURL())))[0];
+        $php = explode('.', substr($_SERVER['SCRIPT_NAME'], strlen(dirname($_SERVER['SCRIPT_NAME']))))[0];
         $php = substr($php, is_numeric(strpos($php, '/')) ? strpos($php, '/') + 1 : 0);
 
         if (in_array($ns, array_keys($in_folders))) {

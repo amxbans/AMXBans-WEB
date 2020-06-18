@@ -48,8 +48,8 @@
 
 					<td><img alt="{$ban.type}" src="{"webSources/images/games"|res_url}/{$ban.type}.gif" />
 					</td>
-					<td><a href="{['ban', $ban.id]|url}">{$ban.created|date_format:$lang.date_format}</a></td>
-					<td><a href="{['ban', $ban.id]|url}">{$ban.player}</a></td>
+					<td><a href="{['bans', $ban.id]|url}">{$ban.created|date_format:$lang.date_format}</a></td>
+					<td><a href="{['bans', $ban.id]|url}">{$ban.player}</a></td>
 					<td>{$ban.admin}</td>
 					<td>{$ban.reason}</td>
                     {if $ban.length > 0}

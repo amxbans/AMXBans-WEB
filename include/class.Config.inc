@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Support\Path;
+
 /**
  * Class Config
  *
@@ -26,8 +28,9 @@
  * @property-read string $allow_unregistered_comments
  * @property-read int    $prune_bans
  * @property-read int    $max_login_tries
+ * @property-read array  $smilies
  */
-class Config
+class Config implements ArrayAccess
 {
     /**
      * @var array
@@ -43,6 +46,7 @@ class Config
      * @var array
      */
     private $variables = [
+        'cookie'                      => 'amxx',
         'per_page'                    => 50,
         'banner_src'                  => 'amxbans.png',
         'banner_url'                  => '//forum.amxbans.net',
@@ -64,10 +68,10 @@ class Config
     {
         if (!$install) {
             if (!file_exists(__DIR__ . "/db.Config.inc")) {
-                if (is_dir(Route::getRootPath() . '/install')) {
-                    header('Location: ' . Route::getBaseURL() . '/install');
+                if (is_dir(Path::getRootPath() . '/install')) {
+                    header('Location: ' . Path::getBaseURL() . '/install');
                 }
-                die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER[ 'SERVER_ADMIN' ] . "</p><hr />" . @$_SERVER[ 'SERVER_SIGNATURE' ]);
+                die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER['SERVER_ADMIN'] . "</p><hr />" . @$_SERVER['SERVER_SIGNATURE']);
             } else {
                 $this->db = new DB();
 
@@ -76,19 +80,19 @@ class Config
         }
 
         //save current language to session
-        if (!isset($_SESSION[ "lang" ])) {
-            $_SESSION[ "lang" ] = ($install ? 'english' : $this->default_lang);
+        if (!isset($_SESSION["lang"])) {
+            $_SESSION["lang"] = ($install ? 'english' : $this->default_lang);
         }
-        if (isset($_GET[ 'lang' ])) {
-            $_SESSION[ 'lang' ] = $_GET[ 'lang' ];
+        if (isset($_GET['lang'])) {
+            $_SESSION['lang'] = $_GET['lang'];
         }
 
         //Setup language strings
-        $lang = Route::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION[ 'lang' ] . '.php';
+        $lang = Path::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION['lang'] . '.php';
         if (file_exists($lang)) {
             $lang = require $lang;
         } else {
-            $lang = require str_ireplace($_SESSION[ 'lang' ], 'english', $lang);
+            $lang = require str_ireplace($_SESSION['lang'], 'english', $lang);
         }
         define('__LANG__', $lang);
     }
@@ -108,7 +112,9 @@ class Config
      */
     public function __get($name)
     {
-        if (isset($this->variables[$name])) return $this->variables[$name];
+        if (isset($this->variables[$name])) {
+            return $this->variables[$name];
+        }
         $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         throw new Exception("Configuration variable '$name' was not found [L$caller[line] @ $caller[file]]");
     }
@@ -125,18 +131,18 @@ class Config
         $query = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 
         foreach ($query as $k => $v) {
-            if (!isset($this->variables[ $k ])) {
-                $this->variables[ $k ] = $v;
-            } elseif (is_string($this->variables[ $k ])) {
-                $this->variables[ $k ] = $v;
-            } elseif (is_int($this->variables[ $k ]) && $v != '') {
-                $this->variables[ $k ] = (int)$v;
-            } elseif (is_array($this->variables[ $k ])) {
-                $this->variables[ $k ] = explode(', ', $v);
-            } elseif (is_bool($this->variables[ $k ])) {
-                $this->variables[ $k ] = (bool)$v;
-            } elseif (is_int($this->variables[ $k ]) && $v == '') {
-                $this->variables[ $k ] = null;
+            if (!isset($this->variables[$k])) {
+                $this->variables[$k] = $v;
+            } elseif (is_string($this->variables[$k])) {
+                $this->variables[$k] = $v;
+            } elseif (is_int($this->variables[$k]) && $v != '') {
+                $this->variables[$k] = (int)$v;
+            } elseif (is_array($this->variables[$k])) {
+                $this->variables[$k] = explode(', ', $v);
+            } elseif (is_bool($this->variables[$k])) {
+                $this->variables[$k] = (bool)$v;
+            } elseif (is_int($this->variables[$k]) && $v == '') {
+                $this->variables[$k] = null;
             }
         }
 
@@ -145,6 +151,38 @@ class Config
         $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->db->prefix}_smilies`");
         $query->execute();
 
-        $this->variables[ 'smilies' ] = $query->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_NUM | PDO::FETCH_UNIQUE);
+        $this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_NUM | PDO::FETCH_UNIQUE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->$offset);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetGet($offset)
+    {
+        return $this->$offset;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        // Nope. Preventing!
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetUnset($offset)
+    {
+        // Nope. Preventing!
     }
 }

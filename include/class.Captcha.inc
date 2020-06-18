@@ -26,7 +26,7 @@ class Captcha
      * @return string
      */
     private static function getSessKey (): string {
-        global $config;
+        $config = Site::$instance->config;
         return ($config->cookie ? $config->cookie . '_' : '') . 'captcha_value';
     }
 }

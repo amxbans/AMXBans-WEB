@@ -25,7 +25,7 @@ session_start();
 require_once("include/config.inc.php");
 require_once("include/access.inc.php");
 require_once("include/menu.inc.php");
-require_once("include/steam.inc.php");
+require_once("include/class.Steam.inc");
 require_once("include/sql.inc.php");
 require_once("include/logfunc.inc.php");
 require_once("include/functions.inc.php");
@@ -104,7 +104,7 @@ if ((isset($_POST['nick'])) || (isset($_POST['steamid'])) || (isset($_POST['ip']
 		while($result = $query->fetch_object()) {
 			if(!empty($result->player_id)) {
 				$steamid = html_safe($result->player_id);
-				$steamcomid = GetFriendId($steamid);
+				$steamcomid = Steam::GetFriendId($steamid);
 			}
 			//search for a activ ban and make it as ref
 			$query2=$mysql->query("SELECT * FROM ".$config->db_prefix."_bans WHERE `player_id`='".$result->player_id."' AND `expired`=0 ORDER BY ban_created DESC LIMIT 1");

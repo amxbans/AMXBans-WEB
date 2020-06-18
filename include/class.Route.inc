@@ -12,65 +12,130 @@
 
 /**
  * Class Route
- *
- * Simplified tool of the most routing systems.
  */
 class Route
 {
-	/**
-	 * Example: https://example.com/realPath/index.php/this/is/path => array('this', 'is', 'path')
-	 *
-	 * @return array
-	 */
-	public static function getFakePathArray(): array { return explode('/', self::getFakePath()); }
+    private static $getRoutes = [];
+    private static $postRoutes = [];
+    private static $putRoutes = [];
+    private static $deleteRoutes = [];
+    private const resourceTpl = [
+        ['type' => 'get', 'key' => '', 'exec' => 'index'],
+        ['type' => 'get', 'key' => '/create', 'exec' => 'create'],
+        ['type' => 'get', 'key' => '/{id}', 'exec' => 'view'],
+        ['type' => 'get', 'key' => '/{id}/edit', 'exec' => 'edit'],
+        ['type' => 'post', 'key' => '', 'exec' => 'store'],
+        ['type' => 'put', 'key' => '/{id}', 'exec' => 'update'],
+        ['type' => 'delete', 'key' => '/{id}', 'exec' => 'delete'],
+    ];
 
     /**
-     * Makes an internal URL with given parameters for fake path.
-     * @param string      $fakePath
-     * @param string|null $php
-     * @param string|null $real_path
-     * @return string
+     * @param string         $url
+     * @param Closure|string $executor
+     *
+     * @throws Exception
      */
-    public static function makeURL(string $fakePath, string $php = NULL, string $real_path = NULL): string
+    public static function get(string $url, $executor): void
     {
-        if ($real_path || $php) {
-            $php = $php ?? array_pop(explode('/', self::getURL()));
-            return str_replace(DIRECTORY_SEPARATOR . '/', '/', Route::getBaseURL() . $real_path . '/' . $php . '/' . $fakePath);
-        }
-        return self::getURL() . '/' . $fakePath;
+        self::$getRoutes[$url] = self::resolveExecutor($executor);
     }
 
-	/**
-	 * @param int $index
-	 * @return string
-	 */
-	public static function getFakePathWay(int $index = 0) { return @self::getFakePathArray()[$index]; }
+    /**
+     * @param string         $url
+     * @param Closure|string $executor
+     *
+     * @throws Exception
+     */
+    public static function post(string $url, $executor): void
+    {
+        self::$postRoutes[$url] = self::resolveExecutor($executor);
+    }
 
-	/**
-	 * Example: https://example.com/realPath/index.php/this/is/path => this/is/path
-	 *
-	 * @return string
-	 */
-	public static function getFakePath(): string { return substr($_SERVER['PATH_INFO'] ?? '/', 1); }
+    /**
+     * @param string         $url
+     * @param Closure|string $executor
+     *
+     * @throws Exception
+     */
+    public static function put(string $url, $executor): void
+    {
+        self::$putRoutes[$url] = self::resolveExecutor($executor);
+    }
 
-	/**
-	 * Example: /var/www/amxbans/include => /var/www/amxbans
-	 *
-	 * @return string
-	 */
-	public static function getRootPath(): string { return dirname(__DIR__); }
+    /**
+     * @param string         $url
+     * @param Closure|string $executor
+     *
+     * @throws Exception
+     */
+    public static function delete(string $url, $executor): void
+    {
+        self::$deleteRoutes[$url] = self::resolveExecutor($executor);
+    }
 
-	/**
-	 * Example: https://example.com/realPath/index.php/this/is/path => /realPath/index.php
-	 *
-	 * @return string
-	 */
-	public static function getURL(): string { return $_SERVER['SCRIPT_NAME']; }
+    /**
+     * @param string $url
+     * @param        $executor
+     * @param array  $exclude
+     * @param bool   $include
+     *
+     * @throws Exception
+     */
+    public static function resource(string $url, $executor, $exclude = [], $include = false): void
+    {
+        foreach (self::resourceTpl as $item) {
+            [$type, $key, $append] = array_values($item);
+            if ((!$include && !in_array($append, $exclude)) || ($include && in_array($append, $exclude))) {
+                self::$type($url . $key, $executor . '@' . $append);
+            }
+        }
+    }
 
-	/**
-	 * Example: https://example.com/realPath/index.php/this/is/path => /realPath
-	 *
-	 * @return string
-	 */
-	public static function getBaseURL(): string { return dirname(self::getURL()); }
+    /**
+     * @param $input
+     *
+     * @return Closure|array
+     * @throws Exception
+     */
+    private static function resolveExecutor($input)
+    {
+        if ($input instanceof Closure) {
+            return $input;
+        }
+        $class_method = explode('@', $input);
+        $class_method[0] = "Controllers\\" . $class_method[0];
+        return $class_method;
+    }
+
+    public function getSite(string $method)
+    {
+//        var_dump(self::$getRoutes, self::$postRoutes, self::$putRoutes, self::$deleteRoutes);
+        $method .= 'Routes';
+        $url = \Support\Path::getFakePathArray();
+        $routes = array_keys(self::$$method);
+        foreach ($routes as $route) {
+            $args = [];
+            $route = explode('/', $route);
+            if (count($route) !== count($url)) {
+                continue;
+            }
+            for ($i = 0; $i < count($url); $i++) {
+                if (preg_replace('/{(\w+)(\??)}/', $url[$i], $route[$i]) != $url[$i]) {
+                    break;
+                } elseif (preg_match('/{(\w+)(\??)}/', $route[$i], $matches, PREG_UNMATCHED_AS_NULL)) {
+                    $args[] = $url[$i];
+                }
+                if ($i + 1 === count($url)) {
+                    return [self::${$method}[implode('/', $route)], $args];
+                }
+            }
+        }
+        header('HTTP/2.0 404 Not Found');
+        exit;
+    }
+
+    public function __construct(string $routing)
+    {
+        include_once \Support\Path::getRootPath() . '/routes/' . $routing;
+    }
 }

@@ -107,10 +107,8 @@ class Auth
 
     public function get($what = 'id') { return self::$data[$what] ?? null; }
 
-    public static function hasPermission(
-        $which,
-        $power = 1
-    ) {
+    public static function hasPermission($which, $power = 1)
+    {
         return self::$logged && !self::$banned ? self::$permissions[$which] == $power : false;
     }
 }

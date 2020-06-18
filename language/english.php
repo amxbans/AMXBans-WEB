@@ -60,11 +60,17 @@ return [
                 'I'  => 'IP',
                 'S'  => 'SteamID',
                 'SI' => 'SteamID & IP',
+                'IS' => 'SteamID & IP',
                 ''   => 'Not defined',
             ],
             'invoked' => 'Invoked on',
             'expired' => 'expired',
             'comments_files' => 'Comments & Files',
+            'add_comment' => 'Add Comment',
+            'comment' => 'Comment',
+            'list_comment' => 'made a comment',
+            'list_file' => 'uploaded a file',
+            'list_comment_file' => 'uploaded a file with comment',
         ],
     ],
 
@@ -161,6 +167,8 @@ return [
     'or' => 'or',
     'yes' => 'yes',
     'no' => 'no',
+    'administrator' => 'admin',
+    'e_mail' => 'email',
 
     'validation_errors' => [
         'required' => 'The :attribute field is required',

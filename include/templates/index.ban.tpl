@@ -3,23 +3,25 @@
 
 {block name="BODY"}
     {if isset($errors)}{include "messages.tpl"}{/if}
-
     <div class="card mb-4" id="ban-details">
         <div class="card-header">
             {$lang.index.ban.details}
             <a href="#" class="float-right" data-toggle="modal" data-target="#shareModal">#{$ban.bid}</a>
         </div>
         <div class="card-body">
-            {if User::$logged}
+            {if Auth::$logged}
                 <div class="text-right">
                     {if $can_user.edit_bans || ($can_user.edit_own_bans && $ban.username == User::get('username'))}
-                        <a href="{['ban', $ban.bid, 'edit']|url}" class="btn btn-outline-primary">{$lang.admin.edit|ucfirst}</a>
+                        <a href="{['bans', $ban.bid, 'edit']|url}"
+                           class="btn btn-outline-primary">{$lang.admin.edit|ucfirst}</a>
                     {/if}
                     {if $can_user.unban || ($can_user.unban_own && $ban.username == User::get('username'))}
-                        <a href="{['ban', $ban.bid, 'unban']|url}" class="btn btn-outline-warning do-confirm">{$lang.admin.unban|ucfirst}</a>
+                        <a href="{['bans', $ban.bid, 'unban']|url}"
+                           class="btn btn-outline-warning do-confirm">{$lang.admin.unban|ucfirst}</a>
                     {/if}
                     {if $can_user.delete_bans || ($can_user.delete_own_bans && $ban.username == User::get('username'))}
-                        <a href="{['ban', $ban.bid, 'delete']|url}" class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</a>
+                        <a href="{['bans', $ban.bid, 'delete']|url}"
+                           class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</a>
                     {/if}
                 </div>
             {/if}
@@ -57,7 +59,8 @@
             </div>
             <div class="row">
                 <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.bans.length|ucfirst}</div>
-                <div class="col"><span class="timeleft">{$ban.ban_length * 60}</span> {if $ban.expired}<i>[{$lang.index.ban.expired}]</i>{/if}</div>
+                <div class="col"><span class="timeleft">{$ban.ban_length * 60}</span> {if $ban.expired}<i>
+                        [{$lang.index.ban.expired}]</i>{/if}</div>
             </div>
             <div class="row">
                 <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.index.bans.admin|ucfirst}</div>
@@ -70,10 +73,42 @@
         </div>
         {*{include file="layer_banedit.tpl"}*}
     </div>
-
     <div class="card">
         <div class="card-header">{$lang.index.ban.comments_files}</div>
+        {if !Auth::$logged or $config.allow_unregistered_comments}
+            <div class="card-body">
+                <button onclick="$('#comment_add').slideToggle()"
+                        class="btn btn-outline-primary btn-block">{$lang.index.ban.add_comment}</button>
+                <form id="comment_add" class="w-100" style="display: none" enctype="multipart/form-data">
+{*                    TODO: Captcha, Route *}
+                    <hr/>
+                    <div class="row">
+                        <div class="col-sm-6"><input name="name" placeholder="{$lang.nickname|ucfirst}" required
+                                                     class="form-control"></div>
+                        <div class="col-sm-6"><input name="email" type="email" placeholder="{$lang.e_mail|ucfirst}"
+                                                     required class="form-control"></div>
+                    </div>
+                    <label class="w-100">
+                    <span id="comment_smilies" class="w-100">
+                        {foreach $config->smilies as $tag => $info}
+                            <button type="button" data-tag="{$tag}" title="{$info.1}" class="btn btn-link p-0 m-1"><img
+                                        src="{"webSources/images/emoticons/{$info[0]}"|res_url}" alt="{$tag}"></button>
+                        {/foreach}
+                    </span>
+                        <label class="w-100">
+                            <textarea id="comment_area" name="comment" class="form-control" rows="6"
+                                      placeholder="{$lang.index.ban.comment}"></textarea>
+                        </label>
+
+                            <input name="file" type="file" class="form-control-file">
+                    </label>
+
+                </form>
+            </div>
+            <hr/>
+        {/if}
         <div class="card-body">
+
             {if  $vars.use_demo == 1}
                 <div class="post">
 
@@ -114,13 +149,13 @@
                         {foreach from=$demos item=dmeo}
                             <form method="post">
 
-                                <input type="hidden" name="bid" value="{$ban_detail.bid}" />
+                                <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
 
-                                <input type="hidden" name="site" value="{$site}" />
+                                <input type="hidden" name="site" value="{$site}"/>
 
-                                <input type="hidden" name="did" value="{$dmeo.id}" />
+                                <input type="hidden" name="did" value="{$dmeo.id}"/>
 
-                                <input type="hidden" name="details_x" value="1" />
+                                <input type="hidden" name="details_x" value="1"/>
 
                                 <tr>
 
@@ -143,29 +178,30 @@
                                         <form method="POST" style="display:inline;">
 
                                             <a href="mailto:{$dmeo.email}"><img src="images/email_go.png" border="0"
-                                                                                title="{"_TIP_SENDMAIL"|lang}" /></a>
+                                                                                title="{"_TIP_SENDMAIL"|lang}"/></a>
 
                                             <input name="down_demo" type="image" src="images/disk.png" border="0"
-                                                   title="{"_TIP_DOWNLOAD"|lang}" />
+                                                   title="{"_TIP_DOWNLOAD"|lang}"/>
 
                                             {if $smarty.session.bans_edit=="yes" || ($smarty.session.bans_edit=="own" && $smarty.session.uname == $dmeo.name)}
                                                 <img src="images/page_edit.png" border="0"
-                                                     onClick="NewToggleLayer('demedit_{$dmeo.id}');" title="{"_TIP_EDIT"|lang}"
-                                                     style="cursor:pointer;" />
+                                                     onClick="NewToggleLayer('demedit_{$dmeo.id}');"
+                                                     title="{"_TIP_EDIT"|lang}"
+                                                     style="cursor:pointer;"/>
                                             {/if}
 
                                             {if $smarty.session.bans_delete=="yes" || ($smarty.session.bans_delete=="own" && $smarty.session.uname == $dmeo.name)}
                                                 <input name="del_demo" type="image"
                                                        src="templates/{$design}_gfx/page_delete.png" border="0"
                                                        onclick="return confirm('{"_DELDEMO"|lang}{"_DATALOSS"|lang}');"
-                                                       title="{"_TIP_DEL"|lang}" />
+                                                       title="{"_TIP_DEL"|lang}"/>
                                             {/if}
 
-                                            <input type="hidden" name="site" value="{$site}" />
+                                            <input type="hidden" name="site" value="{$site}"/>
 
-                                            <input type="hidden" name="bid" value="{$ban_detail.bid}" />
+                                            <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
 
-                                            <input type="hidden" name="details_x" value="1" />
+                                            <input type="hidden" name="details_x" value="1"/>
 
                                         </form>
 
@@ -197,7 +233,7 @@
                         <form method="post" action="">
 
                             <input type="button" class="button" name="newfile" value="{"_NEWFILE"|lang}"
-                                   onclick="$('#add_file').slideToggle('slow');" /><br /><br />
+                                   onclick="$('#add_file').slideToggle('slow');"/><br/><br/>
 
                         </form>
 
@@ -244,13 +280,13 @@
                     {foreach from=$comments item=comment}
                         <form method="POST">
 
-                            <input type="hidden" name="bid" value="{$ban_detail.bid}" />
+                            <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
 
-                            <input type="hidden" name="site" value="{$site}" />
+                            <input type="hidden" name="site" value="{$site}"/>
 
-                            <input type="hidden" name="cid" value="{$comment.id}" />
+                            <input type="hidden" name="cid" value="{$comment.id}"/>
 
-                            <input type="hidden" name="details_x" value="1" />
+                            <input type="hidden" name="details_x" value="1"/>
 
                             <table frame="box" rules="groups" summary="">
 
@@ -266,18 +302,22 @@
 
                                     <td style="width:100px;">{$comment.name}</td>
 
-                                    <td style="width:150px;">{if $smarty.session.ip_view=="yes"}{$comment.addr}{else}<span
-                                                style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>{/if}</td>
+                                    <td style="width:150px;">{if $smarty.session.ip_view=="yes"}{$comment.addr}{else}
+                                            <span
+                                                    style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>{/if}
+                                    </td>
 
                                     <td class="_right" style="width:80px;">
 
                                         {if $smarty.session.bans_edit=="yes"}
                                             <img src="images/page_edit.png" title="{"_EDIT"|lang}" border="0"
-                                                 style="cursor:pointer;" onClick="NewToggleLayer('comedit_{$comment.id}');" />
-                                            <input name="del_comment" type="image" src="templates/{$design}_gfx/page_delete.png"
+                                                 style="cursor:pointer;"
+                                                 onClick="NewToggleLayer('comedit_{$comment.id}');"/>
+                                            <input name="del_comment" type="image"
+                                                   src="templates/{$design}_gfx/page_delete.png"
                                                    border="0"
                                                    onclick="return confirm('{"_DELCOMMENT"|lang}{"_DATALOSS"|lang}');"
-                                                   title="{"_DELETE"|lang}" />
+                                                   title="{"_DELETE"|lang}"/>
                                         {/if}
 
                                     </td>
@@ -304,7 +344,7 @@
                         <form method="post" action="">
 
                             <input type="button" class="button" name="newcomment" value="{"_NEWCOMMENT"|lang}"
-                                   onclick="$('#add_comment').slideToggle('slow');" /><br /><br />
+                                   onclick="$('#add_comment').slideToggle('slow');"/><br/><br/>
 
                         </form>
 
@@ -330,36 +370,44 @@
     </div>
     <!-- Modal -->
     <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="shareLabel">{$lang.index.ban.share}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareLabel">{$lang.index.ban.share}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre>{$ban|var_dump}</pre>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">URL:</div>
+                    <div class="col"><input class="form-control" readonly value="{['bans', $ban.bid]|full_url}"></div>
                 </div>
-                <div class="modal-body">
-                    <pre>{$ban|var_dump}</pre>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">URL:</div>
-                        <div class="col"><input class="form-control" readonly value="{['ban', $ban.bid]|full_url}"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">HTML:</div>
-                        <div class="col"><input class="form-control" readonly value="<a href=&quot;{['ban', $ban.bid]|full_url}&quot;>{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})</a>"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">BBCode:</div>
-                        <div class="col"><input class="form-control" readonly value="[url=&quot;{['ban', $ban.bid]|full_url}&quot;]{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})[/url]"></div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">HTML:</div>
+                    <div class="col"><input class="form-control" readonly
+                                            value="<a href=&quot;{['bans', $ban.bid]|full_url}&quot;>{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})</a>">
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">BBCode:</div>
+                    <div class="col"><input class="form-control" readonly
+                                            value="[url=&quot;{['bans', $ban.bid]|full_url}&quot;]{$ban.player_nick} @ {$lang.date_format|date:$ban.ban_created} (#{$ban.bid})[/url]">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         timer($('.timeleft').text() + '000', '.timeleft');
-		$('.do-confirm').click(function () {
-			return confirm('{$lang.admin.confirm_message}');
-		});
+        $('.do-confirm').click(function () {
+            return confirm('{$lang.admin.confirm_message}');
+        });
+
+        $('#comment_smilies .btn').click(function () {
+            typeInTextarea($('#comment_area'), $(this).data('tag'));
+        });
     </script>
 {/block}

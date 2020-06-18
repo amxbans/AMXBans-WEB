@@ -27,7 +27,7 @@
             <div class="collapse navbar-collapse" id="navbarList">
                 <ul class="navbar-nav mr-auto">
                     {foreach $lang.index.menu as $val}
-                        <li class="nav-item{if $val == $site->getSite()} active{/if}">
+                        <li class="nav-item{if $val == Support\Path::getFakePathWay()} active{/if}">
                             <a class="nav-link" href="{$val|url:"index.php"}">{$lang.index.titles.$val}</a>
                         </li>
                     {/foreach}
