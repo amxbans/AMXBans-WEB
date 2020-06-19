@@ -73,14 +73,14 @@
         </div>
         {*{include file="layer_banedit.tpl"}*}
     </div>
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header">{$lang.index.ban.comments_files}</div>
-        {if !Auth::$logged or $config.allow_unregistered_comments}
+        {if Auth::$logged or $config.allow_unregistered_comments}
             <div class="card-body">
                 <button onclick="$('#comment_add').slideToggle()"
                         class="btn btn-outline-primary btn-block">{$lang.index.ban.add_comment}</button>
-                <form id="comment_add" class="w-100" style="display: none" enctype="multipart/form-data">
-{*                    TODO: Captcha, Route *}
+                <form id="comment_add" class="w-100" style="display: none" enctype="multipart/form-data" method="post">
+                    {$site->makeFormAuth()}
                     <hr/>
                     <div class="row">
                         <div class="col-sm-6"><input name="name" placeholder="{$lang.nickname|ucfirst}" required
@@ -88,285 +88,72 @@
                         <div class="col-sm-6"><input name="email" type="email" placeholder="{$lang.e_mail|ucfirst}"
                                                      required class="form-control"></div>
                     </div>
-                    <label class="w-100">
-                    <span id="comment_smilies" class="w-100">
+                    <div id="comment_smilies" class="w-100">
                         {foreach $config->smilies as $tag => $info}
-                            <button type="button" data-tag="{$tag}" title="{$info.1}" class="btn btn-link p-0 m-1"><img
-                                        src="{"webSources/images/emoticons/{$info[0]}"|res_url}" alt="{$tag}"></button>
+                            <button type="button" data-tag="{$tag}" title="{$info.1}" class="btn btn-link p-0 m-1" tabindex="-1">
+                                <img
+                                        src="{"webSources/images/emoticons/{$info[0]}"|res_url}" alt="{$tag}">
+                            </button>
                         {/foreach}
-                    </span>
-                        <label class="w-100">
+                    </div>
+                    <label class="w-100">
                             <textarea id="comment_area" name="comment" class="form-control" rows="6"
                                       placeholder="{$lang.index.ban.comment}"></textarea>
-                        </label>
-
-                            <input name="file" type="file" class="form-control-file">
                     </label>
 
+                    <div class="form-group">
+                        <input name="file" type="file" class="form-control-file">
+                    </div>
+                    <div class="row">
+                        <label class="col-sm form-group input-group">
+                            {if !Auth::$logged}
+                                <span class="input-group-prepend">
+                                <img src="{Captcha::makeImage()|res_url}" alt="Captcha code"
+                                     class="input-group-prepend">
+                            </span>
+                                <input class="form-control" name="captcha" autocomplete="off"
+                                       placeholder="<- {$lang.index.ban.captcha_placeholder}">
+                            {/if}
+                        </label>
+                        <span class="col-sm-3 col-md-2 col-lg-1 text-right"><button
+                                    class="btn btn-primary">{$lang.save}</button></span>
+                    </div>
                 </form>
             </div>
             <hr/>
         {/if}
-        <div class="card-body">
 
-            {if  $vars.use_demo == 1}
-                <div class="post">
-
-                    <table frame="box" rules="groups" summary="">
-
-                        <thead>
-
-                        <tr>
-
-                            <th colspan="8">{"_BL_FILES"|lang}</th>
-
-                        </tr>
-
-                        <tr>
-
-                            <th style="width:130px;">{"_DATE"|lang}</th>
-
-                            <th style="width:100px;">{"_FILE"|lang}</th>
-
-                            <th style="width:50px;">{"_SIZE"|lang}</th>
-
-                            <th>{"_COMMENT"|lang}</th>
-
-                            <th style="width:100px;">{"_BY"|lang}</th>
-
-                            <th style="width:150px;">{"_IP"|lang}</th>
-
-                            <th style="width:20px;">{"_DOWNLOADS"|lang}</th>
-
-                            <th style="width:80px;">&nbsp;</th>
-
-                        </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                        {foreach from=$demos item=dmeo}
-                            <form method="post">
-
-                                <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
-
-                                <input type="hidden" name="site" value="{$site}"/>
-
-                                <input type="hidden" name="did" value="{$dmeo.id}"/>
-
-                                <input type="hidden" name="details_x" value="1"/>
-
-                                <tr>
-
-                                    <td>{$dmeo.upload_time|date_format:"%d. %b %Y - %T"}</td>
-
-                                    <td>{$dmeo.demo_real}</td>
-
-                                    <td>{$dmeo.file_size} (MODIFIER: FILE_SIZE)</td>
-
-                                    <td>{if $dmeo.comment}{$dmeo.comment|nl2br}{else}{"_NOCOMMENT"|lang}{/if}</td>
-
-                                    <td>{$dmeo.name}</td>
-
-                                    <td>{if $smarty.session.ip_view=="yes"}{$dmeo.addr}{/if}</td>
-
-                                    <td class="_center">{$dmeo.down_count}</td>
-
-                                    <td class="_right">
-
-                                        <form method="POST" style="display:inline;">
-
-                                            <a href="mailto:{$dmeo.email}"><img src="images/email_go.png" border="0"
-                                                                                title="{"_TIP_SENDMAIL"|lang}"/></a>
-
-                                            <input name="down_demo" type="image" src="images/disk.png" border="0"
-                                                   title="{"_TIP_DOWNLOAD"|lang}"/>
-
-                                            {if $smarty.session.bans_edit=="yes" || ($smarty.session.bans_edit=="own" && $smarty.session.uname == $dmeo.name)}
-                                                <img src="images/page_edit.png" border="0"
-                                                     onClick="NewToggleLayer('demedit_{$dmeo.id}');"
-                                                     title="{"_TIP_EDIT"|lang}"
-                                                     style="cursor:pointer;"/>
-                                            {/if}
-
-                                            {if $smarty.session.bans_delete=="yes" || ($smarty.session.bans_delete=="own" && $smarty.session.uname == $dmeo.name)}
-                                                <input name="del_demo" type="image"
-                                                       src="templates/{$design}_gfx/page_delete.png" border="0"
-                                                       onclick="return confirm('{"_DELDEMO"|lang}{"_DATALOSS"|lang}');"
-                                                       title="{"_TIP_DEL"|lang}"/>
-                                            {/if}
-
-                                            <input type="hidden" name="site" value="{$site}"/>
-
-                                            <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
-
-                                            <input type="hidden" name="details_x" value="1"/>
-
-                                        </form>
-
-                                    </td>
-
-                                </tr>
-
-                                <tr id="demedit_{$dmeo.id}" style="display: none">
-
-                                    {*	{include file="layer_demedit.tpl"}*}
-
-                                </tr>
-
-                            </form>
-                            {foreachelse}
-                            <td class="_center" colspan="8">{"_NOFILES"|lang}</td>
-                        {/foreach}
-
-                        </tbody>
-
-                    </table>
-
-                    <div class="clearer">&nbsp;</div>
-
+        {foreach $ban.comments as $comment}
+            <div class="card-body pt-1">
+                <div>
+                    {if $comment.admin}{$lang.administrator|ucfirst}{/if}
+                    <span class="font-weight-bold">{$comment.name}</span>
+                    {if $comment.comment && $comment.file}
+                        {$lang.index.ban.list_comment_file}
+                    {elseif $comment.file}
+                        {$lang.index.ban.list_file}
+                    {else}
+                        {$lang.index.ban.list_comment}
+                    {/if}
                 </div>
-                {if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
-                    <div class="post _center">
-
-                        <form method="post" action="">
-
-                            <input type="button" class="button" name="newfile" value="{"_NEWFILE"|lang}"
-                                   onclick="$('#add_file').slideToggle('slow');"/><br/><br/>
-
-                        </form>
-
-                    </div>
-                    <div id="add_file" class="post" style="display:none;">
-
-                        {*{include file="layer_demadd.tpl"}*}
-
-                    </div>
-                {/if}
-
-            {/if}
-            {if  $vars.use_comment == 1}
-                <div class="post">
-
-                    <table frame="box" rules="groups">
-
-                        <thead>
-
-                        <tr>
-
-                            <th colspan="5">{"_BL_COMMENTS"|lang}</th>
-
-                        </tr>
-
-                        <tr>
-
-                            <th style="width:130px;">{"_DATE"|lang}</th>
-
-                            <th>{"_COMMENT"|lang}</th>
-
-                            <th style="width:100px;">{"_BY"|lang}</th>
-
-                            <th style="width:150px;">{"_IP"|lang}</th>
-
-                            <th style="width:80px;">&nbsp;</th>
-
-                        </tr>
-
-                        </thead>
-
-                    </table>
-
-                    {foreach from=$comments item=comment}
-                        <form method="POST">
-
-                            <input type="hidden" name="bid" value="{$ban_detail.bid}"/>
-
-                            <input type="hidden" name="site" value="{$site}"/>
-
-                            <input type="hidden" name="cid" value="{$comment.id}"/>
-
-                            <input type="hidden" name="details_x" value="1"/>
-
-                            <table frame="box" rules="groups" summary="">
-
-                                <tbody>
-
-                                <!-- Comment List -->
-
-                                <tr>
-
-                                    <td style="width:130px;">{$comment.date|date_format:"%d. %b %Y - %T"}</td>
-
-                                    <td>{$comment.comment}</td>
-
-                                    <td style="width:100px;">{$comment.name}</td>
-
-                                    <td style="width:150px;">{if $smarty.session.ip_view=="yes"}{$comment.addr}{else}
-                                            <span
-                                                    style='font-style:italic;font-weight:bold'>{"_HIDDEN"|lang}</span>{/if}
-                                    </td>
-
-                                    <td class="_right" style="width:80px;">
-
-                                        {if $smarty.session.bans_edit=="yes"}
-                                            <img src="images/page_edit.png" title="{"_EDIT"|lang}" border="0"
-                                                 style="cursor:pointer;"
-                                                 onClick="NewToggleLayer('comedit_{$comment.id}');"/>
-                                            <input name="del_comment" type="image"
-                                                   src="templates/{$design}_gfx/page_delete.png"
-                                                   border="0"
-                                                   onclick="return confirm('{"_DELCOMMENT"|lang}{"_DATALOSS"|lang}');"
-                                                   title="{"_DELETE"|lang}"/>
-                                        {/if}
-
-                                    </td>
-
-                                    <!-- Comment List -->
-
-                        </form>
-                        {foreachelse}
-                        <div class="_center">{"_NOCOMMENTS"|lang}</div>
-                        </tr>
-
-                    {/foreach}
-
-                    </tbody>
-
-                    </table>
-
-                    <div class="clearer">&nbsp;</div>
-
+                <hr class="mt-1"/>
+                <div>
+                    {if $comment.file}
+                    <a href="{$comment.file|res_url}" target="_blank" class="card px-3 py-1 d-inline-block"
+                       style="border-radius: 50px;font-size: 12px;">
+                        <img src="{"webSources/images/page.png"|res_url}" alt="File" height="16px">
+                        {$comment.file|basename|upper}
+                    </a>
+                    {/if}
                 </div>
-                {if $vars.comment_all=="1" || $smarty.session.loggedin == "true"}
-                    <div class="post _center">
-
-                        <form method="post" action="">
-
-                            <input type="button" class="button" name="newcomment" value="{"_NEWCOMMENT"|lang}"
-                                   onclick="$('#add_comment').slideToggle('slow');"/><br/><br/>
-
-                        </form>
-
-                    </div>
-                    <div id="add_comment" class="post" style="display:none;">
-
-                        <tr id="comadd_{$ban_detail.bid}" {if $comment_layer!="1"}style="display: none"{/if}>
-
-                            {*{include file="layer_comadd.tpl"}*}
-
-                        </tr>
-
-                    </div>
-                    <tr id="comedit_{$comments.id}" style="display: none">
-
-                        {*{include file="layer_comedit.tpl"}*}
-
-                    </tr>
-                {/if}
-
+                <p>{$comment.comment}</p>
+            </div>
+            {if !$comment@last}
+                <hr/>
             {/if}
-        </div>
+            {foreachelse}
+            <div class="card-body text-center">{$lang.index.ban.no_comments}</div>
+        {/foreach}
     </div>
     <!-- Modal -->
     <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareLabel" aria-hidden="true">
@@ -379,7 +166,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <pre>{$ban|var_dump}</pre>
                 <div class="row">
                     <div class="col-lg-2 col-md-3 col-sm-4 text-sm-right align-self-center">URL:</div>
                     <div class="col"><input class="form-control" readonly value="{['bans', $ban.bid]|full_url}"></div>
