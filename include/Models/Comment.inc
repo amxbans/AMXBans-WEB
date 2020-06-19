@@ -9,18 +9,19 @@ namespace Models;
  *
  * @package Models
  *
- * @property-read int         $id
- * @property string           $name
- * @property string|null      $comment
- * @property string|null      $file
- * @property string           $email
- * @property string           $addr IP Address
- * @property \DateTime|string $created_at
- * @property int              $bid
- * @property int              $admin_id
- * @property int              $hidden_by
+ * @property-read int           $id
+ * @property string             $name
+ * @property string|null        $comment
+ * @property string|null        $file
+ * @property string             $email
+ * @property string             $addr IP Address
+ * @property \DateTime|string   $created_at
+ * @property int                $bid
+ * @property int                $admin_id
+ * @property int                $hidden_by
  *
- * @property-read Ban         $ban
+ * @property-read Ban           $ban
+ * @property-read WebAdmin|null $admin
  */
 class Comment extends Model
 {

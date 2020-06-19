@@ -53,7 +53,7 @@
 										<tr> 
 											<td class="vtop fat">{"_SCODE"|lang}</td> 
 											<td>{"_SCODEENTER"|lang}<br />
-												<img src="../captcha.php" alt="Security code" style="border: 1px #000000 solid;"><br />
+												<img src="../../webSources/captcha.php" alt="Security code" style="border: 1px #000000 solid;"><br />
 												<input type='text' size="30" name='verify' id="verify_code">
 											</td> 
 										</tr>

@@ -108,7 +108,7 @@ class Model implements ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return isset($this->attributes[$offset]);
+        return isset($this->$offset);
     }
 
     /**
@@ -116,7 +116,7 @@ class Model implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset($this->attributes[$offset]) ? $this->attributes[$offset] : null;
+        return $this->$offset;
     }
 
     /**

@@ -46,6 +46,6 @@ class Ban extends Model
         'server'   => [0, 'Models\Server', 'server_ip', 'address'],
         'admin'    => [0, 'Models\AMXAdmin', 'admin_id', 'steamid'],
         'logs'     => [1, 'Models\BansLog', 'bid', 'bid'],
-        'comments' => [1, 'Models\Comment', 'bid', ''],
+        'comments' => [1, 'Models\Comment', 'bid', 'bid'],
     ];
 }
