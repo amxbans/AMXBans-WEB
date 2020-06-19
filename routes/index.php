@@ -3,5 +3,5 @@
 Route::get('', 'StartController@index');
 
 Route::resource('bans', 'BansController', ['create', 'store']);
-Route::get('/bans/{id}/unban', 'BansController@unban');
-
+Route::get('bans/{id}/unban', 'BansController@unban');
+Route::post('bans/{id}', 'BansController@comment');

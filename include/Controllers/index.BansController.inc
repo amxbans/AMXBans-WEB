@@ -110,4 +110,30 @@ class BansController extends BaseController
         Captcha::generateCode();
         $this->site->output->display('index.ban');
     }
+
+    public function edit($id)
+    {
+        //TODO: generate EDIT method
+    }
+
+    public function update($id)
+    {
+        //TODO: generate UPDATE method
+    }
+
+    public function delete($id)
+    {
+        //TODO: generate DELETE method
+    }
+
+    public function unban($id)
+    {
+        //TODO: generate UNBAN method
+    }
+
+    public function comment($id)
+    {
+
+        //TODO: generate COMMENT method
+    }
 }

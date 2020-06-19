@@ -71,6 +71,8 @@ return [
             'list_comment' => 'made a comment',
             'list_file' => 'uploaded a file',
             'list_comment_file' => 'uploaded a file with comment',
+            'captcha_placeholder' => 'Rewrite captcha here',
+            'no_comments' => 'No comments yet',
         ],
     ],
 
