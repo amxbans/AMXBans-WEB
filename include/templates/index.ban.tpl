@@ -74,7 +74,7 @@
         {*{include file="layer_banedit.tpl"}*}
     </div>
     <div class="card mb-4">
-        <div class="card-header">{$lang.index.ban.comments_files}</div>
+        <div class="card-header">{$lang.index.ban.comments_files} <span class="text-muted">({$ban.comments|count})</span></div>
         {if Auth::$logged or $config.allow_unregistered_comments}
             <div class="card-body">
                 <button onclick="$('#comment_add').slideToggle()"

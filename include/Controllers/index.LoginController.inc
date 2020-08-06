@@ -12,15 +12,16 @@
 
 namespace Controllers;
 
-use Models\Ban;
+use DateTime;
 use Support\BaseController;
+use Templating;
 
 /**
  * Class LoginController
  */
 class LoginController extends BaseController
 {
-    private function getLogin()
+    private function index()
     {
         if (Route::getFakePathWay(1) == 'pass_rec') {
             return $this->getPassRec();
@@ -32,11 +33,26 @@ class LoginController extends BaseController
         $this->site->output->display($this->site->getTplFile());
     }
 
+    private function store()
+    {
+        // Logging in
+    }
+
+    private function view($id)
+    {
+        
+    }
+
     private function postLogin()
     {
         if (Route::getFakePathWay(1) == 'pass_rec') {
             return $this->postPassRec();
         }
+    }
+
+    private function getLostPass()
+    {
+        $this->site->output->display('index.login.lost_pass.tpl');
     }
 
     private function postPassRec()
@@ -70,7 +86,7 @@ class LoginController extends BaseController
                         'Content-type' => 'text/html; charset=utf-8',
                         'To'           => $user->username . '<' . trim($_POST['email']) . '>',
                     ];
-                    $mail = Smarty::$_MBSTRING ? 'mb_send_mail' : 'mail';
+                    $mail = Templating::$_MBSTRING ? 'mb_send_mail' : 'mail';
                     $mail(trim($_POST['email']), __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
                     $msg[] = [
                         'type' => 'info',
@@ -95,7 +111,6 @@ class LoginController extends BaseController
                 ->display('index.login.pass_rec.tpl');
         }
 
-        $this->site->config->output->display('index.login.lost_pass.tpl');
     }
 
     protected function passwordRecovery(string $code = null, $pw = null)
