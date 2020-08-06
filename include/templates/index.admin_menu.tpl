@@ -1,4 +1,4 @@
-{if User::$logged}
+{if Auth::$logged}
     <ul class="navbar-nav mr-auto">
         {foreach $lang.admin.menu as $val}
             <li class="nav-item{if $val == $site->getSite()} active{/if} dropdown">
