@@ -14,13 +14,17 @@
  * @param string      $action
  * @param string      $context
  * @param string|null $user
+ * @throws Exception
  */
-function db_log (string $action, string $context, $user = NULL): void
+function db_log(string $action, string $context, $user = null): void
 {
-    global $config;
-    $q = $config->getDb()
-        ->prepare("INSERT INTO `{$config->dbPrefix}_logs` (ip, username, action, remarks) VALUES (?, ?, ?, ?)");
-    $q->execute([$_SERVER['REMOTE_ADDR'], $user ?? Auth::get('username'), $action, $context]);
+    $log             = new \Models\Log();
+    $log->ip         = $_SERVER['REMOTE_ADDR'];
+    $log->username   = $user ?? Auth::get('username');
+    $log->action     = $action;
+    $log->remarks    = $context;
+    $log->created_at = new DateTime();
+    $log->save();
 }
 
 /**

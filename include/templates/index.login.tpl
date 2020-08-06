@@ -4,7 +4,7 @@
 {block name="BODY"}
 	{include file="messages.tpl"}
 
-	<form method="post" class="row">
+	<form method="post" class="row" action="{['login']|url}">
 		{Site::makeFormAuth()}
 		<label class="col-sm-3 text-sm-right col-form-label" for="name">{$lang.index.login.username}</label>
 		<div class="col-sm-9"><input name="username" class="form-control" id="name" required /></div>

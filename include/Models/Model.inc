@@ -25,7 +25,7 @@ class Model implements ArrayAccess
     public function __construct()
     {
         if ($this->{$this->primary}) {
-            $func = function ($c) {
+            $func           = function ($c) {
                 return get_object_vars($c);
             };
             $this->original = $this->attributes;
@@ -41,20 +41,13 @@ class Model implements ArrayAccess
 
     public function save()
     {
-        $diff = array_filter($this->attributes, function (&$v, $k) {
-            $method = snakeToCamel('set_' . $v);
-            if (method_exists($this, $method)) {
-                $v = $this->$method($v);
-            }
-            return $v != $this->original[$k];
-        }, ARRAY_FILTER_USE_BOTH);
+        $diff = $this->filterChanged();
         /*
         // TODO Model: process and remove relations from $this->attributes when saving
                 echo "<b>" . get_called_class() . "::save() :</b><br /> <pre>";
                 var_dump($diff);
                 die;*/
-
-        if (!isset($this->{$this->primary})) {
+        if (!$this->{$this->primary}) {
             static::query()->insert($diff);
             return static::find(DB::lastInsertId());
         }
@@ -99,7 +92,7 @@ class Model implements ArrayAccess
         /** @var self $instance */
         [$multiple, $instance, $local_col, $foreign_col] = static::relations[$name];
 
-        $q = $instance::query()->where($foreign_col, $this->$local_col);
+        $q           = $instance::query()->where($foreign_col, $this->$local_col);
         $this->$name = !$multiple ? $q->selectOne() : $q->select();
     }
 
@@ -133,5 +126,19 @@ class Model implements ArrayAccess
     public function offsetUnset($offset)
     {
         // TODO: Implement offsetUnset() method.
+    }
+
+    private function filterChanged(): array
+    {
+        foreach ($this->attributes as $k => $v) {
+            $method = snakeToCamel('set_' . $k);
+            if (method_exists($this, $method)) {
+                $v = $this->$method($v);
+            }
+            if ($v != @$this->original[$k]) {
+                $return[$k] = $v;
+            }
+        }
+        return $return ?? [];
     }
 }

@@ -13,6 +13,8 @@
 namespace Controllers;
 
 use DateTime;
+use FormErrors;
+use Models\WebAdmin;
 use Support\BaseController;
 use Templating;
 
@@ -21,137 +23,137 @@ use Templating;
  */
 class LoginController extends BaseController
 {
-    private function index()
+    public function index()
     {
-        if (Route::getFakePathWay(1) == 'pass_rec') {
-            return $this->getPassRec();
-        }
-
         $remaining = @$_SESSION['login_block'] ? time() - $_SESSION['login_block'] : null;
         $this->site->output->assign('blocked', $remaining);
 
-        $this->site->output->display($this->site->getTplFile());
+        $this->site->output->display('index.login');
     }
 
-    private function store()
+    public function store()
     {
         // Logging in
+        //TODO: Remove passreset_* fields if they are present
     }
 
-    private function view($id)
+    public function lostPassForm()
     {
-        
+        $this->site->output->display('index.login.lost_pass');
     }
 
-    private function postLogin()
+    /**
+     * @throws \SmartyException
+     * @throws \Exception
+     */
+    public function lostPassSend()
     {
-        if (Route::getFakePathWay(1) == 'pass_rec') {
-            return $this->postPassRec();
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            $this->site->output->display('index.login.lost_pass');
+            return;
         }
+        $t = new DateTime();
+        /** @var WebAdmin $user */
+        $user = WebAdmin::query()->where('email', trim($_POST['email']))->selectOne([
+            'id',
+            'username',
+            'passreset_code',
+            'passreset_until',
+        ]);
+        if (!$user->exists) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['err_no_user_email']]);
+            $this->site->output->display('index.login.lost_pass');
+            return;
+        }
+        if ($user->passreset_code && ($user->passreset_until > $t)) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['passcode_exist']]);
+            $this->site->output->display('index.login.lost_pass');
+            return;
+        }
+        $code = md5($user->id . $user->username . $t->format('U'));
+        db_log('Login', 'Password recovery: get recovery code', $user->username);
+        $user->passreset_code  = $code;
+        $user->passreset_until = new $t('+1 day');
+        $user->save();
+
+        $msg = new Templating($this->site->config);
+        $msg->assign('replace', [
+            ':username' => $user->username,
+            ':now'      => $t->format(__LANG__['date_format']),
+        ]);
+        $msg->assign('code', $code);
+
+        $mail_headers = [
+            'From'         => $_SERVER['SERVER_ADMIN'],
+            'MIME-Version' => '1.0',
+            'Content-type' => 'text/html; charset=utf-8',
+        ];
+        $mail         = Templating::$_MBSTRING ? 'mb_send_mail' : 'mail';
+        $mail($user->username . '<' . trim($_POST['email']) . '>', __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
+        $this->site->output->assign('message',
+            str_replace(':email', $_POST['email'], __LANG__['index']['login']['passcode_sent']));
+
+        $this->site->output->display('index.login.lost_pass');
+        return;
     }
 
-    private function getLostPass()
+    public function passwordRecovery($code)
     {
-        $this->site->output->display('index.login.lost_pass.tpl');
+        if (!$this->checkCode($code, $user)) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['passreset_nocode']]);
+            return $this->index();
+        }
+        return $this->site->output->display('index.login.pass_change.tpl');
     }
 
-    private function postPassRec()
+    public function updatePassword($code)
     {
-        if ($this->site->validateFormAuth()) {
-            $d = $this->site->config->getDb();
-            $user = $d->prepare("SELECT id, username, passreset_code as code, passreset_until as until FROM {$this->site->config->getDb()->prefix}_webadmins WHERE email=?");
-            $user->execute([trim($_POST['email'])]);
-
-            if ($user->rowCount() == 1) {
-                $t = new DateTime();
-                $user = $user->fetchObject();
-                if ($user->code && (new DateTime($user->until) > $t)) {
-                    $msg[] = ['type' => 'warning', 'text' => __LANG__['index']['login']['passcode_exist']];
-                } else {
-                    $code = md5($user->id . $user->username . $t->format('U'));
-                    db_log('Password Recovery', 'Unset password', $user->username);
-                    $q = $d->prepare("UPDATE `{$this->site->config->getDb()->prefix}_webadmins` SET passreset_code=?, passreset_until=? WHERE id=?");
-                    $q->execute([$code, (new DateTime('+1 day'))->format('Y-m-d H:i:s'), $user->id]);
-
-                    $msg = new Templating($this->site->config);
-                    $msg->assign('replace', [
-                        ':username' => $user->username,
-                        ':now'      => $t->format(__LANG__['date_format']),
-                    ]);
-                    $msg->assign('code', $code);
-
-                    $mail_headers = [
-                        'From'         => $_SERVER['SERVER_ADMIN'],
-                        'MIME-Version' => '1.0',
-                        'Content-type' => 'text/html; charset=utf-8',
-                        'To'           => $user->username . '<' . trim($_POST['email']) . '>',
-                    ];
-                    $mail = Templating::$_MBSTRING ? 'mb_send_mail' : 'mail';
-                    $mail(trim($_POST['email']), __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
-                    $msg[] = [
-                        'type' => 'info',
-                        'text' => str_replace(':email', $_POST['email'], __LANG__['index']['login']['passcode_sent']),
-                    ];
-                }
-            }
+        if (!$this->checkCode($code, $user)) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['passreset_nocode']]);
+            return $this->index();
         }
 
-    }
-
-    private function getPassRec()
-    {
-        if (isset($_GET['code'])) {
-            if ($this->passwordRecovery(trim($_GET['code']))) {
-                return;
-            }
-            return $this->site->config->output->append('messages', [
-                'type' => 'warning',
-                'text' => __LANG__['index']['login']['passreset_nocode'],
-            ])
-                ->display('index.login.pass_rec.tpl');
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            return $this->site->output->display('index.login.pass_change.tpl');
         }
 
+        $err = new FormErrors($_POST, __LANG__['validation_errors']);
+        $err->validate([
+            __LANG__['index']['login']['pass']        => 'required',
+            __LANG__['index']['login']['pass'] . '_2' => 'required|same:' . __LANG__['index']['login']['pass'],
+        ]);
+        if ($err->has()) {
+            $this->site->output->assign('messages', $err);
+            return $this->site->output->display('index.login.pass_change.tpl');
+        }
+
+        /** @var WebAdmin $user */
+        $user->password        = password_hash($_POST[__LANG__['index']['login']['pass']], PASSWORD_DEFAULT);
+        $user->passreset_until = null;
+        $user->passreset_code  = null;
+        $user->save();
+
+        $this->site->output->assign('message',
+            ['type' => 'success', 'text' => __LANG__['index']['login']['pass_changed']]);
+        return $this->site->output->display('index.login.tpl');
     }
 
-    protected function passwordRecovery(string $code = null, $pw = null)
+    private function checkCode($code, &$user = null): bool
     {
-        if ($code) {
-            $d = $this->site->config->getDb();
-            $u = $d->prepare("SELECT id, passreset_until as until, username, email FROM `{$this->site->config->getDb()->prefix}_webadmins` WHERE passreset_code=?");
-            $u->execute([$code]);
-
-            if ($u->rowCount() == 1) {
-                $u = $u->fetchObject();
-                $t = new DateTime();
-
-                if ($t < new DateTime($u->until)) {
-                    if ($pw) {
-                        $q = $d->prepare("UPDATE `{$this->site->config->getDb()->prefix}_webadmins` SET passreset_until=null, passreset_code=null, try=0, password=? WHERE id=?");
-                        $q->execute([password_hash($pw, PASSWORD_DEFAULT), $u->id]);
-                    }
-                    $this->site->config->output->append('messages', [
-                        'type' => 'success',
-                        'text' => __LANG__['index']['login']['pass'],
-                    ])->display();
-                    $this->site->config->output->display('index.login.pass_change.tpl');
-                    return true;
-                }
-            }
+        /** @var WebAdmin $user */
+        $user = WebAdmin::query()->where('passreset_code', $code)->selectOne();
+        if (!$user->exists) {
+            return false;
         }
-        return false;
-    }
-
-    private function putLogin()
-    {
-        if ($this->site->validateFormAuth() && isset($_GET['code'])) {
-            $err = new FormErrors($_POST, __LANG__['validation_errors']);
-            $err->validate([
-                __LANG__['index']['login']['pass']        => 'required',
-                __LANG__['index']['login']['pass'] . '_2' => 'required|same:' . __LANG__['index']['login']['pass'],
-            ]);
-            if ($this->passwordRecovery(trim($_GET['code']), $_POST['pw'])) {
-                return;
-            }
+        if (new DateTime() > $user->passreset_until) {
+            return false;
         }
+        return true;
     }
 }

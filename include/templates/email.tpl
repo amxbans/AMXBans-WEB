@@ -31,7 +31,6 @@
 
 <p>{$lang.email.intro|r:$replace}</p>
 <p>{$lang.email.site}: <br/><a href="{['login', 'pass_rec']|full_url}?code={$code}">{['login', 'pass_rec']|full_url}?code={$code}</a></p>
-<p>{$lang.email.code}: <br /><code style="font-weight: bold;">{$code}</code></p>
 
 </body>
 </html>

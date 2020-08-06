@@ -21,4 +21,15 @@ namespace Models;
 class WebAdmin extends Model
 {
     protected $table = 'webadmins';
+
+
+    public function getPassresetUntil($original)
+    {
+        return $original? new \DateTime($original) : null;
+    }
+
+    public function setPassresetUntil($original)
+    {
+        return $original? $original->format('Y-m-d H:i:s') : null;
+    }
 }

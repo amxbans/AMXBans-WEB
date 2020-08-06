@@ -19,13 +19,4 @@ class BansLog extends Model
     protected const relations = [
         'ban' => [0, 'Models\Ban', 'bid', 'bid'],
     ];
-
-    /**
-     * @return mixed
-     */
-    public function getCreatedAt ()
-    {
-        var_dump($this->created_at);
-        return $this->created_at;
-    }
 }

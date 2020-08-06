@@ -28,14 +28,14 @@ return [
 
             'lost_pass'  => 'Forgot password?',
             'pass_rec'   => 'Password recovery',
-            'rec_code'   => 'Code from email',
+            'err_no_user_email'   => 'User with this email not found',
             'new_pass'   => 'New Password',
             'new_pass_2' => 'Repeat password',
 
             'passcode_exist'   => 'Account with this email already requested password change. Please check email for further instructions',
             'passcode_sent'    => 'Password change instructions sent to :email. Please refer to it.',
-            'passreset_nocode' => 'Sorry but we couldn\'t find any user for this code. Please try copying and pasting the code from email in below.',
-            'pass_changed'     => 'Password changed successfully! You can now go to login panel and try again.',
+            'passreset_nocode' => 'Sorry but we couldn\'t find any user for this code.',
+            'pass_changed'     => 'Password changed successfully! You can now try to login.',
         ],
 
         'bans' => [
@@ -151,7 +151,6 @@ return [
  Link and code is valid only for 24h counting from :now.
  If this was not You just sit back and relax, link will become invalid afterwards.',
         'site'    => 'Click below to change the password',
-        'code'    => 'If link is not letting You to change password then write the code written below to the site opened in link',
 
 
     ],
@@ -164,7 +163,7 @@ return [
     'nickname'    => 'nickname',
     'ip'          => 'IP',
     'server'      => 'server',
-    'web'         => 'wesbite',
+    'web'         => 'website',
     'and' => 'and',
     'or' => 'or',
     'yes' => 'yes',
@@ -172,6 +171,7 @@ return [
     'administrator' => 'admin',
     'e_mail' => 'email',
 
+    'invalidCSRF' => 'Form You provided was not submitted due to missing cross-site security token. Please try submitting it again.',
     'validation_errors' => [
         'required' => 'The :attribute field is required',
         'same'     => 'The :attribute field needs to be the same as :0',

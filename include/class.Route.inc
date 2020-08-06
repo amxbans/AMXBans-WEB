@@ -102,7 +102,7 @@ class Route
         if ($input instanceof Closure) {
             return $input;
         }
-        $class_method = explode('@', $input);
+        $class_method    = explode('@', $input);
         $class_method[0] = "Controllers\\" . $class_method[0];
         return $class_method;
     }
@@ -111,16 +111,16 @@ class Route
     {
 //        var_dump(self::$getRoutes, self::$postRoutes, self::$putRoutes, self::$deleteRoutes);
         $method .= 'Routes';
-        $url = \Support\Path::getFakePathArray();
+        $url    = \Support\Path::getFakePathArray();
         $routes = array_keys(self::$$method);
         foreach ($routes as $route) {
-            $args = [];
+            $args  = [];
             $route = explode('/', $route);
             if (count($route) !== count($url)) {
                 continue;
             }
             for ($i = 0; $i < count($url); $i++) {
-                if (preg_replace('/{(\w+)(\??)}/', $url[$i], $route[$i]) != $url[$i]) {
+                if ($url[$i] != preg_replace('/{(\w+)(\??)}/', $url[$i], $route[$i])) {
                     break;
                 } elseif (preg_match('/{(\w+)(\??)}/', $route[$i], $matches, PREG_UNMATCHED_AS_NULL)) {
                     $args[] = $url[$i];
@@ -134,6 +134,7 @@ class Route
         exit;
     }
 
+    /** @noinspection PhpIncludeInspection */
     public function __construct(string $routing)
     {
         include_once \Support\Path::getRootPath() . '/routes/' . $routing;

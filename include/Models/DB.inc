@@ -55,11 +55,14 @@ class DB
             return false;
         }
         foreach ($data as $k => $datum) {
-            $pieces[] = "`$k` = ?";
+            $data[$str = 'u_' . substr(uniqid(), -3)] = is_bool($datum) ? (int)$datum : $datum;
+            $pieces[] = "`$k` = :$str";
+            unset($data[$k]);
         }
         $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ',
                 $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
-        return $this->db($q)->execute(array_merge(array_values($data), $this->wheres ?? []));
+        var_dump($q, array_merge($data, $this->wheres ?? []));
+        return $this->db($q)->execute(array_merge($data, $this->wheres ?? []));
     }
 
     /**
@@ -96,7 +99,7 @@ class DB
     public function selectOne($columns = '*', int $fetch_type = null)
     {
         $q = $this->limit(1)->select($columns, $fetch_type);
-        return $q[0] ?? false;
+        return $q[0] ?? ($this->model ? new $this->model : false);
     }
 
     private function getTableName() { return \Site::$instance->config->getDb()->prefix . '_' . $this->table; }

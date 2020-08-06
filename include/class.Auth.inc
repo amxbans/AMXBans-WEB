@@ -105,7 +105,7 @@ class Auth
         }
     }
 
-    public function get($what = 'id') { return self::$data[$what] ?? null; }
+    public static function get($what = 'id') { return self::$data[$what] ?? null; }
 
     public static function hasPermission($which, $power = 1)
     {
