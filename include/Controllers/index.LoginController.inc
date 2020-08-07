@@ -92,7 +92,8 @@ class LoginController extends BaseController
             'Content-type' => 'text/html; charset=utf-8',
         ];
         $mail         = Templating::$_MBSTRING ? 'mb_send_mail' : 'mail';
-        $mail($user->username . '<' . trim($_POST['email']) . '>', __LANG__['email']['subject'], $msg->fetch('email.tpl'), $mail_headers);
+        $mail($user->username . '<' . trim($_POST['email']) . '>', __LANG__['email']['subject'],
+            $msg->fetch('email.tpl'), $mail_headers);
         $this->site->output->assign('message',
             str_replace(':email', $_POST['email'], __LANG__['index']['login']['passcode_sent']));
 
@@ -141,7 +142,7 @@ class LoginController extends BaseController
 
         $this->site->output->assign('message',
             ['type' => 'success', 'text' => __LANG__['index']['login']['pass_changed']]);
-        return $this->site->output->display('index.login.tpl');
+        return $this->index();
     }
 
     private function checkCode($code, &$user = null): bool
