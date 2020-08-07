@@ -61,7 +61,6 @@ class DB
         }
         $q = "UPDATE `" . $this->getTableName() . "` SET " . implode(', ',
                 $pieces) . ' ' . $this->processWhere() . ' ' . $this->processLimit();
-        var_dump($q, array_merge($data, $this->wheres ?? []));
         return $this->db($q)->execute(array_merge($data, $this->wheres ?? []));
     }
 
