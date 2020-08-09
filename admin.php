@@ -11,10 +11,6 @@
  */
 
 session_start();
-require_once "include/class.Config.inc";
-$config = new Config;
+require_once "include/class.Site.inc";
 
-//TODO: if (!User::$logged)
-//	header('Location: ' . Route::makeURL(Config::start_pages[$config->start_page], 'index.php'));
-
-Site::build($config);
+Site::build();
