@@ -7,12 +7,12 @@
 	<form method="post" class="row" action="{['login']|url}">
 		{Site::makeFormAuth()}
 		<label class="col-sm-3 text-sm-right col-form-label" for="name">{$lang.index.login.username}</label>
-		<div class="col-sm-9"><input name="username" class="form-control" id="name" required /></div>
+		<div class="col-sm-9"><input name="username" class="form-control" id="name" required value="{'username'|input}" /></div>
 
 		<label class="col-sm-3 text-sm-right col-form-label" for="pass">{$lang.index.login.pass}</label>
-		<div class="col-sm-9"><input type="password" name="password" class="form-control" id="pass" required /></div>
+		<div class="col-sm-9"><input type="password" name="password" class="form-control" id="pass" required value="{'password'|input}" /></div>
 
-		<div class="col-sm-3 text-sm-right"><input type="checkbox" name="rem" class="form" id="rem" /></div>
+		<div class="col-sm-3 text-sm-right"><input type="checkbox" name="rem" class="form" id="rem"{if 'rem'|input:false} checked{/if} /></div>
 		<label for="rem" class="col-sm-9">{$lang.index.login.remember}</label>
 
 		<div class="col-sm-3 text-right">{if $blocked}{$lang.index.login.blocked}:{/if}</div>
