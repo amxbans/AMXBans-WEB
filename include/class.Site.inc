@@ -93,11 +93,7 @@ class Site
 
     public static function hasCookie($what = 'unID'): bool
     {
-        if (!is_array($what)) {
-            $what = [$what];
-        }
-
-        foreach ($what as $value) {
+        foreach ((array)$what as $value) {
             if (!isset($_COOKIE[$value])) {
                 return false;
             }

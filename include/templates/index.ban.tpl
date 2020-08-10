@@ -11,15 +11,15 @@
         <div class="card-body">
             {if Auth::$logged}
                 <div class="text-right">
-                    {if $can_user.edit_bans || ($can_user.edit_own_bans && $ban.username == User::get('username'))}
+                    {if $can_user.edit_bans || ($can_user.edit_own_bans && $ban.username == Auth::get('username'))}
                         <a href="{['bans', $ban.bid, 'edit']|url}"
                            class="btn btn-outline-primary">{$lang.admin.edit|ucfirst}</a>
                     {/if}
-                    {if $can_user.unban || ($can_user.unban_own && $ban.username == User::get('username'))}
+                    {if $can_user.unban || ($can_user.unban_own && $ban.username == Auth::get('username'))}
                         <a href="{['bans', $ban.bid, 'unban']|url}"
                            class="btn btn-outline-warning do-confirm">{$lang.admin.unban|ucfirst}</a>
                     {/if}
-                    {if $can_user.delete_bans || ($can_user.delete_own_bans && $ban.username == User::get('username'))}
+                    {if $can_user.delete_bans || ($can_user.delete_own_bans && $ban.username == Auth::get('username'))}
                         <a href="{['bans', $ban.bid, 'delete']|url}"
                            class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</a>
                     {/if}

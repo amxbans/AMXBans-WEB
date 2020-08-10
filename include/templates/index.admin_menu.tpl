@@ -1,7 +1,7 @@
 {if Auth::$logged}
     <ul class="navbar-nav mr-auto">
         {foreach $lang.admin.menu as $val}
-            <li class="nav-item{if $val == $site->getSite()} active{/if} dropdown">
+            <li class="nav-item{if $val == Support\Path::getFakePathWay()} active{/if} dropdown">
                 <a class="nav-link text-warning dropdown-toggle" href="#" id="admin{$val@index}" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">{$lang.admin.titles.$val}</a>
                 <div class="dropdown-menu" aria-labelledby="admin{$val@index}">

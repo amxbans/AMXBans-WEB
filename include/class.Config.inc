@@ -81,10 +81,10 @@ class Config implements ArrayAccess
 
         //save current language to session
         if (!isset($_SESSION["lang"])) {
-            $_SESSION["lang"] = ($install ? 'english' : $this->default_lang);
+            $_SESSION["lang"] = $install ? 'english' : ($_COOKIE['lang'] ?? $this->default_lang);
         }
         if (isset($_GET['lang'])) {
-            $_SESSION['lang'] = $_GET['lang'];
+            setcookie('lang', $_SESSION['lang'] = $_GET['lang'], 3600 * 24 * 7, Path::getBaseURL());
         }
 
         //Setup language strings
@@ -151,7 +151,7 @@ class Config implements ArrayAccess
         $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->db->prefix}_smilies`");
         $query->execute();
 
-        $this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_NUM | PDO::FETCH_UNIQUE);
+        $this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_NUM|PDO::FETCH_UNIQUE);
     }
 
     /**

@@ -49,10 +49,13 @@ class Model implements ArrayAccess
                 die;*/
         if (!$this->{$this->primary}) {
             static::query()->insert($diff);
-            return static::find(DB::lastInsertId());
+            $this->{$this->primary} = DB::lastInsertId();
+        } else {
+            static::query()->where($this->primary, $this->original[$this->primary])->update($diff);
         }
-        static::query()->where($this->primary, $this->original[$this->primary])->update($diff);
-        return static::find($this->{$this->primary});
+        $this->attributes = static::find($this->{$this->primary})->original;
+        $this->__construct();
+        return $this;
     }
 
     public function __get($name)

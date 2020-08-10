@@ -16,6 +16,7 @@ use DateTime;
 use FormErrors;
 use Models\WebAdmin;
 use Support\BaseController;
+use Support\Path;
 use Templating;
 
 /**
@@ -23,26 +24,83 @@ use Templating;
  */
 class LoginController extends BaseController
 {
+    /**
+     * Blockage time (in seconds) at reaching max tries.
+     */
+    private $blockTime = 600;
+
+    /**
+     * Shows initial login form
+     *
+     * @throws \SmartyException
+     */
     public function index()
     {
         $remaining = @$_SESSION['login_block'] ? time() - $_SESSION['login_block'] : null;
         $this->site->output->assign('blocked', $remaining);
 
-        $this->site->output->display('index.login');
+        $this->site->output->display('index.login.tpl');
     }
 
+    /**
+     * Process submitted login info
+     *
+     * @throws \SmartyException
+     * @throws \Exception
+     */
     public function store()
     {
-        // Logging in
-        //TODO: Remove passreset_* fields if they are present
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            return $this->index();
+        }
+        if ($this->isLoginBlocked()) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['blocked']]);
+            return $this->index();
+        }
+        /** @var WebAdmin $user */
+        $user = WebAdmin::query()->where('username', $_POST['username'])->selectOne();
+        if (!$user->exists) {
+            $this->addLoginTry();
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['no_user']]);
+            return $this->index();
+        }
+        if ($this->isLoginBlocked($user)) {
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['blocked']]);
+            return $this->index();
+        }
+        if (!password_verify($_POST['password'], $user->password)) {
+            db_log('Login', 'Attempt: wrong password', $user->username);
+            $this->addLoginTry($user);
+            $this->site->output->assign('message',
+                ['type' => 'warning', 'text' => __LANG__['index']['login']['wrong_pass']]);
+        }
+
+        $this->site->user->login($user, isset($_POST['rem']));
+            $user->last_action = new DateTime();
+            $user->passreset_code = null;
+            $user->passreset_until = null;
+            $user->save();
+            header('Location: ' . Path::makeURL('index/sys_info', 'admin.php'));
+            return true;
     }
 
+    /**
+     * Shows the form for password recovery request
+     *
+     * @throws \SmartyException
+     */
     public function lostPassForm()
     {
         $this->site->output->display('index.login.lost_pass');
     }
 
     /**
+     * Checks user existence and sends email for password recovery request
+     *
      * @throws \SmartyException
      * @throws \Exception
      */
@@ -101,6 +159,12 @@ class LoginController extends BaseController
         return;
     }
 
+    /**
+     * Shows the form for password change @ password recovery
+     *
+     * @param $code
+     * @throws \SmartyException
+     */
     public function passwordRecovery($code)
     {
         if (!$this->checkCode($code, $user)) {
@@ -111,6 +175,12 @@ class LoginController extends BaseController
         return $this->site->output->display('index.login.pass_change.tpl');
     }
 
+    /**
+     * Submitted form for password change @ password recovery
+     *
+     * @param $code
+     * @throws \SmartyException
+     */
     public function updatePassword($code)
     {
         if (!$this->checkCode($code, $user)) {
@@ -140,6 +210,9 @@ class LoginController extends BaseController
         $user->passreset_code  = null;
         $user->save();
 
+        $_SESSION['login_try'] = 0;
+        $_SESSION['login_block'] = 0;
+
         $this->site->output->assign('message',
             ['type' => 'success', 'text' => __LANG__['index']['login']['pass_changed']]);
         return $this->index();
@@ -156,5 +229,37 @@ class LoginController extends BaseController
             return false;
         }
         return true;
+    }
+
+    private function isLoginBlocked(WebAdmin $webAdmin = null): bool
+    {
+        $_SESSION['login_try'] = $_SESSION['login_try'] ?? ($webAdmin ? $webAdmin->try : 0);
+        if ($_SESSION['login_try'] >= $this->site->config->max_login_tries) {
+            $left = $webAdmin ? $webAdmin->last_action->getTimestamp() + $this->blockTime : ($_SESSION['login_block'] ?? 0);
+            if ($left < time()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param WebAdmin|null $toUser
+     * @throws \Exception
+     */
+    private function addLoginTry(WebAdmin $toUser = null)
+    {
+        $_SESSION['login_try']++;
+        if ($toUser) {
+            $toUser->try         += 1;
+            $toUser->last_action = new DateTime();
+            $toUser = $toUser->save();
+        }
+
+        if ($this->isLoginBlocked($toUser)) {
+            $_SESSION['login_block'] = time() + 600;
+            db_log('Login', 'Attempt: blocked (too many tries)', $toUser? $toUser->username : $_POST['username']);
+        }
     }
 }

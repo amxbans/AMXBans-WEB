@@ -17,11 +17,15 @@ namespace Models;
  * @property string $email
  * @property \DateTime $last_action
  * @property int $try
+ *
+ * @property-read WebPermission $permissions
  */
 class WebAdmin extends Model
 {
     protected $table = 'webadmins';
-
+    protected const relations = [
+        'permissions' => [0, 'Models\WebPermission', 'perm_level', 'level'],
+    ];
 
     public function getPassresetUntil($original)
     {
