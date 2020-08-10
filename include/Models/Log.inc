@@ -9,8 +9,8 @@ namespace Models;
  *
  * @package Models
  *
- * @property int $id
- * @property \DateTime $created_at
+ * @property int         $id
+ * @property \DateTime   $created_at
  * @property string|null $ip
  * @property string|null $username
  * @property string|null $action
@@ -19,14 +19,5 @@ namespace Models;
 class Log extends Model
 {
     protected $table = 'logs';
-
-
-    public function getCreatedAt($original)
-    {
-        return new \DateTime($original);
-    }
-    public function setCreatedAt(\DateTime $original)
-    {
-        return $original->format('Y-m-d H:i:s');
-    }
+    protected $dates = ['created_at'];
 }

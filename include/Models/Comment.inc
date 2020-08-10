@@ -34,6 +34,7 @@ class Comment extends Model
         'ban' => [0, 'Models\Ban', 'bid', 'bid'],
     ];
     protected $table = 'comments';
+    protected $dates = ['created_at'];
 
     public static function query(int $type = self::ALL)
     {

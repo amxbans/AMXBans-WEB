@@ -27,13 +27,5 @@ class WebAdmin extends Model
         'permissions' => [0, 'Models\WebPermission', 'perm_level', 'level'],
     ];
 
-    public function getPassresetUntil($original)
-    {
-        return $original? new \DateTime($original) : null;
-    }
-
-    public function setPassresetUntil($original)
-    {
-        return $original? $original->format('Y-m-d H:i:s') : null;
-    }
+    protected $dates = ['passreset_until' => null, 'last_action' => '@1'];
 }

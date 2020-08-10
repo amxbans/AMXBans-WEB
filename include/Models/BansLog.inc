@@ -16,6 +16,7 @@ namespace Models;
  */
 class BansLog extends Model
 {
+    protected $dates = ['created_at'];
     protected const relations = [
         'ban' => [0, 'Models\Ban', 'bid', 'bid'],
     ];

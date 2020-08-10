@@ -28,7 +28,7 @@ class DB
      * @param string|array $columns
      * @param int          $fetch_type
      *
-     * @return mixed
+     * @return mixed|static|bool
      */
     public function select($columns = '*', int $fetch_type = null): array
     {
@@ -93,7 +93,7 @@ class DB
      * @param string|array $columns
      * @param int|null     $fetch_type
      *
-     * @return mixed|bool
+     * @return mixed|bool|static
      */
     public function selectOne($columns = '*', int $fetch_type = null)
     {

@@ -9,6 +9,14 @@ class Model implements ArrayAccess
 {
     protected $table = '';
     protected $primary = 'id';
+    /**
+     * Dates to be translated automatically when receiving from and saving to database.
+     *      If field is as key, it's considered as <i>nullable</i> and
+     *          at saving will be checked whether null;
+     *          when receiving, value of key will be inserted to DateTime.
+     *      If field is as value, than regular translation will be performed.
+     */
+    protected $dates = [];
 
     protected const relations = [];
 
@@ -25,14 +33,20 @@ class Model implements ArrayAccess
     public function __construct()
     {
         if ($this->{$this->primary}) {
-            $func           = function ($c) {
-                return get_object_vars($c);
-            };
             $this->original = $this->attributes;
             foreach ($this->original as $key => $value) {
                 $method = snakeToCamel('get_' . $key);
                 if (method_exists($this, $method)) {
                     $this->attributes[$key] = $this->$method($value);
+                }
+            }
+            foreach ($this->dates as $key => $date) {
+                if (is_numeric($key)) {
+                    $this->attributes[$date] = new \DateTime($this->original[$date]);
+                } elseif (is_null($date)) {
+                    $this->attributes[$key] = $this->original[$key] ? new \DateTime($this->original[$key]) : null;
+                } else {
+                    $this->attributes[$key] = new \DateTime($this->original[$key] ?? $date);
                 }
             }
             $this->exists = true;
@@ -41,12 +55,8 @@ class Model implements ArrayAccess
 
     public function save()
     {
+        $this->dropRelations();
         $diff = $this->filterChanged();
-        /*
-        // TODO Model: process and remove relations from $this->attributes when saving
-                echo "<b>" . get_called_class() . "::save() :</b><br /> <pre>";
-                var_dump($diff);
-                die;*/
         if (!$this->{$this->primary}) {
             static::query()->insert($diff);
             $this->{$this->primary} = DB::lastInsertId();
@@ -133,6 +143,15 @@ class Model implements ArrayAccess
 
     private function filterChanged(): array
     {
+        foreach ($this->dates as $key => $date) {
+            if (is_numeric($key)) {
+                $this->attributes[$date] = $this->attributes[$date]->format('Y-m-d H:i:s');
+            } elseif (is_null($date)) {
+                $this->attributes[$key] = $this->attributes[$key] ? $this->attributes[$key]->format('Y-m-d H:i:s') : null;
+            } else {
+                $this->attributes[$key] = @new \DateTime($date) == $this->attributes[$key] ? null : $this->attributes[$key]->format('Y-m-d H:i:s');
+            }
+        }
         foreach ($this->attributes as $k => $v) {
             $method = snakeToCamel('set_' . $k);
             if (method_exists($this, $method)) {
@@ -143,5 +162,12 @@ class Model implements ArrayAccess
             }
         }
         return $return ?? [];
+    }
+
+    public function dropRelations(): void
+    {
+        foreach (static::relations as $relation => $data) {
+            unset($this->attributes[$relation]);
+        }
     }
 }
