@@ -76,6 +76,7 @@ class AdminController
                             $ban->expired = true;
                             $ban->save();
 
+                            //TODO: remove function and just operate with model
                             db_bans_log($ban, '--SYSTEM--', 'Bantime expired', $ban->ban_created + $tz + $bl);
                         }
                     }

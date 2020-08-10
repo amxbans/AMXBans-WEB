@@ -108,7 +108,7 @@ class Site
         }
         $_SESSION['TOKEN_V'] = uniqid();
         $_SESSION['TOKEN_T'] = time();
-        $_SESSION['TOKEN_M'] = $method;
+        $_SESSION['TOKEN_M'] = strtolower($method);
 
         $o = strtolower($method) == 'post' ? '' : "<input type='hidden' name='_method_' value='{$method}' />";
         return $o . "<input type='hidden' name='f_v_t' value='{$_SESSION['TOKEN_V']}' />";

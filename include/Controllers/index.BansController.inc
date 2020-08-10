@@ -135,6 +135,10 @@ class BansController extends BaseController
 
     public function update($id)
     {
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            return $this->edit($id);
+        }
         if (!Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit', 2)) {
             $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
             return $this->view($id);
@@ -170,17 +174,18 @@ class BansController extends BaseController
             return $this->edit($id);
         }
 
+        db_log('Ban edit', 'Edit ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
         $ban->player_nick = $_POST['player_nick'];
-        $ban->player_id = $_POST['player_id'];
-        $ban->ban_type = in_array($_POST['ban_type'], __LANG__['index']['ban']['types'])? $_POST['ban_type'] : '';
-        $ban->ban_reason = $_POST['ban_reason'];
+        $ban->player_id   = $_POST['player_id'];
+        $ban->ban_type    = in_array($_POST['ban_type'], __LANG__['index']['ban']['types']) ? $_POST['ban_type'] : '';
+        $ban->ban_reason  = $_POST['ban_reason'];
         $ban->save();
 
-        $bl = new BansLog();
-        $bl->admin_nick = Auth::get('username');
-        $bl->bid = $ban->bid;
+        $bl              = new BansLog();
+        $bl->admin_nick  = Auth::get('username');
+        $bl->bid         = $ban->bid;
         $bl->edit_reason = $_POST['edit_reason'];
-        $bl->created_at = new \DateTime();
+        $bl->created_at  = new \DateTime();
         $bl->save();
 
         $this->site->output->assign('message', __LANG__['admin']['saved']);
@@ -194,7 +199,21 @@ class BansController extends BaseController
 
     public function unban($id)
     {
-        //TODO: generate UNBAN method
+        $ban = Ban::find($id);
+        if (!$ban->exists) {
+            die(header('HTTP/2.0 404 Not Found'));
+        }
+
+        if ($ban->admin_nick == Auth::get('username') && !Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit',
+                2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            return $this->view($id);
+        }
+
+        $ban->expired = true;
+        $ban->ban_length = -1;
+        $ban->save();
+        db_log('Ban edit', 'Unban ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
     }
 
     public function comment($id)

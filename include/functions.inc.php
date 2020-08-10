@@ -34,15 +34,17 @@ function db_log(string $action, string $context, $user = null): void
  * @param int|null          $time
  *
  * @throws Exception
+ * @deprecated
  */
-function db_bans_log ($ban_id, string $admin = null, string $reason = NULL, int $time = null): void
+function db_bans_log($ban_id, string $admin = null, string $reason = null, int $time = null): void
 {
-    $log = new \Models\BansLog();
-    $log->bid = $ban_id instanceof \Models\Ban ? $ban_id->bid : $ban_id;
-    $log->admin_nick = $admin ?? Auth::get('username');
+    $log              = new \Models\BansLog();
+    $log->bid         = $ban_id instanceof \Models\Ban ? $ban_id->bid : $ban_id;
+    $log->admin_nick  = $admin ?? Auth::get('username');
     $log->edit_reason = $reason;
-    if ($time)
+    if ($time) {
         $log->created_at = new DateTime('@' . $time);
+    }
     $log->save();
 }
 
