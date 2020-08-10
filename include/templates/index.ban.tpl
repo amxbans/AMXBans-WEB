@@ -2,7 +2,7 @@
 {block name="head-title" prepend}{$lang.index.titles.ban} | {/block}
 
 {block name="BODY"}
-    {if isset($errors)}{include "messages.tpl"}{/if}
+    {include "messages.tpl"}
     <div class="card mb-4" id="ban-details">
         <div class="card-header">
             {$lang.index.ban.details}
@@ -73,15 +73,32 @@
         </div>
         {*{include file="layer_banedit.tpl"}*}
     </div>
+    {if Auth::$logged}
+        <div class="card mb-4">
+            <div class="card-header">{$lang.index.ban.edit_history}</div>
+            <div class="card-body">
+                {foreach $ban.logs as $log}
+                    <div><b>{$log.admin_nick} @ {$log.created_at->format($lang.date_format)}</b>: {$log.edit_reason}
+                    </div>
+                    {if !$log@last}
+                        <hr />
+                    {/if}
+                    {foreachelse}
+                    {$lang.empty}
+                {/foreach}
+            </div>
+        </div>
+    {/if}
     <div class="card mb-4">
-        <div class="card-header">{$lang.index.ban.comments_files} <span class="text-muted">({$ban.comments|count})</span></div>
+        <div class="card-header">{$lang.index.ban.comments_files} <span
+                    class="text-muted">({$ban.comments|count})</span></div>
         {if Auth::$logged or $config.allow_unregistered_comments}
             <div class="card-body">
                 <button onclick="$('#comment_add').slideToggle()"
                         class="btn btn-outline-primary btn-block">{$lang.index.ban.add_comment}</button>
                 <form id="comment_add" class="w-100" style="display: none" enctype="multipart/form-data" method="post">
                     {$site->makeFormAuth()}
-                    <hr/>
+                    <hr />
                     <div class="row">
                         <div class="col-sm-6"><input name="name" placeholder="{$lang.nickname|ucfirst}" required
                                                      class="form-control"></div>
@@ -90,7 +107,8 @@
                     </div>
                     <div id="comment_smilies" class="w-100">
                         {foreach $config->smilies as $tag => $info}
-                            <button type="button" data-tag="{$tag}" title="{$info.1}" class="btn btn-link p-0 m-1" tabindex="-1">
+                            <button type="button" data-tag="{$tag}" title="{$info.1}" class="btn btn-link p-0 m-1"
+                                    tabindex="-1">
                                 <img
                                         src="{"webSources/images/emoticons/{$info[0]}"|res_url}" alt="{$tag}">
                             </button>
@@ -120,7 +138,7 @@
                     </div>
                 </form>
             </div>
-            <hr/>
+            <hr />
         {/if}
 
         {foreach $ban.comments as $comment}
@@ -136,20 +154,20 @@
                         {$lang.index.ban.list_comment}
                     {/if}
                 </div>
-                <hr class="mt-1"/>
+                <hr class="mt-1" />
                 <div>
                     {if $comment.file}
-                    <a href="{$comment.file|res_url}" target="_blank" class="card px-3 py-1 d-inline-block"
-                       style="border-radius: 50px;font-size: 12px;">
-                        <img src="{"webSources/images/page.png"|res_url}" alt="File" height="16px">
-                        {$comment.file|basename|upper}
-                    </a>
+                        <a href="{$comment.file|res_url}" target="_blank" class="card px-3 py-1 d-inline-block"
+                           style="border-radius: 50px;font-size: 12px;">
+                            <img src="{"webSources/images/page.png"|res_url}" alt="File" height="16px">
+                            {$comment.file|basename|upper}
+                        </a>
                     {/if}
                 </div>
                 <p>{$comment.comment}</p>
             </div>
             {if !$comment@last}
-                <hr/>
+                <hr />
             {/if}
             {foreachelse}
             <div class="card-body text-center">{$lang.index.ban.no_comments}</div>
@@ -187,13 +205,13 @@
     </div>
 
     <script>
-        timer($('.timeleft').text() + '000', '.timeleft');
-        $('.do-confirm').click(function () {
-            return confirm('{$lang.admin.confirm_message}');
-        });
+		timer($('.timeleft').text() + '000', '.timeleft');
+		$('.do-confirm').click(function () {
+			return confirm('{$lang.admin.confirm_message}');
+		});
 
-        $('#comment_smilies .btn').click(function () {
-            typeInTextarea($('#comment_area'), $(this).data('tag'));
-        });
+		$('#comment_smilies .btn').click(function () {
+			typeInTextarea($('#comment_area'), $(this).data('tag'));
+		});
     </script>
 {/block}

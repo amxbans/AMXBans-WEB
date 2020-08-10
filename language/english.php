@@ -75,6 +75,8 @@ return [
             'list_comment_file'   => 'uploaded a file with comment',
             'captcha_placeholder' => 'Rewrite captcha here',
             'no_comments'         => 'No comments yet',
+            'edit_history'        => 'Edit history',
+            'edit_reason'         => 'Editing reason',
         ],
     ],
 
@@ -143,6 +145,7 @@ return [
 
 
         'no_access' => 'You have insufficient permissions to view this page!', // _NOACCESS
+        'saved'     => 'Entry saved', // _FILEEDITED
     ],
 
     'email' => [
@@ -173,12 +176,17 @@ return [
     'no'            => 'no',
     'administrator' => 'admin',
     'e_mail'        => 'email',
+    'editing'       => 'editing',
+    'empty'         => 'Nothing in here...',
 
     'invalidCSRF'       => 'Form You provided was not submitted due to missing cross-site security token. Please try submitting it again.',
     'validation_errors' => [
         'required' => 'The :attribute field is required',
         'same'     => 'The :attribute field needs to be the same as :0',
         'min'      => 'The :attribute field needs to be at least :0',
+        'max'      => 'The :attribute field cannot be more than :0',
+        'later'    => 'The :attribute field needs to be later than now',
+        'ip'       => 'The :attribute field needs to be an ip-compliant string (0.0.0.0-255.255.255.255)',
     ],
 ];
 

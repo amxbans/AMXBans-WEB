@@ -17,6 +17,7 @@ namespace Controllers;
 use Auth;
 use Captcha;
 use Models\Ban;
+use Models\BansLog;
 use PDO;
 use Support\BaseController;
 use Steam;
@@ -28,8 +29,8 @@ class BansController extends BaseController
 {
     public function index()
     {
-        $page = (int)($_GET['page'] ?? 0);
-        $page = $page < 1 ? 0 : $page - 1;
+        $page   = (int)($_GET['page'] ?? 0);
+        $page   = $page < 1 ? 0 : $page - 1;
         $offset = $page * $this->site->config->per_page;
         $offset = $offset ? $offset - 1 : 0;
 
@@ -43,25 +44,25 @@ class BansController extends BaseController
             $comments = $this->site->config->getDb()
                 ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE comment IS NOT NULL");
             $comments->execute();
-            $comments = $comments->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN, 1);
+            $comments = $comments->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_COLUMN, 1);
         }
 
         $files = $this->site->config->getDb()
             ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE file IS NOT NULL");
         $files->execute();
-        $files = $files->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_COLUMN, 1);
+        $files = $files->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_COLUMN, 1);
 
         $bans = $bans->fetchAll(PDO::FETCH_OBJ);
         foreach ($bans as $ban) {
-            $b['id'] = $ban->bid;
-            $b['player'] = $ban->player_nick;
-            $b['admin'] = $ban->admin_nick;
-            $b['reason'] = $ban->ban_reason;
-            $b['length'] = $ban->ban_length;
+            $b['id']         = $ban->bid;
+            $b['player']     = $ban->player_nick;
+            $b['admin']      = $ban->admin_nick;
+            $b['reason']     = $ban->ban_reason;
+            $b['length']     = $ban->ban_length;
             $b['kick_count'] = $ban->ban_kicks;
-            $b['created'] = $ban->ban_created + ($ban->timezone_fixx * 60 * 60);
-            $b['ended'] = ($ban->ban_length > 0 && ($ban->ban_created + ($ban->ban_length * 60) + ($ban->timezone_fixx * 60 * 60)) < time());
-            $b['type'] = $ban->gametype ?: 'website';
+            $b['created']    = $ban->ban_created + ($ban->timezone_fixx * 60 * 60);
+            $b['ended']      = ($ban->ban_length > 0 && ($ban->ban_created + ($ban->ban_length * 60) + ($ban->timezone_fixx * 60 * 60)) < time());
+            $b['type']       = $ban->gametype ?: 'website';
             $b['file_count'] = isset($files[$ban->bid]) ? count($files[$ban->bid]) : 0;
 
             $same = array_filter($bans, function ($value) use ($ban) {
@@ -90,8 +91,8 @@ class BansController extends BaseController
             die(header('HTTP/2.0 404 Not Found'));
         }
         $ban->ban_created = $ban->ban_created + $ban->server->timezone_fixx * 3600;
-        $ban->expired = ($ban->ban_length > 0 && ($ban->ban_created + ($ban->ban_length * 60)) < time());
-        $ban->com_id = $ban->player_id ? Steam::GetFriendID($ban->player_id) : false;
+        $ban->expired     = ($ban->ban_length > 0 && ($ban->ban_created + ($ban->ban_length * 60)) < time());
+        $ban->com_id      = $ban->player_id ? Steam::GetFriendID($ban->player_id) : false;
 
         $this->site->output->assign('ban', $ban);
         $this->site->output->assign('can_user', [
@@ -120,18 +121,70 @@ class BansController extends BaseController
 
         $ban = Ban::find($id);
 
-        if (Auth::get('username') != $ban->admin->username && !Auth::hasPermission('bans_edit')){
+        if (Auth::get('username') != $ban->admin->username && !Auth::hasPermission('bans_edit', 2)) {
             $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
             return $this->view($id);
         }
 
         $this->site->output->assign('ban', $ban);
+        $this->site->output->assign('can_user', [
+            'view_ips' => Auth::hasPermission('ip_view'),
+        ]);
         $this->site->output->display('index.ban.edit.tpl');
     }
 
     public function update($id)
     {
-        //TODO: generate UPDATE method
+        if (!Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit', 2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            return $this->view($id);
+        }
+
+        $ban = Ban::find($id);
+        if (!$ban->exists) {
+            die(header('HTTP/2.0 404 Not Found'));
+        }
+
+        if (Auth::get('username') != $ban->admin_nick && !Auth::hasPermission('bans_edit', 2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            return $this->view($id);
+        }
+
+        $errors = new \FormErrors($_POST, __LANG__['validation_errors']);
+        $errors->validate([
+            'player_nick' => 'required|max:31',
+            'player_id'   => 'steamid',
+            'edit_reason' => 'required|max:250',
+        ]);
+        if (Auth::hasPermission('ip_view')) {
+            $errors->validate(['player_ip' => 'ip']);
+            $ban->player_ip = $_POST['player_ip'];
+        }
+
+        //Ban length must be the same, permanent (0) or later than now (created+length)
+        if ($_POST['ban_length'] != 0 && $_POST['ban_length'] != $ban->ban_length && $ban->ban_created + $_POST['ban_length'] * 60 < time()) {
+            $errors->addValidationError('ban_length', 'later');
+        }
+        if ($errors->has()) {
+            $this->site->output->assign('messages', $errors);
+            return $this->edit($id);
+        }
+
+        $ban->player_nick = $_POST['player_nick'];
+        $ban->player_id = $_POST['player_id'];
+        $ban->ban_type = in_array($_POST['ban_type'], __LANG__['index']['ban']['types'])? $_POST['ban_type'] : '';
+        $ban->ban_reason = $_POST['ban_reason'];
+        $ban->save();
+
+        $bl = new BansLog();
+        $bl->admin_nick = Auth::get('username');
+        $bl->bid = $ban->bid;
+        $bl->edit_reason = $_POST['edit_reason'];
+        $bl->created_at = new \DateTime();
+        $bl->save();
+
+        $this->site->output->assign('message', __LANG__['admin']['saved']);
+        return $this->edit($id);
     }
 
     public function delete($id)

@@ -142,7 +142,31 @@ class FormErrors
     private function valMin($value, array $otherValues = [])
     {
         return is_string($value) ?
-            strlen($value) >= strlen($otherValues[0]) :
+            strlen($value) >= $otherValues[0] :
             $value >= $otherValues[0];
+    }
+
+    private function valMax($value, array $otherValues = [])
+    {
+        return is_string($value) ?
+            strlen($value) <= $otherValues[0] :
+            $value <= $otherValues[0];
+    }
+
+    private function valLater($value, array $otherValues = [])
+    {
+        $value = $value instanceof DateTime? $value : new DateTime((is_int($value)? '@' : '') . $value);
+        $now = new DateTime();
+        return $value > $now;
+    }
+
+    private function valIp($value, array $otherValues = [])
+    {
+        return $value? preg_match('/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/', $value) : true;
+    }
+
+    private function valSteamid($value, array $otherValues = [])
+    {
+        return $value? preg_match('/^STEAM_0:[01]:[0-9]{1,10}$/', $value) : true;
     }
 }
