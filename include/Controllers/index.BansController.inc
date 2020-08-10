@@ -86,8 +86,8 @@ class BansController extends BaseController
     public function view($id)
     {
         $ban = Ban::find($id);
-        if (!$ban) {
-            die(header('HTTP/1.1 404'));
+        if (!$ban->exists) {
+            die(header('HTTP/2.0 404 Not Found'));
         }
         $ban->ban_created = $ban->ban_created + $ban->server->timezone_fixx * 3600;
         $ban->expired = ($ban->ban_length > 0 && ($ban->ban_created + ($ban->ban_length * 60)) < time());
@@ -108,12 +108,25 @@ class BansController extends BaseController
         ]);
 
         Captcha::generateCode();
-        $this->site->output->display('index.ban');
+        $this->site->output->display('index.ban.tpl');
     }
 
     public function edit($id)
     {
-        //TODO: generate EDIT method
+        if (!Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit', 2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            return $this->view($id);
+        }
+
+        $ban = Ban::find($id);
+
+        if (Auth::get('username') != $ban->admin->username && !Auth::hasPermission('bans_edit')){
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            return $this->view($id);
+        }
+
+        $this->site->output->assign('ban', $ban);
+        $this->site->output->display('index.ban.edit.tpl');
     }
 
     public function update($id)
