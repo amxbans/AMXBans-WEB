@@ -37,6 +37,7 @@ namespace Models;
  * @property AMXAdmin|null  $admin
  * @property Server|null    $server
  * @property BansLog[]|null $logs
+ * @property Comment[]|null $comments
  */
 class Ban extends Model
 {

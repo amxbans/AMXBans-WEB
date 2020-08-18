@@ -10,7 +10,8 @@
         </div>
         <div class="card-body">
             {if Auth::$logged}
-                <div class="text-right">
+                <form class="text-right" method="post" action="{['bans', $ban.bid]|url}">
+                    {Site::makeFormAuth('DELETE')}
                     {if $can_user.edit_bans || ($can_user.edit_own_bans && $ban.username == Auth::get('username'))}
                         <a href="{['bans', $ban.bid, 'edit']|url}"
                            class="btn btn-outline-primary">{$lang.admin.edit|ucfirst}</a>
@@ -20,10 +21,9 @@
                            class="btn btn-outline-warning do-confirm">{$lang.admin.unban|ucfirst}</a>
                     {/if}
                     {if $can_user.delete_bans || ($can_user.delete_own_bans && $ban.username == Auth::get('username'))}
-                        <a href="{['bans', $ban.bid, 'delete']|url}"
-                           class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</a>
+                        <button class="btn btn-outline-danger do-confirm">{$lang.admin.delete|ucfirst}</button>
                     {/if}
-                </div>
+                </form>
             {/if}
             <div class="row">
                 <div class="col-lg-3 col-sm-5 text-sm-right">{$lang.nickname|ucfirst}</div>

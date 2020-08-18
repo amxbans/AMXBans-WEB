@@ -18,6 +18,7 @@ use Auth;
 use Captcha;
 use Models\Ban;
 use Models\BansLog;
+use Models\Comment;
 use PDO;
 use Support\BaseController;
 use Steam;
@@ -42,13 +43,13 @@ class BansController extends BaseController
 
         if ($this->site->config->bans_show_comments) {
             $comments = $this->site->config->getDb()
-                ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE comment IS NOT NULL");
+                                           ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE comment IS NOT NULL");
             $comments->execute();
             $comments = $comments->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_COLUMN, 1);
         }
 
         $files = $this->site->config->getDb()
-            ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE file IS NOT NULL");
+                                    ->prepare("SELECT id, bid FROM `{$this->site->config->getDb()->prefix}_comments` WHERE file IS NOT NULL");
         $files->execute();
         $files = $files->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_COLUMN, 1);
 
@@ -65,7 +66,7 @@ class BansController extends BaseController
             $b['type']       = $ban->gametype ?: 'website';
             $b['file_count'] = isset($files[$ban->bid]) ? count($files[$ban->bid]) : 0;
 
-            $same = array_filter($bans, function ($value) use ($ban) {
+            $same           = array_filter($bans, function ($value) use ($ban) {
                 return $value->player_id == $ban->player_id;
             });
             $b['ban_count'] = count($same);
@@ -114,16 +115,8 @@ class BansController extends BaseController
 
     public function edit($id)
     {
-        if (!Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit', 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
-            return $this->view($id);
-        }
-
-        $ban = Ban::find($id);
-
-        if (Auth::get('username') != $ban->admin->username && !Auth::hasPermission('bans_edit', 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
-            return $this->view($id);
+        if (!($ban = $this->recoverBan($id, 'bans_edit'))) {
+            exit;
         }
 
         $this->site->output->assign('ban', $ban);
@@ -139,19 +132,8 @@ class BansController extends BaseController
             $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
             return $this->edit($id);
         }
-        if (!Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit', 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
-            return $this->view($id);
-        }
-
-        $ban = Ban::find($id);
-        if (!$ban->exists) {
-            die(header('HTTP/2.0 404 Not Found'));
-        }
-
-        if (Auth::get('username') != $ban->admin_nick && !Auth::hasPermission('bans_edit', 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
-            return $this->view($id);
+        if (!($ban = $this->recoverBan($id, 'bans_edit'))) {
+            exit;
         }
 
         $errors = new \FormErrors($_POST, __LANG__['validation_errors']);
@@ -194,23 +176,28 @@ class BansController extends BaseController
 
     public function delete($id)
     {
-        //TODO: generate DELETE method
+        if (!($ban = $this->recoverBan($id, 'bans_delete'))) {
+            exit;
+        }
+
+        $comms = Comment::query(Comment::FILES)->where('bid', $id)->select('file');
+        foreach ($comms ?? [] as $comment) {
+            unlink($comment->file);
+        }
+        Comment::query()->where('bid', $id)->delete();
+        Ban::query()->where('bid', $id)->delete();
+        db_log('Ban edit', 'Delete ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
+        $this->site->output->assign('message', __LANG__['admin']['deleted']);
+        return $this->index();
     }
 
     public function unban($id)
     {
-        $ban = Ban::find($id);
-        if (!$ban->exists) {
-            die(header('HTTP/2.0 404 Not Found'));
+        if (!($ban = $this->recoverBan($id, 'bans_unban'))) {
+            return;
         }
 
-        if ($ban->admin_nick == Auth::get('username') && !Auth::hasPermission('bans_edit') && !Auth::hasPermission('bans_edit',
-                2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
-            return $this->view($id);
-        }
-
-        $ban->expired = true;
+        $ban->expired    = true;
         $ban->ban_length = -1;
         $ban->save();
         db_log('Ban edit', 'Unban ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
@@ -220,5 +207,34 @@ class BansController extends BaseController
     {
 
         //TODO: generate COMMENT method
+    }
+
+    /**
+     * @param $id
+     * @param $permission
+     *
+     * @return bool|Ban
+     */
+    private function recoverBan($id, $permission)
+    {
+
+        if (!Auth::hasPermission($permission) && !Auth::hasPermission($permission, 2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            $this->view($id);
+            return false;
+        }
+
+        $ban = Ban::find($id);
+        if (!$ban->exists) {
+            die(header('HTTP/2.0 404 Not Found'));
+        }
+
+        if (Auth::get('username') != $ban->admin_nick && !Auth::hasPermission($permission, 2)) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            $this->view($id);
+            return false;
+        }
+
+        return $ban;
     }
 }

@@ -123,7 +123,7 @@ class Site
         $m = $_SESSION['TOKEN_M'];
         $v = $_SESSION['TOKEN_V'];
         $this->destroyFormAuth();
-        return ($v == $_POST['f_v_t'] && $this->method == $m);
+        return ($v == @$_POST['f_v_t'] && $this->method == $m);
     }
 
     protected function destroyFormAuth()
@@ -136,6 +136,8 @@ class Site
     {
         if (strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
             return 'get';
+        } elseif (strtolower($_SERVER['REQUEST_METHOD']) != 'post') {
+            return strtolower($_SERVER['REQUEST_METHOD']);
         } else {
             return strtolower($_POST['_method_'] ?? 'post');
         }

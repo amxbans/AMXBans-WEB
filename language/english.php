@@ -146,6 +146,7 @@ return [
 
         'no_access' => 'You have insufficient permissions to view this page!', // _NOACCESS
         'saved'     => 'Entry saved', // _FILEEDITED
+        'deleted'   => 'Entry deleted', // _LEVELDELETED (part of)
     ],
 
     'email' => [

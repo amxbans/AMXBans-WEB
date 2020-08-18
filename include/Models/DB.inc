@@ -32,8 +32,8 @@ class DB
      */
     public function select($columns = '*', int $fetch_type = null): array
     {
-        if ($columns != '*' OR is_array($columns)) {
-            $columns = '`' . implode('`, `', is_array($columns) ? $columns : [$columns]) . '`';
+        if ($columns != '*') {
+            $columns = '`' . implode('`, `', (array)$columns) . '`';
         }
         $q = "SELECT $columns FROM " . $this->getTableName() . " " . $this->processWhere() . ' ' . $this->processLimit();
         $q = $this->db($q);
@@ -223,5 +223,14 @@ class DB
         $q = $this->db($q);
         $q->execute($this->wheres);
         return $q->fetchColumn()[0];
+    }
+
+    public function delete($ids = [])
+    {
+        if (!empty($ids)) {
+            $this->where($this->primary, 'IN', $ids);
+        }
+        $q = "DELETE FROM `{$this->getTableName()}` {$this->processWhere()}";
+        return $this->db($q)->execute($this->wheres);
     }
 }
