@@ -100,10 +100,10 @@
                     {$site->makeFormAuth()}
                     <hr />
                     <div class="row">
-                        <div class="col-sm-6"><input name="name" placeholder="{$lang.nickname|ucfirst}" required
-                                                     class="form-control"></div>
+                        <div class="col-sm-6"><input name="name" placeholder="{$lang.nickname|ucfirst}"
+                                                     class="form-control" value="{'name'|input}"></div>
                         <div class="col-sm-6"><input name="email" type="email" placeholder="{$lang.e_mail|ucfirst}"
-                                                     required class="form-control"></div>
+                                                     class="form-control" value="{'email'|input}"></div>
                     </div>
                     <div id="comment_smilies" class="w-100">
                         {foreach $config->smilies as $tag => $info}
@@ -116,7 +116,7 @@
                     </div>
                     <label class="w-100">
                             <textarea id="comment_area" name="comment" class="form-control" rows="6"
-                                      placeholder="{$lang.index.ban.comment}"></textarea>
+                                      placeholder="{$lang.index.ban.comment}">{"comment"|input}</textarea>
                     </label>
 
                     <div class="form-group">

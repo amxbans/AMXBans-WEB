@@ -22,6 +22,7 @@ use Models\Comment;
 use PDO;
 use Support\BaseController;
 use Steam;
+use Support\Path;
 
 /**
  * Class BansController
@@ -201,15 +202,86 @@ class BansController extends BaseController
         $ban->ban_length = -1;
         $ban->save();
         db_log('Ban edit', 'Unban ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
-    }
-
-    public function comment($id)
-    {
-
-        //TODO: generate COMMENT method
+        return $this->view($id);
     }
 
     /**
+     * Form validation and comment creation on new ban comment submission.
+     *
+     * @param $id Ban ID to save comment under
+     */
+    public function comment($id)
+    {
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            return $this->view($id);
+        }
+        if (!$this->site->config->allow_unregistered_comments && !Auth::$logged) {
+            $this->site->output->assign('message', __LANG__['index']['ban']['no_commenting']);
+            return $this->view($id);
+        }
+
+        $errorChecker = new \FormErrors($_POST, __LANG__['validation_errors']);
+        $errorChecker->validate([
+            'comment' => 'required|max:65535',
+        ]);
+        if (!Auth::$logged) {
+            $errorChecker->validate([
+                'name'    => 'required|max:100',
+                'email'   => 'required|email',
+                'captcha' => 'required|captcha',
+            ]);
+        }
+
+        if ($errorChecker->has()) {
+            $this->site->output->assign('messages', $errorChecker);
+            return $this->view($id);
+        }
+
+        if (isset($_FILES['file']) && $_FILES['file']['error'] != UPLOAD_ERR_NO_FILE) {
+            $file = $_FILES['file'];
+            if ($file['error'] == UPLOAD_ERR_INI_SIZE || $file['error'] == UPLOAD_ERR_FORM_SIZE || $file['size'] > $this->site->config->uploaded_file_size) {
+                $this->site->output->assign('message',
+                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_too_big']]);
+                return $this->view($id);
+            }
+
+            if ($file['error'] != UPLOAD_ERR_OK) {
+                $this->site->output->assign('message',
+                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_not_uploaded']]);
+                return $this->view($id);
+            }
+
+            $extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+            if (!in_array($extension, $this->site->config->uploaded_file_types)) {
+                $this->site->output->assign('message',
+                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_not_type']]);
+                return $this->view($id);
+            }
+
+
+            $newName = 'webSources/uploads/' . date('Ymd_His-') . rand(0, 9) . '.' . $extension;
+            move_uploaded_file($file['tmp_name'], Path::getRootPath() . '/' . $newName);
+        }
+
+
+        $comment           = new Comment();
+        $comment->file     = $newName ?? null;
+        $comment->comment  = $_POST['comment'];
+        $comment->name     = $_POST['name'] ?: Auth::get('username');
+        $comment->email    = $_POST['email'] ?: Auth::get('email');
+        $comment->addr     = $_SERVER['REMOTE_ADDR'];
+        $comment->bid      = $id;
+        $comment->admin_id = Auth::get() ?: null;
+        $comment->save();
+
+        $this->site->output->assign('message', __LANG__['index']['ban']['comment_saved']);
+        return header('Location: ' . Path::makeURL('bans/' . $id));
+    }
+
+    /**
+     * Checks permission and returns model if all ok, false otherwise.
+     *
      * @param $id
      * @param $permission
      *

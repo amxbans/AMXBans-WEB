@@ -169,4 +169,14 @@ class FormErrors
     {
         return $value? preg_match('/^STEAM_0:[01]:[0-9]{1,10}$/', $value) : true;
     }
+
+    private function valEmail($value, array $otherValues = [])
+    {
+        return $value? preg_match('/^[a-zA-Z0-9-_.]{2,64}@[a-zA-Z0-9-_.]{2,251}.[a-z]{2,4}$/', $value) : true; // https://stackoverflow.com/a/386302
+    }
+
+    private function valCaptcha($value, array $otherValues = [])
+    {
+        return $value? Captcha::isValid($value) : true;
+    }
 }

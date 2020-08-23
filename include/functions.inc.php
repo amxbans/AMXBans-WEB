@@ -142,3 +142,8 @@ function toBool($value): bool
 {
     return ($value === 'on' OR $value === 'On' OR $value == 'Yes' OR $value == 'yes' OR $value > 0 or $value == true);
 }
+
+function now(): DateTime
+{
+    return new DateTime();
+}

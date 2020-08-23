@@ -144,6 +144,9 @@ class Model implements ArrayAccess
     private function filterChanged(): array
     {
         foreach ($this->dates as $key => $date) {
+            if (!isset($this->attributes[$date]) && !isset($this->attributes[$key])) {
+                continue;
+            }
             if (is_numeric($key)) {
                 $this->attributes[$date] = $this->attributes[$date]->format('Y-m-d H:i:s');
             } elseif (is_null($date)) {

@@ -70,6 +70,7 @@ return [
             'comments_files'      => 'Comments & Files',
             'add_comment'         => 'Add Comment',
             'comment'             => 'Comment',
+            'no_commenting'       => 'Commenting are not allowed from unregistered users.',
             'list_comment'        => 'made a comment',
             'list_file'           => 'uploaded a file',
             'list_comment_file'   => 'uploaded a file with comment',
@@ -77,6 +78,10 @@ return [
             'no_comments'         => 'No comments yet',
             'edit_history'        => 'Edit history',
             'edit_reason'         => 'Editing reason',
+            'file_too_big'        => 'Uploaded file was too big. Try to reduce its size.', // _FILETOBIG
+            'file_not_uploaded'   => 'File was not uploaded or saved', // _FILEUPLOADFAIL
+            'file_not_type'       => 'Uploaded file was not  allowed file type', // _FILETYPENOTALLOWED
+            'comment_saved'       => 'Comment saved successfully', // _COMADDED
         ],
     ],
 
