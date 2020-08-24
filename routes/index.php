@@ -6,6 +6,8 @@ Route::resource('bans', 'BansController', ['create', 'store']);
 Route::get('bans/{id}/unban', 'BansController@unban');
 Route::post('bans/{id}', 'BansController@comment');
 
+Route::get('servers', 'ServersController@index');
+
 Route::resource('login', 'LoginController', ['index', 'store'], true);
 Route::get('login/pass_rec', 'LoginController@lostPassForm');
 Route::post('login/pass_rec', 'LoginController@lostPassSend');
