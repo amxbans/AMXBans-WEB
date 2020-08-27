@@ -63,7 +63,7 @@ class ServersController extends BaseController
         }
         $this->site->output->assign('last_ban', $lb);
 
-        return $this->site->output->display('view.tpl');
+        return $this->site->output->display('index.servers.tpl');
     }
 
     public function ajaxServerInfo($server)
