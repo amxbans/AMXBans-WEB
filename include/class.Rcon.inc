@@ -407,7 +407,7 @@ class Rcon
         #asort($result);
 
         //return formatted result
-        return $result;
+        return $result ?? [];
 
     } //function ServerRules()
 

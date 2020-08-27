@@ -100,6 +100,7 @@ class ServersController extends BaseController
             ]);
         }
 
+        $out['players'] = [];
         foreach ((array)$rcon->Players() as $player) {
             $out['players'][] = [
                 "name"  => htmlspecialchars($player['name']),
@@ -112,7 +113,9 @@ class ServersController extends BaseController
         $mapPic = "/webSources/images/maps/{$infos['mod']}/{$infos['map']}.jpg";
 
         //main server info
+        $rules = $rcon->ServerRules();
         $out['info'] = [
+            'RULES' => $rules,
             "hostname"     => $infos['name'],
             'address'      => $server['address'],
             "map"          => $infos['map'],
@@ -125,9 +128,9 @@ class ServersController extends BaseController
             "dedicated"    => ($infos['dedicated'] == "d") ? "Dedicated" : "Listen",
             "os"           => ($infos['os'] == "l") ? "Linux" : "Windows",
             "password"     => (bool)$infos['password'],
-            "timeleft"     => $rcon->ServerRules()['amx_timeleft'] ?? 0,
-            "nextmap"      => $rcon->ServerRules()['amx_nextmap'] ?? '',
-            "friendlyFire" => (bool)$rcon->ServerRules()['mp_friendlyfire'],
+            "timeleft"     => $rules['amx_timeleft'] ?? '-:--',
+            "nextmap"      => $rules['amx_nextmap'] ?? '',
+            "friendlyFire" => (bool)($rules['mp_friendlyfire'] ?? false),
             "picture"      => Path::getBaseURL() . (file_exists(Path::getRootPath() . $mapPic) ? $mapPic : "/webSources/images/maps/noimage.jpg"),
             'vac'          => (bool)$infos['secure'],
         ];
