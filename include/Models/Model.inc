@@ -25,6 +25,9 @@ class Model implements ArrayAccess
 
     public $exists = false;
 
+    /**
+     * @return DB|static
+     */
     public static function query()
     {
         return DB::table((new static())->table, static::class);

@@ -55,6 +55,57 @@ function typeInTextarea(el, newText) {
 	el[0].selectionStart = el[0].selectionEnd = start + newText.length;
 	el.focus();
 }
+
+$(function () {
+	$('#serverInfoContainer > .card').click(function (e) {
+		if ($('.card-body.show', this).length) {
+			return e;
+		}
+		const $this = $(this);
+		if (!$this.children().last().hasClass('spinner')) {
+			return e;
+
+		}
+		$this.children().last().html('<div style="padding: 15vh;" class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>');
+		let server = $this.data('server-id');
+		$.get('servers/' + server, data => {
+			if (!data.success) {
+				$this.children().last().html('<div class="alert alert-warning">' + data.message + '</div>');
+				return e;
+			}
+
+			let tpl = '<div class="row">' +
+				'<div class="col-12 col-md"><div class="mx-auto text-center" style="max-width: 150px"><img /></div><ul class="list-group"></ul></div>' +
+				'<div class="col"><div class="h6">'+data.lang.players + ' ('+ (data.info.players.active - data.info.players.bots) + ' ' + data.lang.player.active + ', ' + data.info.players.bots + ' ' + data.lang.player.bots + ' // ' + data.info.players.max + ' ' + data.lang.player.total + ')' +
+				'</div><ul class="list-group players"></ul></div>' +
+				'</div>';
+			const $child = $this.children().last().removeClass('spinner').html(tpl);
+			$('img', $child).attr('src', data.info.picture).attr('alt', data.info.map).parent().append('<small class="text-muted">' + data.info.map + '</small>');
+			data.players.forEach(function (player) {
+				$('ul.players', $child).append('<li class="list-group-item d-flex justify-content-between align-items-center">\n' +
+					(player.name? player.name : '<span class="font-italic">' + data.lang.player.connecting + '</span>') +
+					'<span>' +
+					// '<span class="badge badge-secondary badge-pill">' + player.time + '</span>' +
+					'<span class="badge badge-secondary badge-pill">' + player.kills + '</span>' +
+					'</span>\n' +
+					'  </li>');
+			});
+			if (data.players.length === 0) {
+				$('ul.players', $child).parent().html('<p class="text-center">' + data.lang.player.none + '</p>')
+			}
+
+			tpl = '<li class="list-group-item d-flex justify-content-between align-items-center"></li>';
+			$('ul:not(.players)', $child).append('<li class="list-group-item text-center"><p class="font-bold">' + data.info.hostname + '</p></li>');
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.hostname + ':</b> ' + data.info.address));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.password + ':</b> ' + (data.info.password? data.lang.yes : data.lang.no)));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.friendlyFire + ':</b> ' + (data.info.friendlyFire? data.lang.yes : data.lang.no)));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.map + ':</b> ' + data.info.map));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.timeleft + ':</b> ' + data.info.timeleft));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.nextmap + ':</b> ' + data.info.nextmap));
+		});
+	});
+});
+
 /*
 
 function ToggleLayer(obj) {

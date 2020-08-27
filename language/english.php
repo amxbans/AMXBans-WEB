@@ -83,6 +83,36 @@ return [
             'file_not_type'       => 'Uploaded file was not  allowed file type', // _FILETYPENOTALLOWED
             'comment_saved'       => 'Comment saved successfully', // _COMADDED
         ],
+
+        'servers' => [
+            'stats'          => 'Overall statistics', // _STATS
+            'last_ban'       => 'Last ban',
+            'players_online' => 'Players online',
+            'connect'        => 'Connect', // _CONNECT
+            'hostname'       => 'Address', // _ADDRESS
+            'map'            => 'Map', // _MAP
+            'nextmap'        => 'Nextmap', // _NEXTMAP
+            'timeleft'       => 'Timeleft', // _TIMELEFT
+            'password'       => 'Password protected', // _TIMELEFT
+            'friendly_fire'  => 'Friendly Fire', // _FRIENDLYFIRE
+            'player'         => [
+                'connecting' => 'Player connecting...', // _PLAYERCONNECTING
+                'none'       => 'No Players', // _NOPLAYERS
+                'active'     => 'Real',
+                'bots'       => 'Bots',
+                'total'      => 'Total',
+            ],
+
+
+            'ajax' => [
+                'not_found'      => 'Server not available', // _SERVEROFFLINE
+                'cannot_connect' => 'Cannot connect live to server',
+            ],
+
+            'total_bans' => 'Total bans',
+            'temp_bans'  => 'Temporary',
+            'servers'    => 'Servers', // _ACTIVE_SERVERS
+        ],
     ],
 
     'admin' => [

@@ -23,7 +23,7 @@
 	if(!$_SESSION["loggedin"]) {
 		header("Location:index.php");
 	}
-	require_once("include/rcon_hl_net.inc");
+	require_once("include/class.Rcon.inc");
 	
 	$admin_site="sv";
 	$title2 ="_TITLESERVER";

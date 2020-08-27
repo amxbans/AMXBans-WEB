@@ -14,7 +14,12 @@
 
 namespace Controllers;
 
+use Models\AMXAdmin;
+use Models\Ban;
+use Models\DB;
+use Models\Server;
 use Support\BaseController;
+use Support\Path;
 
 /**
  * Class ServersController
@@ -24,229 +29,124 @@ class ServersController extends BaseController
     public function index()
     {
         //fetch server_information
-        $resource2	= $mysql->query("SELECT * FROM ".$config->db_prefix."_serverinfo ORDER BY hostname ASC") or die ($mysql->error);
+        $servers = Server::query()->select();
+        $this->site->output->assign("servers", $servers);
 
-        $server_array = array();
-        $addons_array = array();
-        $rules_array = array();
-        $anticheat_array = array();
-        $rules = "";
-        while($result2 = $resource2->fetch_object()) {
-
-            $split_address = explode (":", $result2->address);
-            $ip	= $split_address['0'];
-            $port		= $split_address['1'];
-
-            if($ip && $port) {
-                $server = new Rcon();
-                $ip=gethostbyname($ip);
-                $server->Connect($ip, $port, $result2->rcon);
-
-                $infos = $server->Info();
-                if($infos) { //yes, infos ok
-                    $players = $server->Players();
-                    $rules = $server->ServerRules();
-
-                    //copy rules to rules array for template
-                    if(is_array($rules)) {
-                        foreach($rules as $k => $v){
-                            $rules_array[] =array("name"=>$k,"value"=>$v);
-                        }
-                    }
-                    //check if mappic exists
-                    if(file_exists("images/maps/".$infos['mod']."/".$infos['map'].".jpg")) {
-                        $mappic = $infos['map'];
-                    } else {
-                        $mappic = "noimage";
-                    }
-
-                    //create addons array
-                    if(is_array($rules)) {
-                        if($rules[amxmodx_version]) $addons_array[]=array("name"=>"AmxModx","version"=>$rules[amxmodx_version],"url"=>"http://www.amxmodx.org");
-                        if($rules[amxbans_version]) $addons_array[]=array("name"=>"AmxBans","version"=>$rules[amxbans_version],"url"=>"http://www.amxbans.de");
-                        if($rules[metamod_version]) $addons_array[]=array("name"=>"MetaMod","version"=>$rules[metamod_version],"url"=>"http://www.metamod.org");
-                        if($rules[hltv_report]) $addons_array[]=array("name"=>"HLTV Report","version"=>$rules[hltv_report],"url"=>"http://forums.alliedmods.net/showthread.php?t=66506");
-                        if($rules[atac_version]) $addons_array[]=array("name"=>"ATAC","version"=>$rules[atac_version],"url"=>"http://forums.alliedmods.net/showthread.php?t=61572");
-
-                        //create anticheat array
-                        if($infos[secure]) $anticheat_array[]=array("name"=>"VAC","version"=>"2","url"=>"");
-                        if($rules[sbsrv_version]) $anticheat_array[]=array("name"=>"Steambans","version"=>$rules[sbsrv_version],"url"=>"http://www.steambans.com");
-                        if($rules[hlg_version]) $anticheat_array[]=array("name"=>"HLGuard","version"=>$rules[hlg_version],"url"=>"");
-                    }
-                    //main server info
-                    $server_info = array(
-                        "sid"			=> $result2->id,
-                        "type"			=> $infos[type],
-                        "version"		=> $infos[version],
-                        "hostname"      => $infos[name],
-                        "map"         	=> $infos[map],
-                        "mod"        	=> $infos[mod],
-                        "game"         	=> $infos[game],
-                        "appid"        	=> $infos[appid],
-                        "cur_players"	=> $infos[activeplayers],
-                        "max_players"	=> $infos[maxplayers],
-                        "bot_players"	=> $infos[botplayers],
-                        "dedicated"		=> ($infos[dedicated]=="d")?"Dedicated":"Listen",
-                        "os"			=> ($infos[os]=="l")?"Linux":"Windows",
-                        "password"		=> $infos[password],
-                        "secure"		=> $infos[secure],
-                        "sversion"		=> $infos[sversion],
-                        "timeleft"		=> $rules[amx_timeleft],
-                        "maxrounds"		=> $rules[mp_maxrounds],
-                        "timelimit"		=> $rules[mp_timelimit],
-                        "nextmap"		=> $rules[amx_nextmap],
-                        "friendlyfire"	=> $rules[mp_friendlyfire],
-                        "address"		=> $result2->address,
-                        "mappic"		=> $mappic,
-                        "players"		=> ""
-                    );
-
-                    //get the players
-                    $player_array	= array();
-                    $int = $infos[activeplayers];
-                    for ($i=0; $i<$int; $i++) {
-                        $player = $players[$i];
-                        $player[name] = html_safe($player[name]);
-
-                        $player_info = array(
-                            "name"		=> $player[name],
-                            "frag"		=> $player[frag],
-                            "time"		=> $player[time],
-                        );
-
-                        $player_array[] = $player_info;
-                    }
-
-                    $server_info[players] = $player_array;
-                    $server_array[] = $server_info;
-                } else {
-                    $server_info = array(
-                        "sid"			=> $result2->id,
-                        "type"			=> "",
-                        "version"		=> "",
-                        "hostname"    	=> $result2->hostname,
-                        "map"         	=> "",
-                        "mod"        		=> $result2->gametype,
-                        "game"         	=> "",
-                        "appid"        	=> "",
-                        "cur_players"		=> "0",
-                        "max_players"		=> "0",
-                        "bot_players"		=> "0",
-                        "dedicated"		=> "",
-                        "os"			=> "",
-                        "password"		=> "",
-                        "secure"		=> "",
-                        "sversion"		=> "",
-                        "timeleft"		=> "00:00",
-                        "maxrounds"		=> "0",
-                        "timelimit"		=> "00",
-                        "nextmap"		=> "",
-                        "friendlyfire"	=> "",
-                        "address"		=> $result2->address,
-                        "mappic"		=> "noimage",
-                        "players"		=> ""
-                    );
-                    $server_array[] = $server_info;
-                }
-
-                //close connection
-                $server->Disconnect();
-            }
-        }
-        /*
+        /**
          *
-         * 		Stats
+         *        Stats
          *
          */
-        $stats['total']		= $mysql->query("SELECT bid FROM ".$config->db_prefix."_bans")->num_rows;
-        $stats['permanent']	= $mysql->query("SELECT bid FROM ".$config->db_prefix."_bans WHERE ban_length = 0")->num_rows;
-        $stats['active']	= $mysql->query("SELECT bid FROM ".$config->db_prefix."_bans WHERE ((ban_created+(ban_length*60)) > ".time()." OR ban_length = 0)")->num_rows;
-        $stats['temp']		= $stats['active'] - $stats['permanent'];
-        $stats['admins']	= $mysql->query("SELECT id FROM ".$config->db_prefix."_amxadmins")->num_rows;
-        $stats['servers']	= $mysql->query("SELECT id FROM ".$config->db_prefix."_serverinfo")->num_rows;
-        /*
+        $this->site->output->assign('stats', [
+            'total'     => Ban::query()->count('bid'),
+            'permanent' => Ban::query()->where('ban_length', 0)->count('bid'),
+            'temp'      => (int)DB::selectRaw("SELECT COUNT(bid) as count FROM {$this->site->config->getDb()->prefix}_bans WHERE ban_created+(ban_length*60) > UNIX_TIMESTAMP()")[0]->count,
+            'admins'    => AMXAdmin::query()->count('id'),
+            'servers'   => Server::query()->count('id'),
+        ]);
+        /**
          *
-         * 		Latest Ban
-         *
-         */
-        $lb	= $mysql->query("SELECT player_id, player_nick, ban_reason, ban_created, ban_length, ban_type FROM ".$config->db_prefix."_bans ORDER BY ban_created DESC LIMIT 1") or die ($mysql->error);
-        $lb = $lb->fetch_object();
-
-        if($lb->ban_length == 0) {
-            $ban_length	= 0;
-        } else {
-            $ban_length 	= ($lb->ban_created + ($lb->ban_length * 60));
-        }
-        if($lb->ban_type == "SI") {
-            $steamid	= "SI";
-        } else {
-            $steamid	= $lb->player_id;
-        }
-
-        $last_ban_arr= array("steamid"	=> $steamid,
-                             "nickname"	=> html_safe(_substr($lb->player_nick, 15)),
-                             "reason"	=> html_safe(_substr($lb->ban_reason, 15)),
-                             "created"	=> $lb->ban_created,
-                             "length"	=> $ban_length,
-                             "time"		=> time());
-        /*
-         *
-         * 		Template parsing
+         *        Latest Ban
          *
          */
+        $lb = Ban::query()->orderBy('ban_created', true)->selectOne([
+            'bid',
+            'player_nick',
+            'player_id',
+            'ban_length',
+            'ban_created',
+            'ban_reason',
+        ]);
 
-// Header
-        $title = "_TITLEVIEW";
-
-// Section
-        $section = "live";
-
-// Parsing
-        $smarty = new dynamicPage;
-
-        $smarty->assign("meta","");
-        $smarty->assign("title",$title);
-        $smarty->assign("section",$section);
-        $smarty->assign("version_web",$config->v_web);
-
-        $smarty->assign("server",$server_array);
-        $smarty->assign("stats",$stats);
-        $smarty->assign("last_ban",$last_ban_arr);
-        $smarty->assign("addons",$addons_array);
-        $smarty->assign("rules",$rules);
-        $smarty->assign("rules_array",$rules_array);
-        $smarty->assign("anticheat_array",$anticheat_array);
-        $smarty->assign("players", isset($player_array) ? $player_array : NULL);
-        $smarty->assign("empty_result",isset($empty_result) ? $empty_result : NULL);
-//$smarty->assign("error",$error);
-
-// amxbans.css available in design? if not, take default one.
-        if(file_exists("templates/".$config->design."/amxbans.css")) {
-            $smarty->assign("design",$config->design);
+        if ($lb->ban_length > 0) {
+            $lb->ban_length = $lb->ban_length * 60;
         }
-        $smarty->assign("dir",$config->document_root);
-        $smarty->assign("this",$_SERVER['PHP_SELF']);
-        $smarty->assign("menu",$menu);
-        $smarty->assign("banner",$config->banner);
-        $smarty->assign("banner_url",$config->banner_url);
+        $this->site->output->assign('last_ban', $lb);
 
-        $smarty->display('master.tpl');
-        echo "<script type=\"text/javascript\">
-		function jumpMenu(selection, target)
-		{
-			var url = selection.options[selection.selectedIndex].value;
-			
-			if (url == \"\")
-			{
-				return false;
-			}
-			else
-			{
-				window.location = url;
-			}
-		}
-	</script>";
-        $smarty->display('view.tpl');
-        $smarty->display('main_footer.tpl');
+        return $this->site->output->display('view.tpl');
+    }
+
+    public function ajaxServerInfo($server)
+    {
+        $server = Server::find($server);
+        if (!$server->exists) {
+            return json_encode([
+                'success' => false,
+                'message' => __LANG__['index']['servers']['ajax']['not_found'],
+            ]);
+        }
+
+        [$ip, $port] = explode(":", $server->address);
+        if (!$ip || !$port) {
+            return json_encode([
+                'success' => false,
+                'message' => __LANG__['index']['servers']['ajax']['not_found'],
+            ]);
+        }
+
+        try {
+            $rcon = new \Rcon($ip, $port);
+
+        } catch (\Exception $e) {
+            return json_encode([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+        if (!($infos = $rcon->Info())) {
+            return json_encode([
+                'success' => false,
+                'message' => __LANG__['index']['servers']['ajax']['cannot_connect'],
+            ]);
+        }
+
+        foreach ((array)$rcon->Players() as $player) {
+            $out['players'][] = [
+                "name"  => htmlspecialchars($player['name']),
+                "kills" => $player['frag'],
+                "time"  => $player['time'],
+            ];
+        }
+
+        //check if mappic exists
+        $mapPic = "/webSources/images/maps/{$infos['mod']}/{$infos['map']}.jpg";
+
+        //main server info
+        $out['info'] = [
+            "hostname"     => $infos['name'],
+            'address'      => $server['address'],
+            "map"          => $infos['map'],
+            "mod"          => $infos['mod'],
+            'players'      => [
+                'active' => $infos['activeplayers'],
+                "bots"   => $infos['botplayers'],
+                "max"    => $infos['maxplayers'],
+            ],
+            "dedicated"    => ($infos['dedicated'] == "d") ? "Dedicated" : "Listen",
+            "os"           => ($infos['os'] == "l") ? "Linux" : "Windows",
+            "password"     => (bool)$infos['password'],
+            "timeleft"     => $rcon->ServerRules()['amx_timeleft'] ?? 0,
+            "nextmap"      => $rcon->ServerRules()['amx_nextmap'] ?? '',
+            "friendlyFire" => (bool)$rcon->ServerRules()['mp_friendlyfire'],
+            "picture"      => Path::getBaseURL() . (file_exists(Path::getRootPath() . $mapPic) ? $mapPic : "/webSources/images/maps/noimage.jpg"),
+            'vac'          => (bool)$infos['secure'],
+        ];
+
+        $out['lang'] = [
+            'players'      => __LANG__['index']['servers']['players_online'],
+            'player'       => __LANG__['index']['servers']['player'],
+            'hostname'     => __LANG__['index']['servers']['hostname'],
+            'friendlyFire' => __LANG__['index']['servers']['friendly_fire'],
+            'password'     => __LANG__['index']['servers']['password'],
+            'map'          => __LANG__['index']['servers']['map'],
+            'timeleft'     => __LANG__['index']['servers']['timeleft'],
+            'nextmap'      => __LANG__['index']['servers']['nextmap'],
+            'yes'          => ucfirst(__LANG__['yes']),
+            'no'           => ucfirst(__LANG__['no']),
+        ];
+
+        header('Content-Type: application/json');
+        $out['success'] = true;
+        echo json_encode($out);
     }
 }

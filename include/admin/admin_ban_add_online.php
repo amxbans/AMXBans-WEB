@@ -19,7 +19,7 @@
 	If not, see <http://creativecommons.org/licenses/by-nc-sa/2.0/>.
 
 */
-require_once("include/rcon_hl_net.inc");
+require_once("include/class.Rcon.inc");
 	
 	if(!$_SESSION["loggedin"]) {
 		header("Location:index.php");

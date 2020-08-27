@@ -2,12 +2,15 @@ html, body {
 	height: 100%;
 }
 
-img { max-width: 100% }
+img {
+	max-width: 100%
+}
 
 
 .wrapper {
 	min-height: 100%;
 }
+
 footer.footer {
 	padding: 1rem 0;
 	color: #999;
@@ -17,6 +20,15 @@ footer.footer {
 }
 
 /* Image Buttons */
+.iconHolder > * {
+	width: 16px;
+	height: 16px;
+}
+
+.iconHolder > *:not(:last-child) {
+	margin-right: 2px;
+}
+
 .stat-icon {
 	content: " ";
 	display: inline-block;
@@ -68,4 +80,13 @@ footer.footer {
 
 .icon-download {
 	background-position: -61px 0;
+}
+
+.icon-connect {
+	display: inline-block;
+	background-repeat: no-repeat;
+	width: 80px;
+	height: 15px;
+	cursor: pointer;
+	margin: 0;
 }
