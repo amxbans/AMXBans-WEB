@@ -23,6 +23,8 @@ use Support\Path;
 
 /**
  * Class ServersController
+ *
+ * @package Controllers
  */
 class ServersController extends BaseController
 {

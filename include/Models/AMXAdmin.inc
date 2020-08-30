@@ -23,5 +23,4 @@ namespace Models;
 class AMXAdmin extends Model
 {
     protected $table = 'amxadmins';
-    protected $dates = ['created'];
 }

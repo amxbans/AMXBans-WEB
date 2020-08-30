@@ -113,6 +113,34 @@ return [
             'temp_bans'  => 'Temporary',
             'servers'    => 'Servers', // _ACTIVE_SERVERS
         ],
+
+        'admins' => [
+            'access_title' => 'Access permissions', // _ACCESSPERMS
+            'accesses' => [
+                "a - Immunity (can't be kicked/banned etc.)",
+                'b - Reserved slots (can use reserved slots)',
+                'c - amx_kick command',
+                'd - amx_ban and amx_unban commands',
+                'e - amx_slay and amx_slap commands',
+                'f - amx_map command',
+                'g - amx_cvar command (not all CVARs available)',
+                'h - amx_cfg command',
+                'i - amx_chat and other chat commands',
+                'j - amx_vote and other vote commands',
+                'k - Access to sv_password cvar (through amx_cvar command)',
+                'l - Access to amx_rcon command and rcon_password cvar (through amx_cvar command)',
+                'm - User defined Level A (for other plugins)',
+                'n - User defined Level B',
+                'o - User defined Level C',
+                'p - User defined Level D',
+                'q - User defined Level E',
+                'r - User defined Level F',
+                's - User defined Level G',
+                't - User defined Level H',
+                'u - Menu access',
+                'z - User (not admin)',
+            ],
+        ],
     ],
 
     'admin' => [

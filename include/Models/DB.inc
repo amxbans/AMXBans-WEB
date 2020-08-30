@@ -179,19 +179,19 @@ class DB
         $w = '';
         foreach ($wheres as $where) {
             if (is_array($where[1])) {
-                $w .= "$where[0] (" . substr($this->processWhere($where[1]), 6) . ')';
+                $w .= "$where[0] (" . substr($this->processWhere($where[1]), 6) . ') ';
             } elseif (is_null($where[3])) {
-                $w .= "$where[0] `$where[1]` $where[2] NULL";
+                $w .= "$where[0] `$where[1]` $where[2] NULL ";
             } elseif (strpos('IN', $where[2]) !== false) {
                 foreach ($where[3] as $value) {
                     $word                = 'w_' . substr(uniqid(), -3);
                     $this->wheres[$word] = is_bool($value) ? (int)$value : $value;
                     $words[]             = ":$word";
                 }
-                $w .= "$where[0] `$where[1]` $where[2] (" . implode(', ', $words) . ")";
+                $w .= "$where[0] `$where[1]` $where[2] (" . implode(', ', $words) . ") ";
             } else {
                 $this->wheres[$word = 'w_' . substr(uniqid(), -3)] = is_bool($where[3]) ? (int)$where[3] : $where[3];
-                $w                                                 .= "$where[0] `$where[1]` $where[2] :$word";
+                $w                                                 .= "$where[0] `$where[1]` $where[2] :$word ";
             }
         }
         return "WHERE" . substr($w, strpos($w, ' '));
