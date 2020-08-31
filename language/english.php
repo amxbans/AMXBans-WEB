@@ -116,7 +116,7 @@ return [
 
         'admins' => [
             'access_title' => 'Access permissions', // _ACCESSPERMS
-            'accesses' => [
+            'accesses' => [ // _ACCESS_FLAGS
                 "a - Immunity (can't be kicked/banned etc.)",
                 'b - Reserved slots (can use reserved slots)',
                 'c - amx_kick command',
@@ -242,6 +242,8 @@ return [
     'e_mail'        => 'email',
     'editing'       => 'editing',
     'empty'         => 'Nothing in here...',
+    'until'         => 'until',
+    'from'         => 'from',
 
     'invalidCSRF'       => 'Form You provided was not submitted due to missing cross-site security token. Please try submitting it again.',
     'validation_errors' => [

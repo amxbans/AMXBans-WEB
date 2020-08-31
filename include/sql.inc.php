@@ -109,33 +109,6 @@ function sql_get_amxadmins() {
 	}
 	return $admins;
 }
-function sql_get_amxadmins_list() {
-	global $config, $mysql;
-	$query = $mysql->query("SELECT * FROM `".$config->db_prefix."_amxadmins` WHERE `ashow`=1 AND (`expired`=0 OR `expired`>UNIX_TIMESTAMP()) ORDER BY `expired`,`access` DESC,`username` ASC") or die ($mysql->error);
-	$admins=array();
-	while($result = $query->fetch_object()) {
-		if(!empty($result->steamid)) {
-			$steamid = htmlentities($result->steamid, ENT_QUOTES);
-			$steamcomid = Steam::GetFriendId($steamid);
-		}
-		$admin=array(
-			"aid"=>$result->id,
-			"username"=>html_safe($result->username),
-			"comid"=>$steamcomid,
-			"password"=>$result->password,
-			"access"=>$result->access,
-			"flags"=>$result->flags,
-			"steamid"=>$result->steamid,
-			"nickname"=>html_safe($result->nickname),
-			"ashow"=>$result->ashow,
-			"created"=>$result->created,
-			"expired"=>$result->expired,
-			"days"=>$result->days
-		);
-		$admins[]=$admin;
-	}
-	return $admins;
-}
 function sql_get_amxadmins_server($server) {
 	global $config, $mysql;
 	$query = $mysql->query("SELECT * FROM `".$config->db_prefix."_amxadmins` ORDER BY `ashow` DESC,`expired`,`access` DESC,`username` ASC") or die ($mysql->error);
