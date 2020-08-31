@@ -140,6 +140,7 @@ return [
                 'u - Menu access',
                 'z - User (not admin)',
             ],
+            ''
         ],
     ],
 

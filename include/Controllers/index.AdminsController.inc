@@ -34,6 +34,6 @@ class AdminsController extends BaseController
         }, null, null, 'OR')->orderBy('expired')->orderBy('access', true)->orderBy('username')->select();
 
         $this->site->output->assign(compact('admins'));
-        return $this->site->output->display('admin_list.tpl');
+        return $this->site->output->display('index.admins.tpl');
     }
 }
