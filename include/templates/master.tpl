@@ -63,7 +63,8 @@
         {block name="BODY"}{/block}
     </main>
 </div>
-<footer class="footer">
+<footer class="footer d-flex justify-content-between align-items-center">
+    <small class="font-italic">{$lang.footer_amxbans|replace:":version":$version}</small>
     {if !$site->user->get() }<a href="{"login"|url}">{$lang.index.titles.login}</a>{/if}
 </footer>
 </body>

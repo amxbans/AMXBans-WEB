@@ -27,11 +27,10 @@ class AdminsController extends BaseController
 {
     public function index()
     {
-
-//get all amxadmins
         $admins = AMXAdmin::query()->where('ashow', true)->where(function (DB $DB) {
             return $DB->where('expired', 0)->where('expired', '>', time());
         }, null, null, 'OR')->orderBy('expired')->orderBy('access', true)->orderBy('username')->select();
+
 
         $this->site->output->assign(compact('admins'));
         return $this->site->output->display('index.admins.tpl');

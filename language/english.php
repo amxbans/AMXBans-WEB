@@ -255,6 +255,8 @@ return [
         'later'    => 'The :attribute field needs to be later than now',
         'ip'       => 'The :attribute field needs to be an ip-compliant string (0.0.0.0-255.255.255.255)',
     ],
+
+    'footer_amxbans' => 'Powered by <a href="//amxbans.net" target="_blank" class="text-muted">AMXBans</a> v:version &copy; 2020',
 ];
 
 //default
