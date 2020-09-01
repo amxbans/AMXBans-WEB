@@ -1,5 +1,5 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.ban} | {/block}
+{block name="head-title" prepend}{$lang.index.titles.admins} | {/block}
 
 {block name="BODY"}
     {include "messages.tpl"}
