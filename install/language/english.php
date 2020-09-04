@@ -9,15 +9,14 @@
 
 return [
     'LANG_SHORTHAND' => 'en',
-
     'MAIN_TITLE' => "AMXBans v:version installation",
     'STEPS' => [1 => 'Licencing', 'Compability', 'Forms', 'Confirmation', 'Finish'],
 
     'NEXT' => 'Next',
+    'BACK' => 'Back',
     'REFRESH' => 'Refresh',
     'VALIDATE' => 'Validate',
     'INSTALL' => 'Install',
-    'BACK' => 'Back',
     'YES' => 'Yes',
 
     'STEP_TITLES' => [

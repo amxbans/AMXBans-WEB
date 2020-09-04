@@ -1,5 +1,5 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.admins} | {/block}
+{block name="head-title" prepend}{'menu_titles'|lang:'admins'} | {/block}
 
 {block name="BODY"}
     {include "messages.tpl"}
@@ -8,10 +8,10 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>{$lang.index.bans.admin|ucfirst}</th>
-                    <th>{$lang.index.admins.access_title}</th>
-                    <th>{$lang.from|ucfirst}</th>
-                    <th>{$lang.until|ucfirst}</th>
+                    <th>{'admin'|lang}</th>
+                    <th>{'access_title'|lang}</th>
+                    <th>{'admin_since'|lang}</th>
+                    <th>{'admin_until'|lang}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,9 +29,9 @@
                             {/if}
                         </td>
                         <td>{$admin.access}</td>
-                        <td>{$admin.created|date_format:$lang.date_format}</td>
-                        <td>{if !$admin.expired}<i>{$lang.index.bans.permanent|ucfirst}</i>
-                            {else}{$admin.expired|date_format:$lang.date_format}{/if}</td>
+                        <td>{$admin.created|date_format:$lang_date_format}</td>
+                        <td>{if !$admin.expired}<i>{'unlimited'|lang|ucfirst}</i>
+                            {else}{$admin.expired|date_format:$lang_date_format}{/if}</td>
                     </tr>
                 {/foreach}
                 <!-- Stop Loop -->
@@ -41,9 +41,9 @@
 
         <div class="col">
             <div class="card">
-                <div class="card-header">{$lang.index.admins.access_title}</div>
+                <div class="card-header">{'access_title'|lang}</div>
                 <div class="card-body">
-                    {foreach $lang.index.admins.accesses as $access}
+                    {foreach 'access_flags'|lang as $access}
                         {$access}
                         <br>
                     {/foreach}

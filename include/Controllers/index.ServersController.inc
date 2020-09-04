@@ -74,7 +74,7 @@ class ServersController extends BaseController
         if (!$server->exists) {
             return json_encode([
                 'success' => false,
-                'message' => __LANG__['index']['servers']['ajax']['not_found'],
+                'message' => \Lang::get('server_not_found'),
             ]);
         }
 
@@ -82,7 +82,7 @@ class ServersController extends BaseController
         if (!$ip || !$port) {
             return json_encode([
                 'success' => false,
-                'message' => __LANG__['index']['servers']['ajax']['not_found'],
+                'message' => \Lang::get('server_not_found'),
             ]);
         }
 
@@ -98,7 +98,7 @@ class ServersController extends BaseController
         if (!($infos = $rcon->Info())) {
             return json_encode([
                 'success' => false,
-                'message' => __LANG__['index']['servers']['ajax']['cannot_connect'],
+                'message' => \Lang::get('server_cannot_connect'),
             ]);
         }
 
@@ -138,16 +138,16 @@ class ServersController extends BaseController
         ];
 
         $out['lang'] = [
-            'players'      => __LANG__['index']['servers']['players_online'],
-            'player'       => __LANG__['index']['servers']['player'],
-            'hostname'     => __LANG__['index']['servers']['hostname'],
-            'friendlyFire' => __LANG__['index']['servers']['friendly_fire'],
-            'password'     => __LANG__['index']['servers']['password'],
-            'map'          => __LANG__['index']['servers']['map'],
-            'timeleft'     => __LANG__['index']['servers']['timeleft'],
-            'nextmap'      => __LANG__['index']['servers']['nextmap'],
-            'yes'          => ucfirst(__LANG__['yes']),
-            'no'           => ucfirst(__LANG__['no']),
+            'players'      => \Lang::get('players_online'),
+            'player'       => \Lang::get('player_info'),
+            'address'     => \Lang::get('address'), // TODO: edit the key in template
+            'friendlyFire' => \Lang::get('friendly_fire'),
+            'password'     => \Lang::get('server_password'),
+            'map'          => \Lang::get('map'),
+            'timeleft'     => \Lang::get('timeleft'),
+            'nextmap'      => \Lang::get('nextmap'),
+            'yes'          => ucfirst(\Lang::get('yes')),
+            'no'           => ucfirst(\Lang::get('no')),
         ];
 
         header('Content-Type: application/json');

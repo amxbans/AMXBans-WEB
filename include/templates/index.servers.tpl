@@ -1,12 +1,12 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.servers} | {/block}
+{block name="head-title" prepend}{'menu_titles'|lang:'servers'} | {/block}
 
 {block name="BODY"}
     {include "messages.tpl"}
     <div class="row">
     <div class="col-lg-9">
         <div class="card mb-3">
-            <h2 class="card-header h5">{$lang.index.titles.servers}</h2>
+            <h2 class="card-header h5">{'menu_titles'|lang:'servers'}</h2>
             <div class="card-body accordion" id="serverInfoContainer">
                 {foreach $servers as $server}
                     <div class="card" data-server-id="{$server.id}">
@@ -16,7 +16,7 @@
                                          src="{"webSources/images/games/:game.gif"|replace:":game":$server.gametype|res_url}" />
                                 </span>
                             {$server.hostname}
-                            <a href="steam://connect/{$server.address}" title="{$lang.index.servers.connect}"
+                            <a href="steam://connect/{$server.address}" title="{'connect'|lang}"
                                class="icon-connect float-right"
                                style="background-image: url({"webSources/images/gfx/connect.png"|res_url});"></a>
                         </div>
@@ -37,39 +37,39 @@
             <div class="col-sm col-lg-12">
                 <div class="card bg-light mb-3">
                     <h3 class="card-header d-flex justify-content-between align-items-center h6">
-                        {$lang.index.servers.stats}
+                        {'stats'|lang}
                         <span class="float-right stat-icon stats"></span>
                     </h3>
                     <div class="card-body">
                         <ul class="list-group">
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.servers.total_bans}:</b>
+                                <b>{'total_bans'|lang}:</b>
                                 <span>{$stats.total}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <span class="ml-2">{$lang.admin.sys_info.active|ucfirst}:</span>
+                                <span class="ml-2">{'active_bans'|lang}:</span>
                                 <span>{$stats.permanent+$stats.temp}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
                                 <span></span>
-                                <i>{$lang.index.bans.permanent|ucfirst}: {$stats.permanent}</i>
+                                <i>{'permanent'|lang}: {$stats.permanent}</i>
                             </li>
 
                             <li class=" d-flex justify-content-between align-items-center">
                                 <span></span>
-                                <i>{$lang.index.servers.temp_bans|ucfirst}: {$stats.temp}</i>
+                                <i>{'temp_bans'|lang}: {$stats.temp}</i>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.admin.subtitles.server.admins}:</b>
+                                <b>{'admins'|lang}:</b>
                                 <span>{$stats.admins}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.servers.servers}:</b>
+                                <b>{'servers'|lang}:</b>
                                 <span>{$stats.servers}</span>
                             </li>
                         </ul>
@@ -79,46 +79,46 @@
             <div class="col">
                 <div class="card bg-light mb-3">
                     <h3 class="card-header d-flex justify-content-between align-items-center h6">
-                        {$lang.index.servers.last_ban}
+                        {'latest_ban'|lang}
                         <span class="float-right stat-icon clock"></span>
                     </h3>
                     <div class="card-body">
                         <ul class="list-group">
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.bans.player|ucfirst}:</b>
+                                <b>{'player'|lang}:</b>
                                 <span>{$last_ban.player_nick}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.ban.steamid|ucfirst}:</b>
+                                <b>{'steamid'|lang}:</b>
                                 <span>{$last_ban.player_id}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.bans.reason|ucfirst}:</b>
+                                <b>{'reason'|lang}:</b>
                                 <span>{$last_ban.ban_reason}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.bans.length|ucfirst}:</b>
+                                <b>{'length'|lang}:</b>
                                 {if $last_ban.ban_length > 0}
                                     <span class="timeleft">{$last_ban.ban_length}</span>
                                 {elseif $last_ban.ban_length == 0}
-                                    <i>{$lang.index.bans.permanent}</i>
+                                    <i>{'permanent'|lang}</i>
                                 {else}
-                                    <i>{$lang.index.ban.expired}</i>
+                                    <i>{'expired'|lang}</i>
                                 {/if}
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{$lang.index.bans.date|ucfirst}:</b>
-                                <span>{$last_ban.ban_created|date_format:$lang.date_format}</span>
+                                <b>{'date'|lang}:</b>
+                                <span>{$last_ban.ban_created|date_format:$lang_date_format}</span>
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <a href="{['bans']|url}">&#171; {$lang.index.titles.bans|ucfirst}</a>
-                                <a href="{['bans', $last_ban.bid]|url}">{$lang.index.titles.ban} &#187;</a>
+                                <a href="{['bans']|url}">&#171; {'menu_titles'|lang:'bans'}</a>
+                                <a href="{['bans', $last_ban.bid]|url}">{'menu_titles'|lang:'ban'} &#187;</a>
                             </li>
 
                         </ul>

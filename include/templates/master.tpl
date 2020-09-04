@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{$lang.locale}" dir="{$lang.html_direction}">
+<html lang="{$lang_locale}" dir="{$lang_html_direction}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -26,9 +26,9 @@
         <div class="container">
             <div class="collapse navbar-collapse" id="navbarList">
                 <ul class="navbar-nav mr-auto">
-                    {foreach $lang.index.menu as $val}
+                    {foreach "menu"|lang as $val}
                         <li class="nav-item{if $val == Support\Path::getFakePathWay()} active{/if}">
-                            <a class="nav-link" href="{$val|url:"index.php"}">{$lang.index.titles.$val}</a>
+                            <a class="nav-link" href="{$val|url:"index.php"}">{'menu_titles'|lang:$val}</a>
                         </li>
                     {/foreach}
                 </ul>
@@ -40,11 +40,11 @@
             </button>
             <div class="navbar-nav dropdown">
                 <a class="nav-item nav-link dropdown-toggle" href="#" id="langDD" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">{$smarty.session.lang|ucfirst}</a>
+                   aria-haspopup="true" aria-expanded="false">{$lang}</a>
                 <div class="dropdown-menu" aria-labelledby="langDD">
                     {foreach $availLangs as $l}
-                        <a href="?lang={$l|escape}"
-                                class="dropdown-item{if $smarty.session.lang == $l} active{/if}">{$l|escape|ucfirst}</a>
+                        <a href="?lang={$l@key}"
+                                class="dropdown-item{if $smarty.session.lang == $l} active{/if}">{$l|escape}</a>
                     {/foreach}
                 </div>
             </div>
@@ -64,8 +64,11 @@
     </main>
 </div>
 <footer class="footer d-flex justify-content-between align-items-center">
-    <small class="font-italic">{$lang.footer_amxbans|replace:":version":$version}</small>
-    {if !$site->user->get() }<a href="{"login"|url}">{$lang.index.titles.login}</a>{/if}
+    <small class="font-italic">
+        {'powered_by'|lang} <a href="//amxbans.net" target="_blank" class="text-muted">AMXBans</a> v{$version} &copy; 2020
+        <!-- {'design_by'|lang} Bootstrap original -->
+    </small>
+    {if !$site->user->get() }<a href="{"login"|url}">{'login'|lang}</a>{/if}
 </footer>
 </body>
 </html>

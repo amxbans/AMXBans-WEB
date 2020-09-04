@@ -1,29 +1,29 @@
 {extends file="master.tpl"}
-{block name="head-title" prepend}{$lang.index.titles.login} | {/block}
+{block name="head-title" prepend}{'menu_titles'|lang:'login'} | {/block}
 
 {block name="BODY"}
 	{include file="messages.tpl"}
 
 	<form method="post" class="row" action="{['login']|url}">
 		{Site::makeFormAuth()}
-		<label class="col-sm-3 text-sm-right col-form-label" for="name">{$lang.index.login.username}</label>
+		<label class="col-sm-3 text-sm-right col-form-label" for="name">{'username'|lang}</label>
 		<div class="col-sm-9"><input name="username" class="form-control" id="name" required value="{'username'|input}" /></div>
 
-		<label class="col-sm-3 text-sm-right col-form-label" for="pass">{$lang.index.login.pass}</label>
+		<label class="col-sm-3 text-sm-right col-form-label" for="pass">{'password'|lang}</label>
 		<div class="col-sm-9"><input type="password" name="password" class="form-control" id="pass" required value="{'password'|input}" /></div>
 
 		<div class="col-sm-3 text-sm-right"><input type="checkbox" name="rem" class="form" id="rem"{if 'rem'|input:false} checked{/if} /></div>
-		<label for="rem" class="col-sm-9">{$lang.index.login.remember}</label>
+		<label for="rem" class="col-sm-9">{'remember'|lang}</label>
 
-		<div class="col-sm-3 text-right">{if $blocked}{$lang.index.login.blocked}:{/if}</div>
+		<div class="col-sm-3 text-right">{if $blocked}{'login_blocked'|lang}:{/if}</div>
 		<div class="col-sm-9">
-			<button class="btn btn-primary">{$lang.index.titles.login}</button>
+			<button class="btn btn-primary">{'login'|lang}</button>
 			{if $blocked}<span id="block"></span>{/if}
 		</div>
 
 		<div class="col-sm-3"></div>
 		<div class="col-sm-9">
-			{$lang.index.login.lost_pass} <a href="{['login', 'pass_rec']|url}">{$lang.index.login.pass_rec}</a>
+			{'lost_pass'|lang}? <a href="{['login', 'pass_rec']|url}">{'pass_rec'|lang}</a>
 		</div>
 	</form>
 

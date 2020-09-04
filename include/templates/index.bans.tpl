@@ -1,5 +1,5 @@
 {extends 'master.tpl'}
-{block name="head-title" prepend}{$lang.index.titles.bans} | {/block}
+{block name="head-title" prepend}{'menu_titles'|lang:'bans'} | {/block}
 
 {block name="BODY"}
 	<div class="main">
@@ -25,16 +25,16 @@
 			<thead>
 			<tr>
 				<th style="width: 40px"></th>
-				<th>{$lang.index.bans.date|ucfirst}</th>
-				<th>{$lang.index.bans.player|ucfirst}</th>
-				<th>{$lang.index.bans.admin|ucfirst}</th>
-				<th>{$lang.index.bans.reason|ucfirst}</th>
-				<th class="text-center">{$lang.index.bans.length|ucfirst}</th>
+				<th>{'date'|lang}</th>
+				<th>{'player'|lang}</th>
+				<th>{'admin'|lang}</th>
+				<th>{'reason'|lang}</th>
+				<th class="text-center">{'length'|lang}</th>
                 {if $config->bans_show_comments}
 					<th class="text-center"><img src="{'webSources/images/details.gif'|res_url}" alt="comments"
-							title="{$lang.index.bans.comments|ucfirst}"></th>{/if}
+							title="{'comments'|lang}"></th>{/if}
 				<th class="text-center"><img src="{'webSources/images/disk.png'|res_url}" alt="files"
-							title="{$lang.index.bans.files|ucfirst}"></th>
+							title="{'files'|lang}"></th>
                 {if $config->bans_show_kicks}
 					<th class="text-center"><i class="stat-icon kicks"></i></th>
                 {/if}
@@ -48,14 +48,14 @@
 
 					<td><img alt="{$ban.type}" src="{"webSources/images/games"|res_url}/{$ban.type}.gif" />
 					</td>
-					<td><a href="{['bans', $ban.id]|url}">{$ban.created|date_format:$lang.date_format}</a></td>
+					<td><a href="{['bans', $ban.id]|url}">{$ban.created|date_format:$lang_date_format}</a></td>
 					<td><a href="{['bans', $ban.id]|url}">{$ban.player}</a></td>
 					<td>{$ban.admin}</td>
 					<td>{$ban.reason}</td>
                     {if $ban.length > 0}
 						<td class="timeleft text-center">{$ban.length * 60}</td>
                     {else}
-						<td class="text-center">{$lang.index.bans.permanent}</td>
+						<td class="text-center">{'permanent'|lang}</td>
                     {/if}
                     {if $config->bans_show_comments}
 						<td class="text-center">{$ban.comment_count}</td>{/if}

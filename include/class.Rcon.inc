@@ -56,7 +56,7 @@ class Rcon
         stream_set_timeout($fp, 2);
 
         if (!$fp) {
-            throw new Exception(__LANG__['index']['servers']['ajax']['cannot_connect']);
+            throw new Exception(\Lang::get('server_cannot_connect'));
         }
 
         //store socket

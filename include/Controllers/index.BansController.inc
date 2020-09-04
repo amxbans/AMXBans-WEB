@@ -130,14 +130,14 @@ class BansController extends BaseController
     public function update($id)
     {
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
             return $this->edit($id);
         }
         if (!($ban = $this->recoverBan($id, 'bans_edit'))) {
             exit;
         }
 
-        $errors = new \FormErrors($_POST, __LANG__['validation_errors']);
+        $errors = new \FormErrors($_POST, \Lang::get('validation_errors'));
         $errors->validate([
             'player_nick' => 'required|max:31',
             'player_id'   => 'steamid',
@@ -160,7 +160,7 @@ class BansController extends BaseController
         db_log('Ban edit', 'Edit ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
         $ban->player_nick = $_POST['player_nick'];
         $ban->player_id   = $_POST['player_id'];
-        $ban->ban_type    = in_array($_POST['ban_type'], __LANG__['index']['ban']['types']) ? $_POST['ban_type'] : '';
+        $ban->ban_type    = in_array($_POST['ban_type'], \Lang::get('ban_types')) ? $_POST['ban_type'] : '';
         $ban->ban_reason  = $_POST['ban_reason'];
         $ban->save();
 
@@ -171,7 +171,7 @@ class BansController extends BaseController
         $bl->created_at  = new \DateTime();
         $bl->save();
 
-        $this->site->output->assign('message', __LANG__['admin']['saved']);
+        $this->site->output->assign('message', \Lang::get('saved'));
         return $this->edit($id);
     }
 
@@ -188,7 +188,7 @@ class BansController extends BaseController
         Comment::query()->where('bid', $id)->delete();
         Ban::query()->where('bid', $id)->delete();
         db_log('Ban edit', 'Delete ID ' . $ban->bid . ' (' . $ban->player_nick . ' <' . $ban->player_id . '>)');
-        $this->site->output->assign('message', __LANG__['admin']['deleted']);
+        $this->site->output->assign('message', \Lang::get('deleted'));
         return $this->index();
     }
 
@@ -213,15 +213,15 @@ class BansController extends BaseController
     public function comment($id)
     {
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['invalidCSRF']]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
             return $this->view($id);
         }
         if (!$this->site->config->allow_unregistered_comments && !Auth::$logged) {
-            $this->site->output->assign('message', __LANG__['index']['ban']['no_commenting']);
+            $this->site->output->assign('message', \Lang::get('no_commenting'));
             return $this->view($id);
         }
 
-        $errorChecker = new \FormErrors($_POST, __LANG__['validation_errors']);
+        $errorChecker = new \FormErrors($_POST, \Lang::get('validation_errors'));
         $errorChecker->validate([
             'comment' => 'required|max:65535',
         ]);
@@ -242,20 +242,20 @@ class BansController extends BaseController
             $file = $_FILES['file'];
             if ($file['error'] == UPLOAD_ERR_INI_SIZE || $file['error'] == UPLOAD_ERR_FORM_SIZE || $file['size'] > $this->site->config->uploaded_file_size) {
                 $this->site->output->assign('message',
-                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_too_big']]);
+                    ['type' => 'warning', 'text' => \Lang::get('file_too_big')]);
                 return $this->view($id);
             }
 
             if ($file['error'] != UPLOAD_ERR_OK) {
                 $this->site->output->assign('message',
-                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_not_uploaded']]);
+                    ['type' => 'warning', 'text' => \Lang::get('file_not_uploaded')]);
                 return $this->view($id);
             }
 
             $extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
             if (!in_array($extension, $this->site->config->uploaded_file_types)) {
                 $this->site->output->assign('message',
-                    ['type' => 'warning', 'text' => __LANG__['index']['ban']['file_not_type']]);
+                    ['type' => 'warning', 'text' => \Lang::get('file_not_type')]);
                 return $this->view($id);
             }
 
@@ -275,7 +275,7 @@ class BansController extends BaseController
         $comment->admin_id = Auth::get() ?: null;
         $comment->save();
 
-        $this->site->output->assign('message', __LANG__['index']['ban']['comment_saved']);
+        $this->site->output->assign('message', \Lang::get('comment_saved'));
         return header('Location: ' . Path::makeURL('bans/' . $id));
     }
 
@@ -291,7 +291,7 @@ class BansController extends BaseController
     {
 
         if (!Auth::hasPermission($permission) && !Auth::hasPermission($permission, 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('no_access')]);
             $this->view($id);
             return false;
         }
@@ -302,7 +302,7 @@ class BansController extends BaseController
         }
 
         if (Auth::get('username') != $ban->admin_nick && !Auth::hasPermission($permission, 2)) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => __LANG__['admin']['no_access']]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('no_access')]);
             $this->view($id);
             return false;
         }

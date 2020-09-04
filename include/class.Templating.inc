@@ -38,7 +38,10 @@ class Templating extends Smarty
         $this->setCompileDir(Path::getRootPath() . '/include/templates/compiled');
         $this->setForceCompile(false);
 
-        $this->assign('lang', __LANG__);
+        foreach (Lang::$properties as $key => $value) {
+            $this->assign('lang_' . $key, $value);
+        }
+        $this->assign('lang', Lang::$properties['name']);
         $this->assign('availLangs', $this->getAvailableLanguages());
         $this->assign('app_name', 'AMXBans v' . Config::version);
         $this->assign('version', Config::version);
@@ -48,15 +51,11 @@ class Templating extends Smarty
 
     private function getAvailableLanguages()
     {
-
-        $langs = scandir('language');
-        foreach ($langs as $file) {
-            if ($file != "." && $file != ".." && substr($file, 0, 4) != "lang") {
-                $lang[] = explode('.', $file)[0];
-            }
+        foreach (Lang::$supported as $index => $item) {
+            $lang[$index] = $item['name'];
         }
 
-        return $lang;
+        return $lang ?? [];
     }
 
     public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)

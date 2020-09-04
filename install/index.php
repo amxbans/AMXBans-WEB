@@ -67,7 +67,7 @@ switch ($site)
     case 3:
         if (isset($_POST['validate']))
         {
-            $errors = new FormErrors($_POST, __LANG__['STEP3_ERRORS']);
+            $errors = new FormErrors($_POST, \Lang::get('STEP3_ERRORS'));
             // DATABASE check
             $errors->validate([
                 'db_host' => 'required',
@@ -84,13 +84,13 @@ switch ($site)
                     $db = new PDO("mysql:dbname={$_SESSION['db_name']};host={$_SESSION['db_host']}", $_SESSION['db_user'], $_SESSION['db_pass']);
                     $db->exec("SET CHARSET utf8");
                 } catch (PDOException $e) {
-                    $errors->addError(__LANG__['STEP3_ERR_DB_CRED'] . ': ' . $e->getMessage(), ['db_host', 'db_user', 'db_pass', 'db_name']);
+                    $errors->addError(\Lang::get('STEP3_ERR_DB_CRED') . ': ' . $e->getMessage(), ['db_host', 'db_user', 'db_pass', 'db_name']);
                 }
             }
             if (!$errors->has() && $db->query('SELECT * FROM ' . $_SESSION['db_prefix'] . '_webconfig'))
-                $errors->addError(__LANG__['STEP3_ERR_ALREADY_INSTALLED'], ['db_prefix']);
+                $errors->addError(\Lang::get('STEP3_ERR_ALREADY_INSTALLED'), ['db_prefix']);
             if (!$errors->has() && !sql_has_all_privileges($db))
-                $errors->addError(__LANG__['STEP3_ERR_NO_PRIVILEGES']);
+                $errors->addError(\Lang::get('STEP3_ERR_NO_PRIVILEGES'));
 
             // admin account validation
             $errors->validate([

@@ -51,7 +51,7 @@ class Config implements ArrayAccess
         'banner_src'                  => 'amxbans.png',
         'banner_url'                  => '//forum.amxbans.net',
         'default_lang'                => 'english',
-        'start_page'                  => 0,
+        'start_page'                  => 1,
         'bans_show_kicks'             => true,
         'bans_show_comments'          => true,
         'uploaded_file_size'          => 2000000,
@@ -79,22 +79,8 @@ class Config implements ArrayAccess
             }
         }
 
-        //save current language to session
-        if (!isset($_SESSION["lang"])) {
-            $_SESSION["lang"] = $install ? 'english' : ($_COOKIE['lang'] ?? $this->default_lang);
-        }
-        if (isset($_GET['lang'])) {
-            setcookie('lang', $_SESSION['lang'] = $_GET['lang'], 3600 * 24 * 7, Path::getBaseURL());
-        }
-
         //Setup language strings
-        $lang = Path::getRootPath() . ($install ? '/install' : '') . '/language/' . $_SESSION['lang'] . '.php';
-        if (file_exists($lang)) {
-            $lang = require $lang;
-        } else {
-            $lang = require str_ireplace($_SESSION['lang'], 'english', $lang);
-        }
-        define('__LANG__', $lang);
+        Lang::init($install, $this->default_lang);
     }
 
     /**

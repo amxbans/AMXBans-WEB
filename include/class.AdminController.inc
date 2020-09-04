@@ -22,8 +22,8 @@ class AdminController
      */
     public function __construct(Site $site, string $method, string $section)
     {
-        $this->site = $site;
-        $this->method = $method;
+        $this->site    = $site;
+        $this->method  = $method;
         $this->section = $section;
 
         // If there's any extra action needed, it has to be placed here for all the 'admin' sites
@@ -54,10 +54,10 @@ class AdminController
                     $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
                     if (!$tables) {
                         $this->site->config->output->append('messages',
-                            ['type' => 'warning', 'text' => __LANG__['admin']['sys_info']['tables_not_optimised']]);
+                            ['type' => 'warning', 'text' => \Lang::get('db_not_optimised')]);
                     } else {
                         $this->site->config->output->append('messages',
-                            ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['tables_optimised']]);
+                            ['type' => 'success', 'text' => \Lang::get('db_optimised')]);
                     }
                     db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
                 }
@@ -65,7 +65,7 @@ class AdminController
                 //prune db
                 if (isset($_GET["prune"]) && Auth::hasPermission('prune_db')) {
                     /** @var Ban[] $bans */
-                    $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
+                    $bans   = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
                     $pruned = 0;
                     foreach ($bans as $ban) {
                         $tz = $ban->server->timezone_fixx * 3600;
@@ -82,7 +82,7 @@ class AdminController
                     }
                     $this->site->config->output->assign(compact('pruned'));
                     $this->site->config->output->append('messages',
-                        ['type' => 'success', 'text' => __LANG__['admin']['sys_info']['bans_pruned']]);
+                        ['type' => 'success', 'text' => \Lang::get('bans_pruned')]);
                     db_log('Web config', 'Pruned bans');
                 }
 
@@ -94,7 +94,7 @@ class AdminController
                     "version_php"         => phpversion(),
                     'version_mysql'       => DB::selectRaw('SELECT VERSION();', null, null, PDO::FETCH_COLUMN)[0],
                     "server_software"     => $_SERVER["SERVER_SOFTWARE"],
-                    "bc-gmp"              => (extension_loaded('bcmath') OR extension_loaded('gmp')) ? __LANG__['yes'] : __LANG__['no'],
+                    "bc-gmp"              => (extension_loaded('bcmath') OR extension_loaded('gmp')) ? \Lang::get('yes') : \Lang::get('no'),
                     "gd"                  => extension_loaded('gd') ? gd_info()['GD Version'] : false,
                 ];
                 $this->site->config->output->assign(compact('php'));
@@ -127,12 +127,12 @@ class AdminController
                     'file_count'    => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
                 ]);
                 $this->site->config->output->display('admin.index.sys_info');
-                break;
+            break;
             case 'ban_add':
                 $this->site->config->output->assign('reasons',
                     Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
                 $this->site->config->output->display('admin.index.ban_add');
-                break;
+            break;
         }
     }
 

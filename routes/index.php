@@ -9,6 +9,10 @@ Route::post('bans/{id}', 'BansController@comment');
 Route::get('servers', 'ServersController@index');
 Route::get('servers/{id}', 'ServersController@ajaxServerInfo');
 
+Route::get('admins', 'AdminsController@index');
+Route::resource('search', 'SearchController', ['create', 'store']);
+
+
 Route::resource('login', 'LoginController', ['index', 'store'], true);
 Route::get('login/pass_rec', 'LoginController@lostPassForm');
 Route::post('login/pass_rec', 'LoginController@lostPassSend');
