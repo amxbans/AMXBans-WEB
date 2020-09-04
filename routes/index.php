@@ -10,7 +10,7 @@ Route::get('servers', 'ServersController@index');
 Route::get('servers/{id}', 'ServersController@ajaxServerInfo');
 
 Route::get('admins', 'AdminsController@index');
-Route::resource('search', 'SearchController', ['create', 'store']);
+Route::resource('search', 'SearchController', ['index', 'store'], true);
 
 
 Route::resource('login', 'LoginController', ['index', 'store'], true);

@@ -30,7 +30,7 @@ class DB
      * @param string|array $columns
      * @param int          $fetch_type
      *
-     * @return mixed|static|bool
+     * @return mixed|static[]|bool
      */
     public function select($columns = '*', int $fetch_type = null): array
     {
@@ -143,7 +143,7 @@ class DB
      * @param string|mixed $asModel
      * @param int|null     $fetch_style
      *
-     * @return array
+     * @return array|\stdClass[]
      */
     public static function selectRaw(string $sql, array $values = null, $asModel = 'stdClass', $fetch_style = null)
     {

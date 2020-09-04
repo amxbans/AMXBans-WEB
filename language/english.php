@@ -40,7 +40,7 @@ return [
     'auto'             => 'Automatic',
     'test'             => 'Test',
     'empty'            => 'Nothing in here...',
-    'send'            => 'Send',
+    'send'             => 'Send',
 
 
 //user menu
@@ -151,6 +151,8 @@ return [
     'expired'             => 'expired',
     'ip'                  => 'IP address',
     'ban_type'            => 'Ban type',
+    // NEW IN v7.0
+    'times_banned'        => 'Times banned',
     'banby'               => 'Banned by',
     'banon'               => 'Banned on',
     'file_typenotallowed' => 'File type not allowed',
@@ -168,7 +170,7 @@ return [
     // NEW IN v7.0
     'list_comment_file'   => 'uploaded a file with comment',
     'newcomment'          => 'New comment',
-    'no_comments'          => 'No comments',
+    'no_comments'         => 'No comments',
     'back'                => 'Back',
     'tip_edit'            => 'Edit',
     'tip_del'             => 'Delete',
@@ -185,7 +187,7 @@ return [
     'add_comment'         => 'Add comment',
     'nofiles'             => 'No files',
     'bandetailsedits'     => 'Changes in past',
-    'edit_reason'          => 'Editing reason',
+    'edit_reason'         => 'Editing reason',
     'unban_player'        => 'Unban',
     'unbanned'            => 'Unbanned',
     'banhistory'          => 'Ban history',
@@ -203,7 +205,7 @@ return [
 
     'username'      => 'Username',
     'password'      => 'Password',
-    'remember'    => 'Remember my login',
+    'remember'      => 'Remember my login',
     'login_blocked' => 'Blocked login',
     'loginfailed'   => 'Login failed!',
     'logintry'      => 'Try',
@@ -324,8 +326,8 @@ return [
     'wadminaddedfailed'     => 'Adding failed. Are there duplicated values?',
     'never'                 => 'never',
     'yourpassword'          => 'For security reasons, you will be logged out after changing your own password!',
-    'new_password'         => 'Enter new password:',
-    'new_password_2'             => 'Re-type password',
+    'new_password'          => 'Enter new password:',
+    'new_password_2'        => 'Re-type password',
     'newpassword'           => 'Change password',
     'passwordchanged'       => 'Password has been changed!',
     'passwordchangedfailed' => 'Password changing failed!',
@@ -334,14 +336,18 @@ return [
 
 //search
 
-    'searchresult' => 'Search results',
-    'searchwith'   => 'Search with',
-    'searchfor'    => 'Search for',
-    'do_search'    => 'Search',
-    'playerswith'  => 'Players with',
-    'morebanshis'  => 'or more previous bans',
-    'active_bans'  => 'Active bans',
-    'expiredbans'  => 'Expired bans',
+    'search_results'   => 'Search results',
+    'searchwith'       => 'Search with',
+    'searchfor'        => 'Search for',
+    'do_search'        => 'Search',
+    'search_with_bans' => 'Players with',
+    'search_prev_bans' => 'or more previous bans',
+    // NEW IN v7.0
+    'active_admins'    => 'Active Admins',
+    // NEW IN v7.0
+    'other_admins'     => 'Other Admins',
+    'active_bans'      => 'Active bans',
+    'expiredbans'      => 'Expired bans',
 
 
 //Admin list
@@ -791,9 +797,9 @@ return [
 // lost-pass
 
     // NEW IN v7.0
-    'lost_pass'         => 'Forgot password',
+    'lost_pass'          => 'Forgot password',
     // NEW IN v7.0
-    'pass_rec'          => 'Password recovery',
+    'pass_rec'           => 'Password recovery',
     // NEW IN v7.0
     'lost_pass_email'    => [
         'subject' => 'Password reset',
