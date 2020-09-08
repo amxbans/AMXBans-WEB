@@ -5,14 +5,14 @@ use Models\Ban;
 use Models\DB;
 use Support\Path;
 
-class AdminController
+class IndexController
 {
     private $section;
     private $method;
     protected $site;
 
     /**
-     * AdminController constructor.
+     * IndexController constructor.
      *
      * @param Site   $site
      * @param string $method
