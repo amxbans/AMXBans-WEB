@@ -84,8 +84,6 @@ class Config implements ArrayAccess
     }
 
     /**
-     * @param bool $name
-     *
      * @return DB
      */
     public function getDb(): DB { return $this->db; }

@@ -27,28 +27,6 @@ function db_log(string $action, string $context, $user = null): void
     $log->save();
 }
 
-/**
- * @param \Models\Ban|mixed $ban_id
- * @param string|null       $admin
- * @param string|null       $reason
- * @param int|null          $time
- *
- * @throws Exception
- * @deprecated
- */
-function db_bans_log($ban_id, string $admin = null, string $reason = null, int $time = null): void
-{
-    $log              = new \Models\BansLog();
-    $log->bid         = $ban_id instanceof \Models\Ban ? $ban_id->bid : $ban_id;
-    $log->admin_nick  = $admin ?? Auth::get('username');
-    $log->edit_reason = $reason;
-    if ($time) {
-        $log->created_at = new DateTime('@' . $time);
-    }
-    $log->save();
-}
-
-
 function db_size()
 {
     global $config;

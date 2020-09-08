@@ -1,54 +1,37 @@
 <?php
+/**
+ *    AMXBans v7
+ * Copyright 2020 by indianiso1
+ * This file is part of AMXBans.
+ *
+ * AMXBans is free software, but it's licensed under the Creative Commons - Attribution-NonCommercial-ShareAlike 2.0
+ * AMXBans is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * You should have received a copy of the cc-nC-SA along with AMXBans.
+ * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
+ */
 
+/**  */
+namespace Controllers;
 
 use Models\Ban;
 use Models\DB;
-use Support\Path;
 
-class IndexController
+/**
+ * Class IndexController
+ *
+ * @package Controllers
+ */
+class IndexController extends \Support\BaseController
 {
-    private $section;
-    private $method;
-    protected $site;
 
-    /**
-     * IndexController constructor.
-     *
-     * @param Site   $site
-     * @param string $method
-     * @param string $section
-     *
-     * @throws Exception
-     */
-    public function __construct(Site $site, string $method, string $section)
-    {
-        $this->site    = $site;
-        $this->method  = $method;
-        $this->section = $section;
-
-        // If there's any extra action needed, it has to be placed here for all the 'admin' sites
-
-        ////////////
-
-        if (method_exists($this, $section)) {
-            $this->$section();
-        } else {
-            throw new Exception('Site "' . $section . '" not found');
-        }
-    }
-
-    private function index()
-    {
-        if ($this->method !== 'get') {
-            $this->navigateTo(AdminIndexController::class, Path::getFakePathWay(1));
-        }
-
+    public function getSysInfo()
+    {/*
         switch (Path::getFakePathWay(1)) {
-            case 'sys_info':
+            case 'sys_info':*/
                 //optimise tables
                 if (isset($_GET["optimise"])) {
-                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb(true) . "` LIKE ?",
-                        [$this->site->config->dbPrefix . '_%'], null, PDO::FETCH_COLUMN);
+                    $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb()->getDbName() . "` LIKE ?",
+                        [$this->site->config->getDb()->prefix . '_%'], null, PDO::FETCH_COLUMN);
                     $tables = implode('`, `', $tables);
 
                     $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
@@ -76,8 +59,13 @@ class IndexController
                             $ban->expired = true;
                             $ban->save();
 
-                            //TODO: remove function and just operate with model
-                            db_bans_log($ban, '--SYSTEM--', 'Bantime expired', $ban->ban_created + $tz + $bl);
+                            // Saving ban log of pruned ban
+                            $banLog = new \Models\BansLog();
+                            $banLog->bid = $ban->bid;
+                            $banLog->admin_nick = '--SYSTEM--';
+                            $banLog->edit_reason = 'Bantime expired';
+                            $banLog->created_at = new \DateTime('@' . ($ban->ban_created + $tz + $bl));
+                            $banLog->save();
                         }
                     }
                     $this->site->config->output->assign(compact('pruned'));
@@ -97,7 +85,7 @@ class IndexController
                     "bc-gmp"              => (extension_loaded('bcmath') OR extension_loaded('gmp')) ? \Lang::get('yes') : \Lang::get('no'),
                     "gd"                  => extension_loaded('gd') ? gd_info()['GD Version'] : false,
                 ];
-                $this->site->config->output->assign(compact('php'));
+                $this->site->output->assign(compact('php'));
 
                 /* TODO WEBSITE SETTINGS (web/settings): move this action to there
                         //clear smarty cache
@@ -116,7 +104,7 @@ class IndexController
                             $repaired = sql_get_comments_count_fail(1);
                         }*/
 
-                $this->site->config->output->assign([
+                $this->site->output->assign([
                     'bans'          => [
                         'total'  => Ban::query()->count('bid'),
                         'active' => Ban::query()->where('expired', false)->count('bid'),
@@ -126,18 +114,14 @@ class IndexController
                     'comment_count' => \Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
                     'file_count'    => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
                 ]);
-                $this->site->config->output->display('admin.index.sys_info');
+                $this->site->output->display('admin.index.sys_info.tpl');/*
             break;
             case 'ban_add':
                 $this->site->config->output->assign('reasons',
                     Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
                 $this->site->config->output->display('admin.index.ban_add');
             break;
-        }
+        }*/
     }
 
-    private function navigateTo($class, $site)
-    {
-        new $class($this->site, $this->method, $site);
-    }
 }
