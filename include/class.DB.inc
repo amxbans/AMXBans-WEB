@@ -26,4 +26,18 @@ class DB extends PDO
     {
         return $this->credentials->name;
     }
+
+    public function getSize()
+    {
+        $q = $this->prepare("SHOW TABLE STATUS FROM `{$this->credentials->name}` LIKE '{$this->prefix}_%'");
+        if (!$q->execute()) {
+            return false;
+        }
+
+        $db_size = 0;
+        while ($value = $q->fetch(parent::FETCH_ASSOC)) {
+            $db_size += $value["Data_length"] + $value['Index_length'];
+        }
+        return $db_size;
+    }
 }

@@ -27,22 +27,6 @@ function db_log(string $action, string $context, $user = null): void
     $log->save();
 }
 
-function db_size()
-{
-    global $config;
-    $db_size = 0;
-
-    $q = $config->getDb()->prepare("SHOW TABLE STATUS FROM `{$config->getDb(true)}` LIKE '{$config->dbPrefix}_%'");
-    if (!$q->execute()) {
-        return false;
-    }
-
-    while ($value = $q->fetch(PDO::FETCH_ASSOC)) {
-        $db_size += $value["Data_length"] + $value['Index_length'];
-    }
-    return $db_size;
-}
-
 function format_size($size)
 {
     if ($size >= 1073741824) {
