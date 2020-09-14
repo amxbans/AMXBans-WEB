@@ -7,7 +7,5 @@ if (!Auth::$logged) {
 }
 
 
-Route::get('index/sys_info', function () {
-    return Site::$instance->output->display('master.tpl');
-});
+Route::get('index/sys_info', 'IndexController@getSysInfo');
 Route::get('logout', 'LoginController@logout');
