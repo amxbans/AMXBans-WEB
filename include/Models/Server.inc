@@ -28,4 +28,32 @@ class Server extends Model
     protected const relations = [
         'bans' => [1, 'Models\Ban', 'address', 'server_ip'],
     ];
+    private $liveInfo;
+
+    public function liveInfo (string $what)
+    {
+        if (!$this->exists)
+            return false;
+        if (isset($this->liveInfo[$what]))
+            return $this->liveInfo[$what];
+
+        [$ip, $port] = explode(':', $this->address);
+        $rcon = new \Rcon($ip, $port, $this->rcon);
+        $this->liveInfo = $rcon->Info();
+        unset($rcon);
+        return $this->liveInfo[$what];
+    }
+
+    public function testConnection (): bool
+    {
+        if (!$this->exists)
+            return false;
+        [$ip, $port] = explode(':', $this->address);
+        try {
+            new \Rcon($ip, $port, $this->rcon);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
