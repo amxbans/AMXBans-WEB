@@ -626,7 +626,7 @@ return [
     'unknown'           => 'Unknown',
     'ban'               => 'Ban',
     'kick'              => 'Kick',
-    'wrongrcon'         => 'Wrong RCON password!',
+    'wrong_rcon'        => 'Wrong RCON password!',
     'playerkicked'      => 'Player kicked!',
     'addbansuccesskick' => 'Ban added. Player will be kicked!',
     'banandkick'        => 'Kick player after ban',

@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpVoidFunctionResultUsedInspection */
+<?php
+/** @noinspection PhpVoidFunctionResultUsedInspection */
+
 /** @noinspection PhpUnhandledExceptionInspection */
 
 if (!Auth::$logged) {
@@ -8,6 +10,7 @@ if (!Auth::$logged) {
 
 
 Route::get('index/sys_info', 'IndexController@getSysInfo');
-Route::get('index/online_ban', 'IndexController@getBanAdd');
+Route::get('index/online_ban', 'IndexController@getOnlineBan');
+Route::get('index/servers/{id}', 'IndexController@ajaxServerPlayers');
 
 Route::get('logout', 'LoginController@logout');

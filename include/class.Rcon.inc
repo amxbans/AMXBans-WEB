@@ -42,6 +42,7 @@ class Rcon
      * @param string $server_ip
      * @param string $server_port
      * @param string $server_password
+     *
      * @throws Exception
      */
     public function __construct($server_ip, $server_port, $server_password = "")
@@ -94,8 +95,9 @@ class Rcon
      * Get detailed player info via rcon
      *
      * @return string
+     * @throws Exception
      */
-    function ServerInfo()
+    public function serverInfo()
     {
         //get server information
         $status = $this->RconCommand("status");
@@ -103,7 +105,7 @@ class Rcon
         //If there is no open connection return false
         //If there is bad rcon password return "Bad rcon_password."
         if (!$status || trim($status) == "Bad rcon_password.") {
-            return $status;
+            throw new Exception(Lang::get('wrong_rcon')); // TODO: add to changable words wrongrcon => wrong_rcon
         }
 
         //format global server info
@@ -166,12 +168,10 @@ class Rcon
 
             //Adress
             $result[$i]["adress"] = $tmp;
-
         } //for($i = 1; $i < $result["activeplayers"]; $i++)
 
         //return formatted result
         return $result;
-
     } //function ServerInfo()
 
 
@@ -202,7 +202,6 @@ class Rcon
 
                 //parse directory name
                 $directory = strstr($text, " ");
-
             } //if(strstr($text, "Dir:"))
 
             else {
@@ -218,7 +217,6 @@ class Rcon
 
                     //parse mapname without suffix (.bsp)
                     $result[$directory][$i] = substr($tmpmap, 1, strpos($tmpmap, ".") - 1);
-
                 }
             } //else if(strstr($text, "(fs)"))
 
@@ -227,11 +225,13 @@ class Rcon
 
         //return formatted result
         return $result;
-
     } //function ServerMaps()
 
-    //Get server info via info protocol
-    function Info()
+    /**
+     * Get server info via info protocol
+     *
+     */
+    public function publicInfo()
     {
         //send info command
         $command = "\xff\xff\xff\xffTSource Engine Query\x00";
@@ -264,17 +264,16 @@ class Rcon
         switch ($result["edf"]) {
             case '\x80': // The server's game port # is included
                 $result["port"] = $this->parse_buffer($buffer, $pos, "short");
-            break;
+                break;
             case '\x40': // The spectator port # and then the spectator server name are included
                 $result["specport"]       = $this->parse_buffer($buffer, $pos, "short");
                 $result["specservername"] = $this->parse_buffer($buffer, $pos, "string");
-            break;
+                break;
             case '\x20': // The game tag data string for the server is included [future use]
                 $result["gametagdata"] = $this->parse_buffer($buffer, $pos, "string");
         }
         //return formatted result
         return $result;
-
     } //function Info()
 
     function parse_buffer($buffer, &$pos, $type)
@@ -286,30 +285,30 @@ class Rcon
                     $result .= substr($buffer, $pos, 1);
                     $pos++;
                 }
-            break;
+                break;
             case 'short':
                 $result = ord(substr($buffer, $pos, 1)) +
                     (ord(substr($buffer, $pos + 1, 1)) << 8);
                 $pos++;
-            break;
+                break;
             case 'long':
                 $result = ord($buffer[$pos]) +
                     (ord($buffer[$pos + 1]) << 8) +
                     (ord($buffer[$pos + 2]) << 16) +
                     (ord($buffer[$pos + 3]) << 24);
                 $pos    += 3;
-            break;
+                break;
             case 'byte':
                 $result = ord(substr($buffer, $pos, 1));
-            break;
+                break;
             case 'bytestr':
                 $result = substr($buffer, $pos, 1);
-            break;
+                break;
             case 'float':
                 $tmptime = @unpack('ftime', substr($buffer, $pos, 4));
                 $result  = date('H:i:s', round($tmptime['time'], 0) + 82800);
                 $pos     += 3;
-            break;
+                break;
         }
         $pos++;
         return $result;
@@ -362,7 +361,6 @@ class Rcon
 
         //return formatted result
         return $result;
-
     } //function Players()
 
 
@@ -401,14 +399,12 @@ class Rcon
         //build rules array
         for ($i = 0; $i < $buffer_count; $i++) {
             $result[$buffer[2 * $i]] = $buffer[2 * $i + 1];
-
         }
         //sort rules
         #asort($result);
 
         //return formatted result
         return $result ?? [];
-
     } //function ServerRules()
 
 
@@ -439,7 +435,6 @@ class Rcon
             $command = "";
 
             $pagenumber--;
-
         } //while($pagenumber >= 0)
 
         //to get more than 1 page from rcon
@@ -469,7 +464,6 @@ class Rcon
 
         //return unformatted result
         return trim($result);
-
     } //function RconCommand ($command)
 
     //AMXBans function to get the online players with more infos
@@ -512,7 +506,6 @@ class Rcon
 
         //return unformatted result
         return trim($result);
-
     } //function RconCommand ($command)
 
     //Communication between PHPrcon and the Gameserver
@@ -539,11 +532,11 @@ class Rcon
 
             //get number of packages
             $po    = ord(substr($buffer, 8, 1));
-            $panum = ($po&1) + ($po&2) + ($po&4) + ($po&8);
+            $panum = ($po & 1) + ($po & 2) + ($po & 4) + ($po & 8);
 
             //get number from current package
             $po    = $po >> 4;
-            $pacur = ($po&1) + ($po&2) + ($po&4) + ($po&8);
+            $pacur = ($po & 1) + ($po & 2) + ($po & 4) + ($po & 8);
 
             //add the first package to the array
             if ($pacur == ($panum - 1)) {
@@ -563,7 +556,7 @@ class Rcon
                 $requestid2 = substr($buffer, 4, 4);
                 $po         = ord(substr($buffer2, 8, 1));
                 $po         = $po >> 4;
-                $pacur      = ($po&1) + ($po&2) + ($po&4) + ($po&8);
+                $pacur      = ($po & 1) + ($po & 2) + ($po & 4) + ($po & 8);
 
                 //check the requestid from every package and add to array
                 if ($requestid == $requestid2) {
@@ -586,7 +579,6 @@ class Rcon
 
         //return complete package including the type byte
         return $bufferret;
-
     } //function Communicate($buffer)
 
 }

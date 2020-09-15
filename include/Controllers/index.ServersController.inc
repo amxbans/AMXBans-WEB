@@ -95,11 +95,13 @@ class ServersController extends BaseController
                 'message' => $e->getMessage(),
             ]);
         }
-        if (!($infos = $rcon->Info())) {
-            return json_encode([
-                'success' => false,
-                'message' => \Lang::get('server_cannot_connect'),
-            ]);
+        if (!($infos = $rcon->publicInfo())) {
+            return json_encode(
+                [
+                    'success' => false,
+                    'message' => \Lang::get('server_cannot_connect'),
+                ]
+            );
         }
 
         $out['players'] = [];

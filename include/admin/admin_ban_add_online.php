@@ -38,25 +38,25 @@ require_once("include/class.Rcon.inc");
 	$servers_array = array();
 	$resource = $mysql->query("SELECT * FROM ".$config->db_prefix."_serverinfo ORDER BY hostname ASC") or die ($mysql->error);
 	while($result = $resource->fetch_object()) {
-		$servers_list[] = $result->id;
-		$key = array_keys($servers_list);
-		$count = count($key);
-		
-		//get some info
-		$server = new Rcon();
-		$server_address=explode(":",trim($result->address));
-		$server->Connect($server_address[0],$server_address[1], $result->rcon);
-		$infos = $server->Info();
-		$server->Disconnect();
-		for ($i=0; $i<$count; $i++) {
-			$servers_info = array(
-				"id"		=> $key[$i],
-				"hostname"	=> $result->hostname,
-				"address"	=> $result->address,
-				"rcon"		=> $result->rcon,
-				"map"         => $infos[map],
-				"mod"        	=> $infos[mod],
-				"os"		=> ($infos[os]=="l")?"Linux":"Windows",
+        $servers_list[] = $result->id;
+        $key            = array_keys($servers_list);
+        $count          = count($key);
+
+        //get some info
+        $server         = new Rcon();
+        $server_address = explode(":", trim($result->address));
+        $server->Connect($server_address[0], $server_address[1], $result->rcon);
+        $infos = $server->publicInfo();
+        $server->Disconnect();
+        for ($i = 0; $i < $count; $i++) {
+            $servers_info = array(
+                "id"             => $key[$i],
+                "hostname"       => $result->hostname,
+                "address"        => $result->address,
+                "rcon"           => $result->rcon,
+                "map"            => $infos[map],
+                "mod"            => $infos[mod],
+                "os"             => ($infos[os] == "l") ? "Linux" : "Windows",
 				"cur_players"	=> $infos[activeplayers], 
 				"max_players"	=> $infos[maxplayers],
 				"bot_players"	=> $infos[botplayers]

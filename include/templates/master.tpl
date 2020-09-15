@@ -70,5 +70,6 @@
     </small>
     {if !$site->user->get() }<a href="{"login"|url}">{'login'|lang}</a>{/if}
 </footer>
+{block name="scripts"}{/block}
 </body>
 </html>

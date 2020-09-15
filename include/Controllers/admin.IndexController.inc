@@ -11,10 +11,12 @@
  */
 
 /**  */
+
 namespace Controllers;
 
 use Models\Ban;
 use Models\DB;
+use Models\Server;
 use Support\Path;
 
 /**
@@ -28,17 +30,25 @@ class IndexController extends \Support\BaseController
     {
         //optimise tables
         if (isset($_GET["optimise"])) {
-            $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb()->getDbName() . "` LIKE ?",
-                [$this->site->config->getDb()->prefix . '_%'], null, \PDO::FETCH_COLUMN);
+            $tables = DB::selectRaw(
+                "SHOW TABLES FROM `" . $this->site->config->getDb()->getDbName() . "` LIKE ?",
+                [$this->site->config->getDb()->prefix . '_%'],
+                null,
+                \PDO::FETCH_COLUMN
+            );
             $tables = implode('`, `', $tables);
 
             $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
             if (!$tables) {
-                $this->site->config->output->append('messages',
-                    ['type' => 'warning', 'text' => \Lang::get('db_not_optimised')]);
+                $this->site->config->output->append(
+                    'messages',
+                    ['type' => 'warning', 'text' => \Lang::get('db_not_optimised')]
+                );
             } else {
-                $this->site->config->output->append('messages',
-                    ['type' => 'success', 'text' => \Lang::get('db_optimised')]);
+                $this->site->config->output->append(
+                    'messages',
+                    ['type' => 'success', 'text' => \Lang::get('db_optimised')]
+                );
             }
             db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
         }
@@ -46,7 +56,7 @@ class IndexController extends \Support\BaseController
         //prune db
         if (isset($_GET["prune"]) && \Auth::hasPermission('prune_db')) {
             /** @var Ban[] $bans */
-            $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
+            $bans   = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
             $pruned = 0;
             foreach ($bans as $ban) {
                 $tz = $ban->server->timezone_fixx * 3600;
@@ -67,19 +77,27 @@ class IndexController extends \Support\BaseController
                 }
             }
             $this->site->config->output->assign(compact('pruned'));
-            $this->site->config->output->append('messages',
-                ['type' => 'success', 'text' => \Lang::get('bans_pruned')]);
+            $this->site->config->output->append(
+                'messages',
+                ['type' => 'success', 'text' => \Lang::get('bans_pruned')]
+            );
             db_log('Web config', 'Pruned bans');
         }
         $php = [
             "display_errors"      => toBool(ini_get('display_errors')),
-            "post_max_size"       => ini_get('post_max_size') . " (" . return_bytes(ini_get('post_max_size')) . " bytes)",
-            "upload_max_filesize" => ini_get('upload_max_filesize') . " (" . return_bytes(ini_get('upload_max_filesize')) . " B)",
+            "post_max_size"       => ini_get('post_max_size') . " (" . return_bytes(
+                    ini_get('post_max_size')
+                ) . " bytes)",
+            "upload_max_filesize" => ini_get('upload_max_filesize') . " (" . return_bytes(
+                    ini_get('upload_max_filesize')
+                ) . " B)",
             "max_execution_time"  => ini_get('max_execution_time'),
             "version_php"         => phpversion(),
             'version_mysql'       => DB::selectRaw('SELECT VERSION();', null, null, \PDO::FETCH_COLUMN)[0],
             "server_software"     => $_SERVER["SERVER_SOFTWARE"],
-            "bc-gmp"              => (extension_loaded('bcmath') or extension_loaded('gmp')) ? \Lang::get('yes') : \Lang::get('no'),
+            "bc-gmp"              => (extension_loaded('bcmath') or extension_loaded('gmp')) ? \Lang::get(
+                'yes'
+            ) : \Lang::get('no'),
             "gd"                  => extension_loaded('gd') ? gd_info()['GD Version'] : false,
         ];
         $this->site->output->assign(compact('php'));
@@ -101,29 +119,61 @@ class IndexController extends \Support\BaseController
                     $repaired = sql_get_comments_count_fail(1);
                 }*/
 
-        $this->site->output->assign([
-            'bans'          => [
-                'total'  => Ban::query()->count('bid'),
-                'active' => Ban::query()->where('expired', false)->count('bid'),
-            ],
-            'db_size'       => format_size($this->site->config->getDb()->getSize()),
-            'prune'         => $this->site->config->prune_bans,
-            'comment_count' => \Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
-            'file_count'    => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
-        ]);
+        $this->site->output->assign(
+            [
+                'bans'          => [
+                    'total'  => Ban::query()->count('bid'),
+                    'active' => Ban::query()->where('expired', false)->count('bid'),
+                ],
+                'db_size'       => format_size($this->site->config->getDb()->getSize()),
+                'prune'         => $this->site->config->prune_bans,
+                'comment_count' => \Models\Comment::query(\Models\Comment::COMMENTS)->count('id'),
+                'file_count'    => \Models\Comment::query(\Models\Comment::FILES)->count('id'),
+            ]
+        );
         $this->site->output->display('admin.index.sys_info.tpl');
-
     }
 
-    public function getBanAdd()
+    public function getBanAdd() //TODO: must develop
     {
-        $this->site->output->assign('reasons', \Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
+        $this->site->output->assign(
+            'reasons',
+            \Models\DB::table('reasons')->select(['id', 'reason'], \PDO::FETCH_KEY_PAIR)
+        );
+        $this->site->output->display('admin.index.ban_add.tpl');
+    }
+
+    public function getOnlineBan()
+    {
         $this->site->output->assign('servers', \Models\Server::query()->select());
-        if (Path::getFakePathWay(2))
+        if (Path::getFakePathWay(2)) {
             $this->site->output->assign('selected', \Models\Server::find(Path::getFakePathWay(2)));
-        else
+        } else {
             $this->site->output->assign('selected', new \Models\Server);
+        }
         $this->site->output->display('admin.index.online_ban.tpl');
+    }
+
+    public function ajaxServerPlayers($server) // TODO: Must ask for some active server info (rcon)
+    {
+        $server = Server::find($server);
+        [$ip, $port] = explode(':', $server->address);
+        try {
+            $live = new \Rcon($ip, $port, $server->rcon);
+            $live = $live->serverInfo();
+            $out  = [
+                'success' => true,
+                'info'    => $live,
+            ];
+        } catch (\Exception $e) {
+            $out = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($out);
     }
 
 }

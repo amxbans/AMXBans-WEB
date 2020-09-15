@@ -38,8 +38,8 @@ class Server extends Model
             return $this->liveInfo[$what];
 
         [$ip, $port] = explode(':', $this->address);
-        $rcon = new \Rcon($ip, $port, $this->rcon);
-        $this->liveInfo = $rcon->Info();
+        $rcon           = new \Rcon($ip, $port, $this->rcon);
+        $this->liveInfo = $rcon->publicInfo();
         unset($rcon);
         return $this->liveInfo[$what];
     }
