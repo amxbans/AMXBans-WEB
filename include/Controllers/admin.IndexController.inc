@@ -15,6 +15,7 @@ namespace Controllers;
 
 use Models\Ban;
 use Models\DB;
+use Support\Path;
 
 /**
  * Class IndexController
@@ -28,7 +29,7 @@ class IndexController extends \Support\BaseController
         //optimise tables
         if (isset($_GET["optimise"])) {
             $tables = DB::selectRaw("SHOW TABLES FROM `" . $this->site->config->getDb()->getDbName() . "` LIKE ?",
-                [$this->site->config->getDb()->prefix . '_%'], null, PDO::FETCH_COLUMN);
+                [$this->site->config->getDb()->prefix . '_%'], null, \PDO::FETCH_COLUMN);
             $tables = implode('`, `', $tables);
 
             $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
@@ -43,9 +44,9 @@ class IndexController extends \Support\BaseController
         }
 
         //prune db
-        if (isset($_GET["prune"]) && Auth::hasPermission('prune_db')) {
+        if (isset($_GET["prune"]) && \Auth::hasPermission('prune_db')) {
             /** @var Ban[] $bans */
-            $bans   = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
+            $bans = Ban::query()->where('expired', 0)->select(['bid', 'ban_created', 'ban_length']);
             $pruned = 0;
             foreach ($bans as $ban) {
                 $tz = $ban->server->timezone_fixx * 3600;
@@ -116,8 +117,13 @@ class IndexController extends \Support\BaseController
 
     public function getBanAdd()
     {
-        $this->site->config->output->assign('reasons', \Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
-        $this->site->config->output->display('admin.index.ban_add');
+        $this->site->output->assign('reasons', \Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR));
+        $this->site->output->assign('servers', \Models\Server::query()->select());
+        if (Path::getFakePathWay(2))
+            $this->site->output->assign('selected', \Models\Server::find(Path::getFakePathWay(2)));
+        else
+            $this->site->output->assign('selected', new \Models\Server);
+        $this->site->output->display('admin.index.online_ban.tpl');
     }
 
 }
