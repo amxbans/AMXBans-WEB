@@ -4,14 +4,18 @@
  * Name:     lang
  * Purpose:  transform string with language replacement
  *
- * @author indianiso1 <indianiso1 at gmail dot com>
- *
  * @param string $key input string
  *
- * @return string made url
+ * @param mixed  ...$additional
  *
+ * @return string made url
+ * @author indianiso1 <indianiso1 at gmail dot com>
  */
-function smarty_modifier_lang($key, $additional = null)
+function smarty_modifier_lang (string $key, ...$additional)
 {
-    return $additional? Lang::get($key)[$additional] : Lang::get($key);
+    if ($additional) {
+        $last = array_pop($additional);
+        return smarty_modifier_lang($key, ...$additional)[$last];
+    }
+    return Lang::get($key);
 }
