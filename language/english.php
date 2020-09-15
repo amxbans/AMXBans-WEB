@@ -267,7 +267,7 @@ return [
 
     'serveradminsettings' => 'Server admin settings',
     'admins'              => 'Admins',
-    'activ'               => 'active',
+    'active'               => 'Active',
     'customflags'         => 'custom flags',
     'staticbantime'       => 'static ban time',
     'editadmins'          => 'Edit admins',
@@ -446,10 +446,10 @@ return [
     'otherfunctions' => 'Other Functions',
     'statistik'      => 'Statistic',
     'clearcache'     => 'Clear page cache',
-    'dbsize'         => 'Database size',
-    'dboptimize'     => 'Optimize database',
+    'db_size'         => 'Database size',
+    'db_optimise'     => 'Optimize database',
     'optimize'       => 'Optimize',
-    'prunedb'        => 'Prune bans',
+    'prune_bans'        => 'Prune bans',
     'prune'          => 'Prune',
 
 
