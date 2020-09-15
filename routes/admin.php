@@ -8,4 +8,6 @@ if (!Auth::$logged) {
 
 
 Route::get('index/sys_info', 'IndexController@getSysInfo');
+Route::get('index/online_ban', 'IndexController@getBanAdd');
+
 Route::get('logout', 'LoginController@logout');
