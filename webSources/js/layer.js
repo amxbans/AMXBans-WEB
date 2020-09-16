@@ -95,10 +95,9 @@ $(function () {
 			}
 
 			tpl = '<li class="list-group-item d-flex justify-content-between align-items-center"></li>';
-			$('ul:not(.players)', $child).append('<li class="list-group-item text-center"><p class="font-bold">' + data.info.hostname + '</p></li>');
-			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.hostname + ':</b> ' + data.info.address));
-			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.password + ':</b> ' + (data.info.password? data.lang.yes : data.lang.no)));
-			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.friendlyFire + ':</b> ' + (data.info.friendlyFire? data.lang.yes : data.lang.no)));
+			$('ul:not(.players)', $child).append('<li class="list-group-item text-center"><div class="font-weight-bold">' + data.info.hostname + '</div>' + data.info.address + '</li>');
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.password + ':</b> ' + (data.info.password ? data.lang.yes : data.lang.no)));
+			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.friendlyFire + ':</b> ' + (data.info.friendlyFire ? data.lang.yes : data.lang.no)));
 			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.map + ':</b> ' + data.info.map));
 			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.timeleft + ':</b> ' + data.info.timeleft));
 			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.nextmap + ':</b> ' + data.info.nextmap));

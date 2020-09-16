@@ -119,7 +119,6 @@ class ServersController extends BaseController
         //main server info
         $rules = $rcon->ServerRules();
         $out['info'] = [
-            'RULES' => $rules,
             "hostname"     => $infos['name'],
             'address'      => $server['address'],
             "map"          => $infos['map'],
@@ -136,7 +135,6 @@ class ServersController extends BaseController
             "nextmap"      => $rules['amx_nextmap'] ?? '',
             "friendlyFire" => (bool)($rules['mp_friendlyfire'] ?? false),
             "picture"      => Path::getBaseURL() . (file_exists(Path::getRootPath() . $mapPic) ? $mapPic : "/webSources/images/maps/noimage.jpg"),
-            'vac'          => (bool)$infos['secure'],
         ];
 
         $out['lang'] = [
