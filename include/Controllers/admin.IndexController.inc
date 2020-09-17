@@ -134,13 +134,73 @@ class IndexController extends \Support\BaseController
         $this->site->output->display('admin.index.sys_info.tpl');
     }
 
-    public function getBanAdd() //TODO: must develop
+    public function getBanAdd()
     {
         $this->site->output->assign(
             'reasons',
             \Models\DB::table('reasons')->select(['id', 'reason'], \PDO::FETCH_KEY_PAIR)
         );
         $this->site->output->display('admin.index.ban_add.tpl');
+    }
+
+    public function postBanAdd()
+    {
+        if (!$this->site->validateFormAuth()) {
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
+            return $this->getBanAdd();
+        }
+        if (!\Auth::hasPermission('bans_add')) {
+            $this->site->output->assign('message', \Lang::get('no_access'));
+            return $this->getBanAdd();
+        }
+
+        $validator = new \FormErrors($_POST, \Lang::get('validation_errors'));
+        $validator->validate(
+            [
+                'ban_type' => 'required',
+                'SteamID'  => (false !== strpos($_POST['ban_type'], 'S') ? 'required|' : '') . 'steamid',
+                'IP'       => (false !== strpos($_POST['ban_type'], 'I') ? 'required|' : '') . 'ip',
+                'username' => 'required',
+            ]
+        );
+        if (!@$_POST['reason'] && !@$_POST['custom_reason']) {
+            $validator->addValidationError('custom_reason', 'required_without', ['reason']);
+        }
+        if ($validator->has()) {
+            $this->site->output->assign('messages', $validator);
+            return $this->getBanAdd();
+        }
+
+        // Chech if an active ban exist
+        $active = Ban::query()->where('expired', 0);
+        if (false !== strpos($_POST['ban_type'], 'S')) {
+            $active->where('player_id', $_POST['SteamID']);
+        }
+        if (false !== strpos($_POST['ban_type'], 'I')) {
+            $active->where('player_ip', $_POST['IP']);
+        }
+        if ($active->count('bid')) {
+            $this->site->output->assign('message', \Lang::get('active_ban_exists'));
+            return $this->getBanAdd();
+        }
+
+        Ban::query()->insert(
+            [
+                'player_ip'   => $_POST['IP'],
+                'player_id'   => $_POST['SteamID'],
+                'player_nick' => $_POST['username'],
+                'admin_nick'  => \Auth::get('username'),
+                'admin_id'    => \Auth::get('username'),
+                'admin_ip'    => $_SERVER['REMOTE_ADDR'],
+                'ban_type'    => $_POST['ban_type'],
+                'ban_reason'  => @$_POST['reason'] ?: $_POST['custom_reason'],
+                'ban_created' => time(),
+                'ban_length'  => $_POST['length'] ?: 0,
+                'server_name' => 'website',
+            ]
+        );
+
+        return $this->getBanAdd();
     }
 
     public function getOnlineBan()

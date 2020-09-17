@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Language: English (UK)
  * Author Notes:
@@ -131,8 +132,8 @@ return [
     'bandetails'          => 'Ban details',
     // NEW IN v7.0
     'ban_types'           => [
-        'I'  => 'IP',
         'S'  => 'SteamID',
+        'I'  => 'IP',
         'SI' => 'SteamID & IP',
         'IS' => 'SteamID & IP',
         ''   => 'Not defined',
@@ -267,7 +268,7 @@ return [
 
     'serveradminsettings' => 'Server admin settings',
     'admins'              => 'Admins',
-    'active'               => 'Active',
+    'active'              => 'Active',
     'customflags'         => 'custom flags',
     'staticbantime'       => 'static ban time',
     'editadmins'          => 'Edit admins',
@@ -446,10 +447,10 @@ return [
     'otherfunctions' => 'Other Functions',
     'statistik'      => 'Statistic',
     'clearcache'     => 'Clear page cache',
-    'db_size'         => 'Database size',
-    'db_optimise'     => 'Optimize database',
+    'db_size'        => 'Database size',
+    'db_optimise'    => 'Optimize database',
     'optimize'       => 'Optimize',
-    'prune_bans'        => 'Prune bans',
+    'prune_bans'     => 'Prune bans',
     'prune'          => 'Prune',
 
 
@@ -484,10 +485,13 @@ return [
 
 //add ban
 
-    'addban'         => 'Add ban',
-    'newban'         => 'Add new ban',
-    'nobanname'      => 'No name entered!',
-    'activbanexists' => 'There already is an active ban!',
+    'addban'            => 'Add ban',
+    'newban'            => 'Add new ban',
+    'nobanname'         => 'No name entered!',
+    // NEW IN v7.0
+    'custom_reason'     => 'custom reason',
+    'active_ban_exists' => 'There already is an active ban!',
+    // TODO LANGUAGES: activbanexists => activeBanExists
 
 
 //messages
@@ -568,12 +572,16 @@ return [
     'invalidCSRF'         => 'Form You provided was not submitted due to missing cross-site security token. Please try submitting it again.',
     // NEW IN v7.0
     'validation_errors'   => [
-        'required' => 'The :attribute field is required',
-        'same'     => 'The :attribute field needs to be the same as :0',
-        'min'      => 'The :attribute field needs to be at least :0',
-        'max'      => 'The :attribute field cannot be more than :0',
-        'later'    => 'The :attribute field needs to be later than now',
-        'ip'       => 'The :attribute field needs to be an ip-compliant string (0.0.0.0-255.255.255.255)',
+        'required'         => 'The :attribute field is required',
+        'same'             => 'The :attribute field needs to be the same as :0',
+        'min'              => 'The :attribute field needs to be at least :0',
+        'max'              => 'The :attribute field cannot be more than :0',
+        'later'            => 'The :attribute field needs to be later than now',
+        'ip'               => 'The :attribute field needs to be an ip-compliant string (0.0.0.0-255.255.255.255)',
+        'steamid'          => 'The :attribute field needs to be a valid SteamID (STEAM_0:[0 or 1]:[1-10 digits])',
+        'email'            => 'The :attribute field needs to be a valid email',
+        'captcha'          => 'Security (Captcha) code is not correct', // wrongcaptcha
+        'required_without' => 'The :attribute field is required if :0 is not present', // wrongcaptcha
     ],
 
 

@@ -10,7 +10,12 @@ if (!Auth::$logged) {
 
 
 Route::get('index/sys_info', 'IndexController@getSysInfo');
+
+Route::get('index/ban_add', 'IndexController@getBanAdd');
+Route::post('index/ban_add', 'IndexController@postBanAdd');
+
 Route::get('index/online_ban', 'IndexController@getOnlineBan');
 Route::get('index/servers/{id}', 'IndexController@ajaxServerPlayers');
+
 
 Route::get('logout', 'LoginController@logout');

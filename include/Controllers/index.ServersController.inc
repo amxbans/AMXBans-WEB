@@ -70,38 +70,49 @@ class ServersController extends BaseController
 
     public function ajaxServerInfo($server)
     {
+        header('Content-Type: application/json');
         $server = Server::find($server);
         if (!$server->exists) {
-            return json_encode([
-                'success' => false,
-                'message' => \Lang::get('server_not_found'),
-            ]);
+            echo json_encode(
+                [
+                    'success' => false,
+                    'message' => \Lang::get('server_not_found'),
+                ]
+            );
+            return;
         }
 
         [$ip, $port] = explode(":", $server->address);
         if (!$ip || !$port) {
-            return json_encode([
-                'success' => false,
-                'message' => \Lang::get('server_not_found'),
-            ]);
+            echo json_encode(
+                [
+                    'success' => false,
+                    'message' => \Lang::get('server_not_found'),
+                ]
+            );
+            return;
         }
 
         try {
             $rcon = new \Rcon($ip, $port);
 
         } catch (\Exception $e) {
-            return json_encode([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ]);
+            echo json_encode(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ]
+            );
+            return;
         }
         if (!($infos = $rcon->publicInfo())) {
-            return json_encode(
+            echo json_encode(
                 [
                     'success' => false,
                     'message' => \Lang::get('server_cannot_connect'),
                 ]
             );
+            return;
         }
 
         $out['players'] = [];
@@ -150,7 +161,6 @@ class ServersController extends BaseController
             'no'           => ucfirst(\Lang::get('no')),
         ];
 
-        header('Content-Type: application/json');
         $out['success'] = true;
         echo json_encode($out);
     }

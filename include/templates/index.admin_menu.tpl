@@ -6,7 +6,8 @@
                    aria-haspopup="true" aria-expanded="false">{'admin_menu_titles'|lang:$val}</a>
                 <div class="dropdown-menu" aria-labelledby="admin{$val@index}">
                     {foreach admin_menu_subtitles|lang:$val as $url}
-                        <a href="{array($val,$url@key)|url:"admin.php"}" class="dropdown-item">{$url}</a>
+                        <a href="{array($val,$url@key)|url:"admin.php"}"
+                           class="dropdown-item{if $url@key == Support\Path::getFakePathWay(1)} active{/if}">{$url}</a>
                     {/foreach}
                 </div>
             </li>
