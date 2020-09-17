@@ -39,17 +39,14 @@ class IndexController extends \Support\BaseController
             $tables = implode('`, `', $tables);
 
             $tables = DB::rawSQL("OPTIMIZE TABLES `$tables`");
-            if (!$tables) {
-                $this->site->config->output->append(
-                    'messages',
-                    ['type' => 'warning', 'text' => \Lang::get('db_not_optimised')]
-                );
-            } else {
-                $this->site->config->output->append(
-                    'messages',
-                    ['type' => 'success', 'text' => \Lang::get('db_optimised')]
-                );
-            }
+
+            $this->site->output->assign(
+                'message',
+                [
+                    'type' => $tables ? 'success' : 'warning',
+                    'text' => $tables ? \Lang::get('db_optimised') : \Lang::get('db_not_optimised')
+                ]
+            );
             db_log('Web config', 'Optimised tables ' . $tables ? 'successfully' : 'NOT successfully');
         }
 
@@ -76,11 +73,8 @@ class IndexController extends \Support\BaseController
                     $banLog->save();
                 }
             }
-            $this->site->config->output->assign(compact('pruned'));
-            $this->site->config->output->append(
-                'messages',
-                ['type' => 'success', 'text' => \Lang::get('bans_pruned')]
-            );
+            $this->site->output->assign(compact('pruned'));
+            $this->site->output->append('messages', ['type' => 'success', 'text' => \Lang::get('bans_pruned')]);
             db_log('Web config', 'Pruned bans');
         }
         $php = [
@@ -136,10 +130,7 @@ class IndexController extends \Support\BaseController
 
     public function getBanAdd()
     {
-        $this->site->output->assign(
-            'reasons',
-            \Models\DB::table('reasons')->select(['id', 'reason'], \PDO::FETCH_KEY_PAIR)
-        );
+        $this->site->output->assign('reasons', DB::table('reasons')->select(['id', 'reason'], \PDO::FETCH_KEY_PAIR));
         $this->site->output->display('admin.index.ban_add.tpl');
     }
 
@@ -198,6 +189,11 @@ class IndexController extends \Support\BaseController
                 'ban_length'  => $_POST['length'] ?: 0,
                 'server_name' => 'website',
             ]
+        );
+        db_log(
+            'BAN MANAGEMENT',
+            'Added ban: ID ' . DB::lastInsertId(
+            ) . ' (' . $_POST['username'] . ') for ' . ($_POST['length'] ? $_POST['length'] . ' minutes' : 'permanent time')
         );
 
         return $this->getBanAdd();
