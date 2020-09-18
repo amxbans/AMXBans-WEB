@@ -18,4 +18,7 @@ Route::get('index/online_ban', 'IndexController@getOnlineBan');
 Route::get('index/servers/{id}', 'IndexController@ajaxServerPlayers');
 
 
+Route::resource('web/users', 'WebAdminController');
+
+
 Route::get('logout', 'LoginController@logout');
