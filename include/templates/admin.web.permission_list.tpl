@@ -1,8 +1,20 @@
-	<td id="main" valign="top" >
-		{if $smarty.session.permissions_edit == "yes"}
-			<span class="title">{"_ADMINLEVELSETTINGS"|lang}</span>
+{extends file="master.tpl"}
+{block name="head-title" prepend}{'admin_menu_subtitles'|lang:'index':'sys_info'} - {'admin_menu_titles'|lang:'index'} | {/block}
+
+{block name="BODY"}
+{include file="messages.tpl"}
+	{if !Auth::hasPermission('permissions_edit')}
+<form method="post" action="{if isset($level)}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
+	{if isset($level)}
+		{Site::makeFormAuth('PUT')}
+		<h3>{'edit_group'|lang}</h3>
+		{else}
+		{Site::makeFormAuth()}
+		<h3>{'new_group'|lang}</h3>
+	{/if}
+</form>
 			<table width="60%" align="center"><tr><td>
-				{foreach from=$levels item=levels}
+				{foreach from=$levels item=level}
 				<form method="POST">
 				<input type="hidden" name="lid" value="{$levels.level}"></input>
 				<fieldset><legend><span class="title">{"_LEVEL"|lang} #{$levels.level}</span></legend>
@@ -58,11 +70,7 @@
 						<input type="submit" class="button" name="new" value="{"_NEWLEVEL"|lang}" {if $smarty.session.permissions_edit !== "yes"}disabled{/if} />
 					</div>
 				</form>
-			{else}
-				<center><div class="admin_msg">{"_NOACCESS"|lang}</div></center>
-			{/if}
-			{if $msg}<br /><div class="notice">{$msg|lang}</div>{/if}
-			</td></tr></table>
-		</td>
-	</tr>
-</table>
+	{else}
+		<div class="alert alert-danger">{'no_access'|lang}</div>
+	{/if}
+{/block}

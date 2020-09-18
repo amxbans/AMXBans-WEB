@@ -3,7 +3,11 @@
 
 namespace Models;
 
-
+/**
+ * Class WebPermission
+ *
+ * @package Models
+ */
 class WebPermission extends Model
 {
     protected $table = 'permissions';

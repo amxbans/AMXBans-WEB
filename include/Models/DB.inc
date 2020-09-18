@@ -230,7 +230,7 @@ class DB
     public function delete($ids = [])
     {
         if (!empty($ids)) {
-            $this->where($this->primary, 'IN', $ids);
+            $this->where($this->primary, 'IN', (array)$ids);
         }
         $q = "DELETE FROM `{$this->getTableName()}` {$this->processWhere()}";
         return $this->db($q)->execute($this->wheres);
