@@ -32,12 +32,12 @@
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="row">
-            <div class="col-sm col-lg-12">
-                <div class="card bg-light mb-3">
-                    <h3 class="card-header d-flex justify-content-between align-items-center h6">
-                        {'stats'|lang}
+        <div class="col-lg-3">
+            <div class="row">
+                <div class="col-sm col-lg-12">
+                    <div class="card bg-light mb-3">
+                        <h3 class="card-header d-flex justify-content-between align-items-center h6">
+                            {'stats'|lang}
                         <span class="float-right stat-icon stats"></span>
                     </h3>
                     <div class="card-body">
@@ -91,7 +91,7 @@
                             </li>
 
                             <li class="d-flex justify-content-between align-items-center">
-                                <b>{'steamid'|lang}:</b>
+                                <b>{*{'steamid'|lang}:*}</b>
                                 <span>{$last_ban.player_id}</span>
                             </li>
 
@@ -125,9 +125,10 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </div>
     <script>
-		timer($('.timeleft').text() + '000', '.timeleft');
+        timer($('.timeleft').text() + '000', '.timeleft');
     </script>
 {/block}
