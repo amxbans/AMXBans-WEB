@@ -470,12 +470,10 @@ return [
     'yourlevel'          => 'Your Level: You will be logged out when saving',
 
 
-// WebAdmin Groups
+// WebAdmin Groups // NEW IN v7.0
 
-    // NEW IN v7.0
-    'new_group'          => 'New Group',
-    // NEW IN v7.0
-    'edit_group'         => 'Edit Group',
+    'new_group'  => 'New Group',
+    'edit_group' => 'Edit Group',
 
 
 //admin logs

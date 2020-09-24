@@ -16,25 +16,21 @@ namespace Controllers;
 
 
 use Models\DB;
+use Models\WebAdmin;
 
 class WebAdminController extends \Support\BaseController
 {
     /**
      * Outputs the whole list of WebAdmins
+     * @throws \SmartyException
      */
     public function index()
     {
         $perm_levels = DB::table('permissions')->orderBy('level')->select('level', \PDO::FETCH_COLUMN);
-        $this->site->output->assign(compact('perm_levels'));
+        $users       = WebAdmin::query()->select();
+        $this->site->output->assign(compact('perm_levels', 'users'));
 
         $this->site->output->display('admin.web.admin_list.tpl');
-    }
-
-    /**
-     * Shows the form of WebAdmin creation
-     */
-    public function create()
-    {
     }
 
     /**

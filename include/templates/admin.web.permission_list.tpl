@@ -2,18 +2,19 @@
 {block name="head-title" prepend}{'admin_menu_subtitles'|lang:'index':'sys_info'} - {'admin_menu_titles'|lang:'index'} | {/block}
 
 {block name="BODY"}
-{include file="messages.tpl"}
-	{if !Auth::hasPermission('permissions_edit')}
-<form method="post" action="{if isset($level)}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
-	{if isset($level)}
-		{Site::makeFormAuth('PUT')}
-		<h3>{'edit_group'|lang}</h3>
-		{else}
-		{Site::makeFormAuth()}
-		<h3>{'new_group'|lang}</h3>
-	{/if}
-</form>
-			<table width="60%" align="center"><tr><td>
+	{include file="messages.tpl"}
+	{if Auth::hasPermission('permissions_edit')}
+		<form method="post"
+			  action="{if isset($level)}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
+			{if isset($level)}
+				{Site::makeFormAuth('PUT')}
+				<h3>{'edit_group'|lang}</h3>
+			{else}
+				{Site::makeFormAuth()}
+				<h3>{'new_group'|lang}</h3>
+			{/if}
+		</form>
+		<table width="60%" align="center"><tr><td>
 				{foreach from=$levels item=level}
 				<form method="POST">
 				<input type="hidden" name="lid" value="{$levels.level}"></input>
