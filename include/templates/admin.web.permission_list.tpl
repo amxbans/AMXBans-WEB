@@ -1,60 +1,20 @@
-<div id="navigation">
-	<div id="main-nav">
-		<ul class="tabbed">
-			<li id="header_1" onclick="ToggleMenu_open('1');"><a href="#">{"_ADMINAREA"|lang}</a></li>
-			<li id="header_2" onclick="ToggleMenu_open('2');"><a href="#">{"_SERVER"|lang}</a></li>
-			<li id="header_3" onclick="ToggleMenu_open('3');"><a href="#">{"_WEB"|lang}</a></li>
-			<li id="header_4" onclick="ToggleMenu_open('4');"><a href="#">{"_OTHER"|lang}</a></li>
-			<li id="header_5" onclick="ToggleMenu_open('5');"><a href="#">{"_MODULES"|lang}</a></li>
-		</ul>
-		<div class="clearer">&nbsp;</div>
-	</div>
+{extends file="master.tpl"}
+{block name="head-title" prepend}{'admin_menu_subtitles'|lang:'index':'sys_info'} - {'admin_menu_titles'|lang:'index'} | {/block}
 
-	<div id="sub-nav">
-		<div id="menu_1" style="display: none;">
-			<ul class="tabbed">
-				<li><a href="../../index.php">{"_MENUINFO"|lang}</a></li>
-				<li><a href="../../index.php">{"_ADDBAN"|lang}</a></li>
-				<li><a href="../../index.php">{"_ADDBANONLINE"|lang}</a></li>
-			</ul>
-		</div>
-		<div id="menu_2" style="display: none;">
-			<ul class="tabbed">
-				<li><a href="../../index.php">{"_SERVER"|lang}</a></li>
-				<li><a href="../../index.php">{"_MENUREASONS"|lang}</a></li>
-				<li><a href="../../index.php">{"_ADMINS"|lang}</a></li>
-				<li><a href="../../index.php">{"_TITLEADMIN"|lang}</a></li>
-			</ul>
-		</div>
-		<div id="menu_3" style="display: block;">
-			<ul class="tabbed">
-				<li><a href="../../index.php">{"_ADMINS"|lang}</a></li>
-				<li><a href="../../index.php">{"_PERM"|lang}</a></li>
-				<li><a href="../../index.php">{"_MENUUSERMENU"|lang}</a></li>
-				<li><a href="../../index.php">{"_SETTINGS"|lang}</a></li>
-			</ul>
-		</div>
-		<div id="menu_4" style="display: none;">
-			<ul class="tabbed">
-				<li><a href="../../index.php">{"_MODULES"|lang}</a></li>
-				<li><a href="../../index.php">{"_MENUUPDATE"|lang}</a></li>
-				<li><a href="../../index.php">{"_MENULOGS"|lang}</a></li>
-			</ul>
-		</div>
-		<div id="menu_5" style="display: none;">
-			<ul class="tabbed">
-				<li><a href="../../index.php">{"_MENUIMPORTEXPORT"|lang}</a></li>
-			</ul>
-		</div>
-		<div class="clearer">&nbsp;</div>
-	</div>
-</div>
-
-		<td id="main" valign="top" >
-		{if $smarty.session.permissions_edit == "yes"}
-			<span class="title">{"_ADMINLEVELSETTINGS"|lang}</span>
+{block name="BODY"}
+{include file="messages.tpl"}
+	{if !Auth::hasPermission('permissions_edit')}
+<form method="post" action="{if isset($level)}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
+	{if isset($level)}
+		{Site::makeFormAuth('PUT')}
+		<h3>{'edit_group'|lang}</h3>
+		{else}
+		{Site::makeFormAuth()}
+		<h3>{'new_group'|lang}</h3>
+	{/if}
+</form>
 			<table width="60%" align="center"><tr><td>
-				{foreach from=$levels item=levels}
+				{foreach from=$levels item=level}
 				<form method="POST">
 				<input type="hidden" name="lid" value="{$levels.level}"></input>
 				<fieldset><legend><span class="title">{"_LEVEL"|lang} #{$levels.level}</span></legend>
@@ -110,11 +70,7 @@
 						<input type="submit" class="button" name="new" value="{"_NEWLEVEL"|lang}" {if $smarty.session.permissions_edit !== "yes"}disabled{/if} />
 					</div>
 				</form>
-			{else}
-				<center><div class="admin_msg">{"_NOACCESS"|lang}</div></center>
-			{/if}
-			{if $msg}<br /><div class="notice">{$msg|lang}</div>{/if}
-			</td></tr></table>
-		</td>
-	</tr>
-</table>
+	{else}
+		<div class="alert alert-danger">{'no_access'|lang}</div>
+	{/if}
+{/block}

@@ -19,6 +19,7 @@ Route::get('index/servers/{id}', 'IndexController@ajaxServerPlayers');
 
 
 Route::resource('web/users', 'WebAdminController');
+Route::resource('web/groups', 'WebPermissionController', ['create']);
 
 
 Route::get('logout', 'LoginController@logout');
