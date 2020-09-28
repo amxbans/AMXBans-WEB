@@ -22,26 +22,28 @@ return [
     'opensteamcomsite' => 'Visit Steam Community page',
     'adminarea'        => 'Admin area',
     'nosite'           => 'Page not available!',
-    'delete'           => 'Delete',
-    'add'              => 'Add',
-    'edit'             => 'Edit',
-    'editing'          => 'Editing',
-    'defaultlang'      => 'Default Language',
-    'other'            => 'Others',
-    'viewip'           => 'Show IP',
-    'level'            => 'Level',
-    'details'          => 'Show Details',
-    'systemsettings'   => 'System',
-    'viewsettings'     => 'View',
-    'commentsettings'  => 'Comments',
-    'filesettings'     => 'Files',
-    'banlistsettings'  => 'Ban list',
-    'configuration'    => 'Configuration',
-    'repair'           => 'Repair',
-    'auto'             => 'Automatic',
-    'test'             => 'Test',
-    'empty'            => 'Nothing in here...',
-    'send'             => 'Send',
+    'delete'          => 'Delete',
+    'add'             => 'Add',
+    'edit'            => 'Edit',
+    'editing'         => 'Editing',
+    'defaultlang'     => 'Default Language',
+    'other'           => 'Others',
+    'viewip'          => 'Show IP',
+    'level'           => 'Level',
+    'details'         => 'Show Details',
+    'systemsettings'  => 'System',
+    'viewsettings'    => 'View',
+    'commentsettings' => 'Comments',
+    'filesettings'    => 'Files',
+    'banlistsettings' => 'Ban list',
+    'configuration'   => 'Configuration',
+    'repair'          => 'Repair',
+    'auto'            => 'Automatic',
+    'test'            => 'Test',
+    'empty'           => 'Nothing in here...',
+    'send'            => 'Send',
+    // NEW IN v7.0
+    'add_new'         => 'Add new',
 
 
 //user menu
@@ -323,7 +325,8 @@ return [
     'webadminadd'           => 'Add web admin',
     'webadminssettings'     => 'Web admin administration',
     'webadmins'             => 'Web admins',
-    'lastlogin'             => 'last login',
+    // NEW IN v7.0
+    'last_seen'             => 'Last seen',
     'wadminaddedfailed'     => 'Adding failed. Are there duplicated values?',
     'never'                 => 'never',
     'yourpassword'          => 'For security reasons, you will be logged out after changing your own password!',
@@ -497,7 +500,6 @@ return [
     // NEW IN v7.0
     'custom_reason'     => 'custom reason',
     'active_ban_exists' => 'There already is an active ban!',
-    // TODO LANGUAGES: activbanexists => activeBanExists
 
 
 //messages
