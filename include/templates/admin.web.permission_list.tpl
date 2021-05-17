@@ -5,72 +5,102 @@
 	{include file="messages.tpl"}
 	{if Auth::hasPermission('permissions_edit')}
 		<form method="post"
-			  action="{if isset($level)}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
-			{if isset($level)}
+			  action="{if $level.level}{array('web', 'groups', $level->level)|url}{else}{array('web', 'groups')|url}{/if}">
+			{if $level.level}
 				{Site::makeFormAuth('PUT')}
 				<h3>{'edit_group'|lang}</h3>
 			{else}
 				{Site::makeFormAuth()}
 				<h3>{'new_group'|lang}</h3>
 			{/if}
+
+			<div class="row row-cols-md-3 row-cols-1">
+				<fieldset class="col align-self-center">
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"bans_add"|lang}</span></span>
+						{html_options name=bans_add options=$options selected=$level.bans_add class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"bans_edit"|lang}</span></span>
+						{html_options name=bans_edit options=$spec_options selected=$level.bans_edit class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"bans_delete"|lang}</span></span>
+						{html_options name=bans_delete options=$spec_options selected=$level.bans_delete class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"bans_unban"|lang}</span></span>
+						{html_options name=bans_unban options=$spec_options selected=$level.bans_unban class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"ip_view"|lang}</span></span>
+						{html_options name=ip_view options=$options selected=$level.ip_view class="form-control"}
+					</label>
+				</fieldset>
+				<fieldset class="col">
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"amxadmins_view"|lang}</span></span>
+						{html_options name=amxadmins_view options=$options selected=$level.amxadmins_view class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"amxadmins_edit"|lang}</span></span>
+						{html_options name=amxadmins_edit options=$options selected=$level.amxadmins_edit class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"webadmins_view"|lang}</span></span>
+						{html_options name=webadmins_view options=$options selected=$level.webadmins_view class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"webadmins_edit"|lang}</span></span>
+						{html_options name=webadmins_edit options=$options selected=$level.webadmins_edit class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"permissions_edit"|lang}</span></span>
+						{html_options name=permissions_edit options=$options selected=$level.permissions_edit class="form-control"}
+					</label>
+				</fieldset>
+				<fieldset class="col">
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"websettings_view"|lang}</span></span>
+						{html_options name=websettings_view options=$options selected=$level.websettings_view class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"websettings_edit"|lang}</span></span>
+						{html_options name=websettings_edit options=$options selected=$level.websettings_edit class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"servers_edit"|lang}</span></span>
+						{html_options name=servers_edit options=$options selected=$level.servers_edit class="form-control"}
+					</label>
+					<label class="input-group">
+						<span class="input-group-prepend"><span class="input-group-text">{"prune_db"|lang}</span></span>
+						{html_options name=prune_db options=$options selected=$level.prune_db class="form-control"}
+					</label>
+					<label class="w-100 text-right">
+						<button class="btn btn-success">{'save'|lang}</button>
+					</label>
+				</fieldset>
+			</div>
 		</form>
-		<table width="60%" align="center"><tr><td>
-				{foreach from=$levels item=level}
-				<form method="POST">
-				<input type="hidden" name="lid" value="{$levels.level}"></input>
-				<fieldset><legend><span class="title">{"_LEVEL"|lang} #{$levels.level}</span></legend>
-				<table style="border:1px;" width="100%">
-					<tr class="htabletop">
-						<td><b>{"_LEVEL"|lang}</b></td><td colspan="6" align="center"><b>{"_BANS"|lang}</b></td><td colspan="2"><b>{"_AMXADMINS"|lang}</b></td><td>&nbsp</td>
-							
-					</tr>
-					<tr class="htablebottom">
-						<td>&nbsp</td>
-						<td>{"_ADD"|lang}</td><td>{"_EDIT"|lang}</td><td>{"_DELETE"|lang}</td><td>{"_LEVELUNBAN"|lang}</td><td>{"_LEVELIMPORT"|lang}</td><td>{"_LEVELEXPORT"|lang}</td>
-						<td>{"_LEVELVIEW"|lang}</td><td>{"_EDIT"|lang}</td><td>&nbsp</td>
-					</tr>
-					<tr>
-						<td rowspan="4" style="{if $levels.level==$smarty.session.level}background-color:#00aa00;{/if}text-align:center;"><b>{$levels.level}</b></td>
-						<td>{html_options name=bans_add values=$choose1 output=$output1|lang selected=$levels.bans_add}</td>
-						<td>{html_options name=bans_edit values=$choose2 output=$output2|lang selected=$levels.bans_edit}</td>
-						<td>{html_options name=bans_delete values=$choose2 output=$output2|lang selected=$levels.bans_delete}</td>
-						<td>{html_options name=bans_unban values=$choose2 output=$output2|lang selected=$levels.bans_unban}</td>
-						<td>{html_options name=bans_import values=$choose1 output=$output1|lang selected=$levels.bans_import}</td>
-						<td>{html_options name=bans_export values=$choose1 output=$output1|lang selected=$levels.bans_export}</td>
-						<td>{html_options name=amxadmins_view values=$choose1 output=$output1|lang selected=$levels.amxadmins_view}</td>
-						<td>{html_options name=amxadmins_edit values=$choose1 output=$output1|lang selected=$levels.amxadmins_edit}</td>
-						<td rowspan="4" {if $levels.level==$smarty.session.level}style="background-color: #00aa00;" {/if}>
-								<input style="margin:0 auto;display:block;" type="submit" class="button" name="save" value="{"_SAVE"|lang}" {if $smarty.session.permissions_edit !== "yes"}disabled{/if} />
-								{if ($levels.level == $level_max && $levels.level > 1)}
-								<input style="margin:0 auto;display:block;" type="submit" class="button" name="del" value="{"_DELETE"|lang}" onclick="return confirm('{"_DELLEVEL"|lang}');" {if $smarty.session.permissions_edit !== "yes"}disabled{/if} />
-								{/if}
-							</td>
-					</tr><tr class="htabletop">
-						<td colspan="2"><b>{"_WEBADMINS"|lang}</b></td><td colspan="2"><b>{"_WEBSETTINGS"|lang}</b></td><td colspan="4"><b>{"_OTHER"|lang}</b></td>
-					</tr><tr class="htablebottom">
-						<td>{"_LEVELVIEW"|lang}</td><td>{"_EDIT"|lang}</td>
-						<td>{"_LEVELVIEW"|lang}</td><td>{"_EDIT"|lang}</td>
-						<td>{"_PERM"|lang}</td><td>{"_DBPRUNE"|lang}</td><td>{"_SERVEREDIT"|lang}</td><td>{"_VIEWIP"|lang}</td>
-					</tr><tr align="center">
-						<td>{html_options name=webadmins_view values=$choose1 output=$output1|lang selected=$levels.webadmins_view}</td>
-						<td>{html_options name=webadmins_edit values=$choose1 output=$output1|lang selected=$levels.webadmins_edit}</td>
-						<td>{html_options name=websettings_view values=$choose1 output=$output1|lang selected=$levels.websettings_view}</td>
-						<td>{html_options name=websettings_edit values=$choose1 output=$output1|lang selected=$levels.websettings_edit}</td>
-						
-						<td>{html_options name=permissions_edit values=$choose1 output=$output1|lang selected=$levels.permissions_edit}</td>
-						<td>{html_options name=prune_db values=$choose1 output=$output1|lang selected=$levels.prune_db}</td>
-						<td>{html_options name=servers_edit values=$choose1 output=$output1|lang selected=$levels.servers_edit}</td>
-						<td>{html_options name=ip_view values=$choose1 output=$output1|lang selected=$levels.ip_view}</td>
-					</tr>
-				</table></fieldset>
-				<div class="clearer">&nbsp</div>
-				</form>
-				{/foreach}
-				<form method="POST">
-					<div class="_right">
-						<input type="submit" class="button" name="new" value="{"_NEWLEVEL"|lang}" {if $smarty.session.permissions_edit !== "yes"}disabled{/if} />
-					</div>
-				</form>
+
+		<h3>{'group_list'|lang}</h3>
+
+		{foreach $perm_list as $permission}
+			<div class="card my-2">
+				<div class="card-header d-flex justify-content-between">
+					{"what_level"|lang|sprintf:$permission.level}
+					<span>
+					<a href="{array('web', 'groups', $permission.level, 'edit')|url}">{"edit"|lang}</a>
+					<a href="{array('web', 'groups', $permission.level)|url}" class="ajax text-danger" data-method="DELETE">{'delete'|lang}</a>
+					</span>
+				</div>
+				<div class="card-body">
+					{foreach Auth::PERMISSIONS as $perm}
+						<span class="text-{if (($perm|substr:0:4 != 'bans' || $perm == 'bans_add') && $permission.$perm == 1) OR ($perm|substr:0:4 == 'bans' && $permission.$perm == 2)}success{elseif $perm|substr:0:4 == 'bans' && $permission.$perm == 1}warning{else}danger{/if}">{$perm|lang}</span>{if !$perm@last},{/if}
+					{/foreach}
+				</div>
+			</div>
+		{/foreach}
 	{else}
 		<div class="alert alert-danger">{'no_access'|lang}</div>
 	{/if}

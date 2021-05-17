@@ -477,6 +477,23 @@ return [
 
     'new_group'  => 'New Group',
     'edit_group' => 'Edit Group',
+    'group_list' => 'Permission groups',
+    'what_level' => 'Group %d', // Used in permission list,
+
+    "bans_add"         => 'Add bans',
+    "bans_edit"        => 'Edit bans',
+    "bans_delete"      => 'Delete bans',
+    "bans_unban"       => 'Unban',
+    "amxadmins_view"   => 'View server admins',
+    "amxadmins_edit"   => 'Edit server admins',
+    "webadmins_view"   => 'View web users',
+    "webadmins_edit"   => 'Edit web users',
+    "websettings_view" => 'View web settings',
+    "websettings_edit" => 'Edit web settings',
+    "permissions_edit" => 'Edit user groups',
+    "prune_db"         => 'Prune database',
+    "servers_edit"     => 'Edit server data',
+    "ip_view"          => 'View IPs',
 
 
 //admin logs

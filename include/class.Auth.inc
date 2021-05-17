@@ -29,18 +29,28 @@ class Auth
     private $config;
     /** @var stdClass */
     protected static $permissions;
+    const PERMISSIONS = [
+        "bans_add",
+        "bans_edit",
+        "bans_delete",
+        "bans_unban",
+        "amxadmins_view",
+        "amxadmins_edit",
+        "webadmins_view",
+        "webadmins_edit",
+        "websettings_view",
+        "websettings_edit",
+        "permissions_edit",
+        "prune_db",
+        "servers_edit",
+        "ip_view",
+    ];
 
     public function __construct(Config $config)
     {
         $this->config = $config;
 
-        if (isSet ($_SESSION['unID'])) {
-            $id = (int)$_SESSION['unID'];
-        } elseif (Site::hasCookie()) {
-            $id = (int)$_COOKIE['unID'];
-        } else {
-            $id = 0;
-        }
+        $id = (int)@$_SESSION['unID'];
 
         $user = WebAdmin::find($id);
 
@@ -69,21 +79,13 @@ class Auth
      *
      * @throws Exception
      */
-    public function login(WebAdmin $user, bool $rem = false)
+    public function login(WebAdmin $user)
     {
         if (!$user->exists) {
             throw new Exception('Login: no user with ID: ' . $user->id . ' found');
         }
 
-        if ($rem) {
-            setcookie('unID', $user->id, [
-                'expires'  => time() + (3600 * 24 * 7),
-                'path'     => \Support\Path::getBaseURL(),
-                'samesite' => 'Strict',
-            ]);
-        } else {
-            $_SESSION['unID'] = $user->id;
-        }
+        $_SESSION['unID'] = $user->id;
         $this->__construct($this->config);
     }
 

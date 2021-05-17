@@ -22,6 +22,7 @@ class WebAdminController extends \Support\BaseController
 {
     /**
      * Outputs the whole list of WebAdmins
+     *
      * @throws \SmartyException
      */
     public function index()
@@ -38,6 +39,7 @@ class WebAdminController extends \Support\BaseController
      */
     public function store()
     {
+        //TODO: write 'store' method for web-admins
     }
 
     /**
@@ -47,6 +49,7 @@ class WebAdminController extends \Support\BaseController
      */
     public function edit($admin)
     {
+        //TODO: write 'edit' method for web-admins
     }
 
     /**
@@ -56,6 +59,7 @@ class WebAdminController extends \Support\BaseController
      */
     public function update($admin)
     {
+        //TODO: write 'update' method for web-admins
     }
 
     /**
@@ -65,5 +69,6 @@ class WebAdminController extends \Support\BaseController
      */
     public function delete($admin)
     {
+        //TODO: write 'delete' method for web-admins
     }
 }

@@ -26,7 +26,11 @@ class WebPermissionController extends \Support\BaseController
     {
         $permissions = WebPermission::query()->orderBy('level')->select();
         $this->site->output->assign('perm_list', $permissions);
-        $this->site->output->assign('spec_perm', [\Lang::get('no'), \Lang::get('own'), \Lang::get('yes'), ]);
+        $this->site->output->assign('spec_options', [\Lang::get('no'), \Lang::get('own'), \Lang::get('yes'),]);
+        $this->site->output->assign('options', [\Lang::get('no'), \Lang::get('yes'),]);
+        if ($this->site->output->getTemplateVars('level') === null) {
+            $this->site->output->assign('level', array_merge(['level' => 0], array_fill_keys(\Auth::PERMISSIONS, 0)));
+        }
         $this->site->output->display('admin.web.permission_list.tpl');
     }
 
@@ -35,24 +39,22 @@ class WebPermissionController extends \Support\BaseController
      */
     public function store()
     {
-        $last_level = WebPermission::query()->count('level');
         WebPermission::query()->insert(
             [
-                'level' => $last_level + 1,
-                'bans_add' => $_POST['bans_add'],
-                'bans_edit' => $_POST['bans_edit'],
-                'bans_delete' => $_POST['bans_delete'],
-                'bans_unban' => $_POST['bans_unban'],
-                'amxadmins_view' => $_POST['amxadmins_view'],
-                'amxadmins_edit' => $_POST['amxadmins_edit'],
-                'webadmins_view' => $_POST['webadmins_view'],
-                'webadmins_edit' => $_POST['webadmins_edit'],
+                'bans_add'         => $_POST['bans_add'],
+                'bans_edit'        => $_POST['bans_edit'],
+                'bans_delete'      => $_POST['bans_delete'],
+                'bans_unban'       => $_POST['bans_unban'],
+                'amxadmins_view'   => $_POST['amxadmins_view'],
+                'amxadmins_edit'   => $_POST['amxadmins_edit'],
+                'webadmins_view'   => $_POST['webadmins_view'],
+                'webadmins_edit'   => $_POST['webadmins_edit'],
                 'websettings_view' => $_POST['websettings_view'],
                 'websettings_edit' => $_POST['websettings_edit'],
                 'permissions_edit' => $_POST['permissions_edit'],
-                'prune_db' => $_POST['prune_db'],
-                'servers_edit' => $_POST['servers_edit'],
-                'ip_view' => $_POST['ip_view'],
+                'prune_db'         => $_POST['prune_db'],
+                'servers_edit'     => $_POST['servers_edit'],
+                'ip_view'          => $_POST['ip_view'],
             ]
         );
 
@@ -80,21 +82,21 @@ class WebPermissionController extends \Support\BaseController
      */
     public function update($permission)
     {
-        $permission = WebPermission::find($permission);
-        $permission->bans_add = $_POST['bans_add'];
-        $permission->bans_edit = $_POST['bans_edit'];
-        $permission->bans_delete = $_POST['bans_delete'];
-        $permission->bans_unban = $_POST['bans_unban'];
-        $permission->amxadmins_view = $_POST['amxadmins_view'];
-        $permission->amxadmins_edit = $_POST['amxadmins_edit'];
-        $permission->webadmins_view = $_POST['webadmins_view'];
-        $permission->webadmins_edit = $_POST['webadmins_edit'];
+        $permission                   = WebPermission::find($permission);
+        $permission->bans_add         = $_POST['bans_add'];
+        $permission->bans_edit        = $_POST['bans_edit'];
+        $permission->bans_delete      = $_POST['bans_delete'];
+        $permission->bans_unban       = $_POST['bans_unban'];
+        $permission->amxadmins_view   = $_POST['amxadmins_view'];
+        $permission->amxadmins_edit   = $_POST['amxadmins_edit'];
+        $permission->webadmins_view   = $_POST['webadmins_view'];
+        $permission->webadmins_edit   = $_POST['webadmins_edit'];
         $permission->websettings_view = $_POST['websettings_view'];
         $permission->websettings_edit = $_POST['websettings_edit'];
         $permission->permissions_edit = $_POST['permissions_edit'];
-        $permission->prune_db = $_POST['prune_db'];
-        $permission->servers_edit = $_POST['servers_edit'];
-        $permission->ip_view = $_POST['ip_view'];
+        $permission->prune_db         = $_POST['prune_db'];
+        $permission->servers_edit     = $_POST['servers_edit'];
+        $permission->ip_view          = $_POST['ip_view'];
         $permission->save();
 
 

@@ -15,7 +15,6 @@
     {block name="head-links"}{/block}
 
     <script src="{"webSources/js/jquery.min.js"|res_url}"></script>
-    {*	<script src="{"webSources/js/tooltip.js"|res_url}"></script>*}
     <script src="{"webSources/js/layer.js"|res_url}"></script>
     <script src="{"webSources/js/bootstrap.min.js"|res_url}"></script>
 </head>

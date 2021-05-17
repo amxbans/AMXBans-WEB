@@ -6,7 +6,7 @@
     {if Auth::hasPermission('webadmins_view')}
         <h2 class="title">{'admin_menu_subtitles'|lang:'web':'users'}</h2>
         {if Auth::hasPermission('webadmins_edit')}
-            <form class="form-inline border-secondary border-bottom border-top bg-light p-sm-2">
+            <form class="form-inline border-secondary border-bottom border-top bg-light p-sm-2" method="post">
                 <h4 class="mr-2">{'add_new'|lang}:</h4>
                 <input name="new_username" placeholder="{'username'|lang}" required class="form-control-sm form-control"
                        autocomplete="off">

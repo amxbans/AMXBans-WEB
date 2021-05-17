@@ -79,7 +79,7 @@ class LoginController extends BaseController
                 ['type' => 'warning', 'text' => \Lang::get('err_wrong_pass')]);
         }
 
-        $this->site->user->login($user, isset($_POST['rem']));
+        $this->site->user->login($user);
             $user->last_action = new DateTime();
             $user->passreset_code = null;
             $user->passreset_until = null;

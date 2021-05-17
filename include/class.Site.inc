@@ -91,16 +91,6 @@ class Site
         return $text;
     }
 
-    public static function hasCookie($what = 'unID'): bool
-    {
-        foreach ((array)$what as $value) {
-            if (!isset($_COOKIE[$value])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static function makeFormAuth($method = 'post')
     {
         if (strtolower($method) == 'get') {

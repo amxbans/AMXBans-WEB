@@ -103,6 +103,10 @@ $(function () {
 			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.nextmap + ':</b> ' + data.info.nextmap));
 		});
 	});
+
+	$('.ajax').click(() => {
+		//TODO: permission_list ajax call unification
+	});
 });
 
 /*
