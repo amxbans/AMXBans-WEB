@@ -42,29 +42,16 @@ function format_size($size)
 
 function init_autoload($class)
 {
-    $in_folders = [
-        'Controllers' => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%2$s.%3$s.inc',
-        'Models'      => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
-        'Support'     => __DIR__ . DIRECTORY_SEPARATOR . '%1$s' . DIRECTORY_SEPARATOR . '%3$s.inc',
-    ];
-    if (file_exists(__DIR__ . '/class.' . $class . '.inc')) {
-        require_once __DIR__ . DIRECTORY_SEPARATOR . "class.$class.inc";
+    if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . "$class.inc")) {
+        require_once __DIR__ . DIRECTORY_SEPARATOR . "$class.inc";
     } else {
+        // PSR-4 inclusion
         $class = explode("\\", $class);
         $c     = array_pop($class);
         $ns    = implode(DIRECTORY_SEPARATOR, $class);
 
-        $php = explode('.', substr($_SERVER['SCRIPT_NAME'], strlen(dirname($_SERVER['SCRIPT_NAME']))))[0];
-        $php = substr($php, is_numeric(strpos($php, '/')) ? strpos($php, '/') + 1 : 0);
-
-        if (in_array($ns, array_keys($in_folders))) {
-            $tpl = sprintf($in_folders[$ns], $ns, $php, $c);
-            if (!file_exists($tpl)) {
-                die(header('HTTP/1.1 500'));
-            }
-            require_once $tpl;
-        } elseif (file_exists(__DIR__ . "/$ns/$php.$c.inc")) {
-            require_once __DIR__ . "/$ns/$php.$c.inc";
+        if (file_exists(__DIR__ . "/$ns/$c.php")) {
+            require_once __DIR__ . "/$ns/$c.php";
         }
     }
     return;

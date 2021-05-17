@@ -47,7 +47,7 @@ class Site
      *
      * @param bool $install
      */
-    public function __construct($install = false)
+    public function __construct(bool $install = false)
     {
         self::$instance = $this;
         // All the initial things
