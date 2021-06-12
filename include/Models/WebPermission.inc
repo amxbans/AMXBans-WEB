@@ -3,6 +3,8 @@
 
 namespace Models;
 
+use Support\Model;
+
 /**
  * Class WebPermission
  *

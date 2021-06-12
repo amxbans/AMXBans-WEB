@@ -4,8 +4,11 @@
 namespace Models;
 
 
+use Support\Model;
+
 /**
  * Class AMXAdmin
+ *
  * @package Models
  *
  * @property-read int       $id

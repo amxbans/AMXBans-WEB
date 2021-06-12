@@ -16,11 +16,12 @@ namespace Controllers;
 
 use Config;
 use Support\BaseController;
+use Support\Path;
 
 class StartController extends BaseController
 {
     public function index()
     {
-        header('Location: ' . \Support\Path::makeURL(Config::start_pages[$this->site->config->start_page]));
+        header('Location: ' . Path::makeURL(Config::start_pages[$this->site->config->start_page]));
     }
 }

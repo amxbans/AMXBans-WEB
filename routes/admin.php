@@ -9,17 +9,17 @@ if (!Auth::$logged) {
 }
 
 
-Route::get('index/sys_info', 'IndexController@getSysInfo');
+Route::get('index/sys_info', 'Admin\IndexController@getSysInfo');
 
-Route::get('index/ban_add', 'IndexController@getBanAdd');
-Route::post('index/ban_add', 'IndexController@postBanAdd');
+Route::get('index/ban_add', 'Admin\IndexController@getBanAdd');
+Route::post('index/ban_add', 'Admin\IndexController@postBanAdd');
 
-Route::get('index/online_ban', 'IndexController@getOnlineBan');
-Route::get('index/servers/{id}', 'IndexController@ajaxServerPlayers');
+Route::get('index/online_ban', 'Admin\IndexController@getOnlineBan');
+Route::get('index/servers/{id}', 'Admin\IndexController@ajaxServerPlayers');
 
 
-Route::resource('web/users', 'WebAdminController', ['create']);
-Route::resource('web/groups', 'WebPermissionController', ['create']);
+Route::resource('web/users', 'Admin\WebAdminController', ['create']);
+Route::resource('web/groups', 'Admin\WebPermissionController', ['create']);
 
 
 Route::get('logout', 'LoginController@logout');

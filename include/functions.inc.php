@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Models\Log;
+
 /**
  * @param string      $action
  * @param string      $context
@@ -18,7 +20,7 @@
  */
 function db_log(string $action, string $context, $user = null): void
 {
-    $log             = new \Models\Log();
+    $log             = new Log();
     $log->ip         = $_SERVER['REMOTE_ADDR'];
     $log->username   = $user ?? Auth::get('username');
     $log->action     = $action;
@@ -46,12 +48,9 @@ function init_autoload($class)
         require_once __DIR__ . DIRECTORY_SEPARATOR . "$class.inc";
     } else {
         // PSR-4 inclusion
-        $class = explode("\\", $class);
-        $c     = array_pop($class);
-        $ns    = implode(DIRECTORY_SEPARATOR, $class);
-
-        if (file_exists(__DIR__ . "/$ns/$c.php")) {
-            require_once __DIR__ . "/$ns/$c.php";
+        $class = str_replace("\\", DIRECTORY_SEPARATOR, $class);
+        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . "$class.php")) {
+            require_once __DIR__ . DIRECTORY_SEPARATOR . "$class.php";
         }
     }
     return;

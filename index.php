@@ -11,6 +11,6 @@
  */
 
 session_start();
-require_once "include/class.Site.inc";
+require_once "include/Site.inc";
 
 Site::build();

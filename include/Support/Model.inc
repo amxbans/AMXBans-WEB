@@ -1,9 +1,10 @@
 <?php
 
 
-namespace Models;
+namespace Support;
 
 use ArrayAccess;
+use DateTime;
 
 class Model implements ArrayAccess
 {
@@ -45,17 +46,20 @@ class Model implements ArrayAccess
             }
             foreach ($this->dates as $key => $date) {
                 if (is_numeric($key)) {
-                    $this->attributes[$date] = new \DateTime($this->original[$date]);
+                    $this->attributes[$date] = new DateTime($this->original[$date]);
                 } elseif (is_null($date)) {
-                    $this->attributes[$key] = $this->original[$key] ? new \DateTime($this->original[$key]) : null;
+                    $this->attributes[$key] = $this->original[$key] ? new DateTime($this->original[$key]) : null;
                 } else {
-                    $this->attributes[$key] = new \DateTime($this->original[$key] ?? $date);
+                    $this->attributes[$key] = new DateTime($this->original[$key] ?? $date);
                 }
             }
             $this->exists = true;
         }
     }
 
+    /**
+     * @return static
+     */
     public function save()
     {
         $this->dropRelations();
@@ -125,7 +129,7 @@ class Model implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->$offset;
+        return $this->__get($offset);
     }
 
     /**
@@ -133,16 +137,13 @@ class Model implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        // TODO: Implement offsetSet() method.
+        $this->__set($offset, $value);
     }
 
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
-    {
-        // TODO: Implement offsetUnset() method.
-    }
+    public function offsetUnset($offset) { }
 
     private function filterChanged(): array
     {
@@ -155,7 +156,7 @@ class Model implements ArrayAccess
             } elseif (is_null($date)) {
                 $this->attributes[$key] = $this->attributes[$key] ? $this->attributes[$key]->format('Y-m-d H:i:s') : null;
             } else {
-                $this->attributes[$key] = @new \DateTime($date) == $this->attributes[$key] ? null : $this->attributes[$key]->format('Y-m-d H:i:s');
+                $this->attributes[$key] = @new DateTime($date) == $this->attributes[$key] ? null : $this->attributes[$key]->format('Y-m-d H:i:s');
             }
         }
         foreach ($this->attributes as $k => $v) {

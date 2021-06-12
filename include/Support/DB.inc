@@ -1,9 +1,11 @@
 <?php
 
 
-namespace Models;
+namespace Support;
 
+use Closure;
 use PDO;
+use Site;
 
 class DB
 {
@@ -103,9 +105,9 @@ class DB
         return $q[0] ?? ($this->model ? new $this->model : false);
     }
 
-    private function getTableName() { return \Site::$instance->config->getDb()->prefix . '_' . $this->table; }
+    private function getTableName() { return Site::$instance->config->getDb()->prefix . '_' . $this->table; }
 
-    protected function db($query) { return \Site::$instance->config->getDb()->prepare($query); }
+    protected function db($query) { return Site::$instance->config->getDb()->prepare($query); }
 
     /**
      * Adds WHERE clause to query
@@ -120,7 +122,7 @@ class DB
     public function where($field, $operator = null, $value = null, $pre = 'AND'): self
     {
         $pre = strtoupper($pre);
-        if ($field instanceof \Closure) {
+        if ($field instanceof Closure) {
             $this->wheres[] = [
                 $pre,
                 $field(new DB())->getWheres(),
@@ -209,14 +211,14 @@ class DB
      */
     public function limit(int $limit = null, int $offset = null)
     {
-        $limit        = is_null($limit) ? \Site::$instance->config->per_page : $limit;
+        $limit        = is_null($limit) ? Site::$instance->config->per_page : $limit;
         $this->limits = !$limit ? '' : "LIMIT $limit" . ($offset ? " OFFSET $offset" : '');
         return $this;
     }
 
     private function processLimit(): string { return $this->limits ?? ''; }
 
-    public static function lastInsertId() { return \Site::$instance->config->getDb()->lastInsertId(); }
+    public static function lastInsertId() { return Site::$instance->config->getDb()->lastInsertId(); }
 
     public function count(string $column, $distinct = false)
     {

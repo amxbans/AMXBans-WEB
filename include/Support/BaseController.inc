@@ -32,9 +32,9 @@ class BaseController
      *
      * @throws Exception
      */
-    public function __construct(Site $site, string $method, string $callable, $arguments = [])
+    public function __construct(Site $site, string $method, string $callable, array $arguments = [])
     {
-        $this->site = $site;
+        $this->site   = $site;
         $this->method = $method;
 
         // If there's any extra action needed, it has to be placed here for all the sites

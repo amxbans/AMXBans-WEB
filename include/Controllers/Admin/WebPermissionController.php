@@ -12,12 +12,16 @@
 
 /**  */
 
-namespace Controllers;
+namespace Controllers\Admin;
 
 
+use Auth;
+use Lang;
 use Models\WebPermission;
+use Support\BaseController;
+use Support\DB;
 
-class WebPermissionController extends \Support\BaseController
+class WebPermissionController extends BaseController
 {
     /**
      * Shows the list of permissions
@@ -26,10 +30,10 @@ class WebPermissionController extends \Support\BaseController
     {
         $permissions = WebPermission::query()->orderBy('level')->select();
         $this->site->output->assign('perm_list', $permissions);
-        $this->site->output->assign('spec_options', [\Lang::get('no'), \Lang::get('own'), \Lang::get('yes'),]);
-        $this->site->output->assign('options', [\Lang::get('no'), \Lang::get('yes'),]);
+        $this->site->output->assign('spec_options', [Lang::get('no'), Lang::get('own'), Lang::get('yes'),]);
+        $this->site->output->assign('options', [Lang::get('no'), Lang::get('yes'),]);
         if ($this->site->output->getTemplateVars('level') === null) {
-            $this->site->output->assign('level', array_merge(['level' => 0], array_fill_keys(\Auth::PERMISSIONS, 0)));
+            $this->site->output->assign('level', array_merge(['level' => 0], array_fill_keys(Auth::PERMISSIONS, 0)));
         }
         $this->site->output->display('admin.web.permission_list.tpl');
     }
@@ -58,8 +62,8 @@ class WebPermissionController extends \Support\BaseController
             ]
         );
 
-        db_log('USER LEVELS', 'Created level ' . ($last_level + 1));
-        $this->site->output->assign('message', \Lang::get('saved'));
+        db_log('USER LEVELS', 'Created level ' . DB::lastInsertId());
+        $this->site->output->assign('message', Lang::get('saved'));
         $this->index();
     }
 
@@ -101,7 +105,7 @@ class WebPermissionController extends \Support\BaseController
 
 
         db_log('USER LEVELS', 'Edited level ' . $permission->level);
-        $this->site->output->assign('message', \Lang::get('saved'));
+        $this->site->output->assign('message', Lang::get('saved'));
         $this->edit($permission);
     }
 
@@ -115,7 +119,7 @@ class WebPermissionController extends \Support\BaseController
         WebPermission::query()->delete($permission);
 
         db_log('USER LEVELS', 'Deleted level ' . $permission);
-        $this->site->output->assign('message', \Lang::get('deleted'));
+        $this->site->output->assign('message', Lang::get('deleted'));
         $this->index();
     }
 }

@@ -4,6 +4,10 @@
 namespace Models;
 
 
+use Exception;
+use Rcon;
+use Support\Model;
+
 /**
  * Class Server
  *
@@ -38,7 +42,7 @@ class Server extends Model
             return $this->liveInfo[$what];
 
         [$ip, $port] = explode(':', $this->address);
-        $rcon           = new \Rcon($ip, $port, $this->rcon);
+        $rcon           = new Rcon($ip, $port, $this->rcon);
         $this->liveInfo = $rcon->publicInfo();
         unset($rcon);
         return $this->liveInfo[$what];
@@ -50,9 +54,9 @@ class Server extends Model
             return false;
         [$ip, $port] = explode(':', $this->address);
         try {
-            new \Rcon($ip, $port, $this->rcon);
+            new Rcon($ip, $port, $this->rcon);
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

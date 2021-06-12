@@ -12,13 +12,15 @@
 
 /**  */
 
-namespace Controllers;
+namespace Controllers\Admin;
 
 
 use Models\DB;
 use Models\WebAdmin;
+use PDO;
+use Support\BaseController;
 
-class WebAdminController extends \Support\BaseController
+class WebAdminController extends BaseController
 {
     /**
      * Outputs the whole list of WebAdmins
@@ -27,7 +29,7 @@ class WebAdminController extends \Support\BaseController
      */
     public function index()
     {
-        $perm_levels = DB::table('permissions')->orderBy('level')->select('level', \PDO::FETCH_COLUMN);
+        $perm_levels = DB::table('permissions')->orderBy('level')->select('level', PDO::FETCH_COLUMN);
         $users       = WebAdmin::query()->select();
         $this->site->output->assign(compact('perm_levels', 'users'));
 

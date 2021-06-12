@@ -20,7 +20,7 @@ namespace Support;
 class Path
 {
     /**
-     * Example: https://example.com/realPath/index.php/this/is/path => array('this', 'is', 'path')
+     * https://example.com/realPath/index.php/this/is/path => array('this', 'is', 'path')
      *
      * @return array
      */
@@ -38,7 +38,8 @@ class Path
     public static function makeURL(string $fakePath, string $php = null, string $real_path = null): string
     {
         if ($real_path || $php) {
-            $php = $php ?? array_pop(explode('/', self::getURL()));
+            $getPHP = explode('/', self::getURL());
+            $php    = $php ?? array_pop($getPHP);
             return str_replace(DIRECTORY_SEPARATOR . '/', '/',
                 Path::getBaseURL() . $real_path . '/' . $php . '/' . $fakePath);
         }
@@ -53,28 +54,28 @@ class Path
     public static function getFakePathWay(int $index = 0) { return @self::getFakePathArray()[$index]; }
 
     /**
-     * Example: https://example.com/realPath/index.php/this/is/path => this/is/path
+     * https://example.com/realPath/index.php/this/is/path => this/is/path
      *
      * @return string
      */
     public static function getFakePath(): string { return substr($_SERVER['PATH_INFO'] ?? '/', 1); }
 
     /**
-     * Example: /var/www/amxbans/include => /var/www/amxbans
+     * /var/www/amxbans/include => /var/www/amxbans
      *
      * @return string
      */
     public static function getRootPath(): string { return dirname(__DIR__, 2); }
 
     /**
-     * Example: https://example.com/realPath/index.php/this/is/path => /realPath/index.php
+     * https://example.com/realPath/index.php/this/is/path => /realPath/index.php
      *
      * @return string
      */
     public static function getURL(): string { return $_SERVER['SCRIPT_NAME']; }
 
     /**
-     * Example: https://example.com/realPath/index.php/this/is/path => /realPath
+     * https://example.com/realPath/index.php/this/is/path => /realPath
      *
      * @return string
      */

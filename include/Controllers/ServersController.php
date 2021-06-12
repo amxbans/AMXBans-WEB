@@ -14,10 +14,13 @@
 
 namespace Controllers;
 
+use Exception;
+use Lang;
 use Models\AMXAdmin;
 use Models\Ban;
 use Models\DB;
 use Models\Server;
+use Rcon;
 use Support\BaseController;
 use Support\Path;
 
@@ -76,7 +79,7 @@ class ServersController extends BaseController
             echo json_encode(
                 [
                     'success' => false,
-                    'message' => \Lang::get('server_not_found'),
+                    'message' => Lang::get('server_not_found'),
                 ]
             );
             return;
@@ -87,16 +90,15 @@ class ServersController extends BaseController
             echo json_encode(
                 [
                     'success' => false,
-                    'message' => \Lang::get('server_not_found'),
+                    'message' => Lang::get('server_not_found'),
                 ]
             );
             return;
         }
 
         try {
-            $rcon = new \Rcon($ip, $port);
-
-        } catch (\Exception $e) {
+            $rcon = new Rcon($ip, $port);
+        } catch (Exception $e) {
             echo json_encode(
                 [
                     'success' => false,
@@ -109,7 +111,7 @@ class ServersController extends BaseController
             echo json_encode(
                 [
                     'success' => false,
-                    'message' => \Lang::get('server_cannot_connect'),
+                    'message' => Lang::get('server_cannot_connect'),
                 ]
             );
             return;
@@ -128,7 +130,7 @@ class ServersController extends BaseController
         $mapPic = "/webSources/images/maps/{$infos['mod']}/{$infos['map']}.jpg";
 
         //main server info
-        $rules = $rcon->ServerRules();
+        $rules       = $rcon->ServerRules();
         $out['info'] = [
             "hostname"     => $infos['name'],
             'address'      => $server['address'],
@@ -149,16 +151,16 @@ class ServersController extends BaseController
         ];
 
         $out['lang'] = [
-            'players'      => \Lang::get('players_online'),
-            'player'       => \Lang::get('player_info'),
-            'address'     => \Lang::get('address'), // TODO: edit the key in template
-            'friendlyFire' => \Lang::get('friendly_fire'),
-            'password'     => \Lang::get('server_password'),
-            'map'          => \Lang::get('map'),
-            'timeleft'     => \Lang::get('timeleft'),
-            'nextmap'      => \Lang::get('nextmap'),
-            'yes'          => ucfirst(\Lang::get('yes')),
-            'no'           => ucfirst(\Lang::get('no')),
+            'players'      => Lang::get('players_online'),
+            'player'       => Lang::get('player_info'),
+            'address'      => Lang::get('address'), // TODO: edit the key in template
+            'friendlyFire' => Lang::get('friendly_fire'),
+            'password'     => Lang::get('server_password'),
+            'map'          => Lang::get('map'),
+            'timeleft'     => Lang::get('timeleft'),
+            'nextmap'      => Lang::get('nextmap'),
+            'yes'          => ucfirst(Lang::get('yes')),
+            'no'           => ucfirst(Lang::get('no')),
         ];
 
         $out['success'] = true;

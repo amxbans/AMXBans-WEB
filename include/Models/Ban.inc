@@ -12,6 +12,8 @@
 
 namespace Models;
 
+use Support\Model;
+
 /**
  * Class Ban
  *

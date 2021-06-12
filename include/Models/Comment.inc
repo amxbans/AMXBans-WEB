@@ -4,6 +4,8 @@
 namespace Models;
 
 
+use Support\Model;
+
 /**
  * Class Comment
  *

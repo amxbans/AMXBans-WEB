@@ -4,14 +4,17 @@
 namespace Models;
 
 
+use Support\Model;
+
 /**
  * Class BansLog
+ *
  * @package Models
  *
- * @property-read int $id
- * @property int $bid
- * @property $created_at
- * @property string $admin_nick
+ * @property-read int    $id
+ * @property int         $bid
+ * @property             $created_at
+ * @property string      $admin_nick
  * @property string|null $edit_reason
  */
 class BansLog extends Model

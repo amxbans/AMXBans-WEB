@@ -14,6 +14,7 @@ namespace Controllers;
 
 use DateTime;
 use FormErrors;
+use Lang;
 use Models\WebAdmin;
 use Support\BaseController;
 use Support\Path;
@@ -51,12 +52,12 @@ class LoginController extends BaseController
     public function store()
     {
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => Lang::get('invalidCSRF')]);
             return $this->index();
         }
         if ($this->isLoginBlocked()) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('login_blocked')]);
+                ['type' => 'warning', 'text' => Lang::get('login_blocked')]);
             return $this->index();
         }
         /** @var WebAdmin $user */
@@ -64,19 +65,19 @@ class LoginController extends BaseController
         if (!$user->exists) {
             $this->addLoginTry();
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('err_no_user')]);
+                ['type' => 'warning', 'text' => Lang::get('err_no_user')]);
             return $this->index();
         }
         if ($this->isLoginBlocked($user)) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('login_blocked')]);
+                ['type' => 'warning', 'text' => Lang::get('login_blocked')]);
             return $this->index();
         }
         if (!password_verify($_POST['password'], $user->password)) {
             db_log('Login', 'Attempt: wrong password', $user->username);
             $this->addLoginTry($user);
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('err_wrong_pass')]);
+                ['type' => 'warning', 'text' => Lang::get('err_wrong_pass')]);
         }
 
         $this->site->user->login($user);
@@ -107,7 +108,7 @@ class LoginController extends BaseController
     public function lostPassSend()
     {
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => Lang::get('invalidCSRF')]);
             $this->site->output->display('index.login.lost_pass');
             return;
         }
@@ -121,13 +122,13 @@ class LoginController extends BaseController
         ]);
         if (!$user->exists) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('err_no_user_email')]);
+                ['type' => 'warning', 'text' => Lang::get('err_no_user_email')]);
             $this->site->output->display('index.login.lost_pass');
             return;
         }
         if ($user->passreset_code && ($user->passreset_until > $t)) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('passcode_exist')]);
+                ['type' => 'warning', 'text' => Lang::get('passcode_exist')]);
             $this->site->output->display('index.login.lost_pass');
             return;
         }
@@ -140,7 +141,7 @@ class LoginController extends BaseController
         $msg = new Templating($this->site->config);
         $msg->assign('replace', [
             ':username' => $user->username,
-            ':now'      => $t->format(\Lang::$properties['date_format']),
+            ':now'      => $t->format(Lang::$properties['date_format']),
         ]);
         $msg->assign('code', $code);
 
@@ -150,10 +151,10 @@ class LoginController extends BaseController
             'Content-type' => 'text/html; charset=utf-8',
         ];
         $mail         = Templating::$_MBSTRING ? 'mb_send_mail' : 'mail';
-        $mail($user->username . '<' . trim($_POST['email']) . '>', \Lang::get('lost_pass_email')['subject'],
+        $mail($user->username . '<' . trim($_POST['email']) . '>', Lang::get('lost_pass_email')['subject'],
             $msg->fetch('email.tpl'), $mail_headers);
         $this->site->output->assign('message',
-            str_replace(':email', $_POST['email'], \Lang::get('passcode_sent')));
+            str_replace(':email', $_POST['email'], Lang::get('passcode_sent')));
 
         $this->site->output->display('index.login.lost_pass');
         return;
@@ -169,7 +170,7 @@ class LoginController extends BaseController
     {
         if (!$this->checkCode($code, $user)) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('passreset_nocode')]);
+                ['type' => 'warning', 'text' => Lang::get('passreset_nocode')]);
             return $this->index();
         }
         return $this->site->output->display('index.login.pass_change.tpl');
@@ -185,19 +186,19 @@ class LoginController extends BaseController
     {
         if (!$this->checkCode($code, $user)) {
             $this->site->output->assign('message',
-                ['type' => 'warning', 'text' => \Lang::get('passreset_nocode')]);
+                ['type' => 'warning', 'text' => Lang::get('passreset_nocode')]);
             return $this->index();
         }
 
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => Lang::get('invalidCSRF')]);
             return $this->site->output->display('index.login.pass_change.tpl');
         }
 
-        $err = new FormErrors($_POST, \Lang::get('validation_errors'));
+        $err = new FormErrors($_POST, Lang::get('validation_errors'));
         $err->validate([
-            \Lang::get('password')        => 'required',
-            \Lang::get('password') . '_2' => 'required|same:' . \Lang::get('password'),
+            Lang::get('password')        => 'required',
+            Lang::get('password') . '_2' => 'required|same:' . Lang::get('password'),
         ]);
         if ($err->has()) {
             $this->site->output->assign('messages', $err);
@@ -205,7 +206,7 @@ class LoginController extends BaseController
         }
 
         /** @var WebAdmin $user */
-        $user->password        = password_hash($_POST[\Lang::get('password')], PASSWORD_DEFAULT);
+        $user->password        = password_hash($_POST[Lang::get('password')], PASSWORD_DEFAULT);
         $user->passreset_until = null;
         $user->passreset_code  = null;
         $user->save();
@@ -214,7 +215,7 @@ class LoginController extends BaseController
         $_SESSION['login_block'] = 0;
 
         $this->site->output->assign('message',
-            ['type' => 'success', 'text' => \Lang::get('pass_changed')]);
+            ['type' => 'success', 'text' => Lang::get('pass_changed')]);
         return $this->index();
     }
 
@@ -254,12 +255,19 @@ class LoginController extends BaseController
         if ($toUser) {
             $toUser->try         += 1;
             $toUser->last_action = new DateTime();
-            $toUser = $toUser->save();
+            $toUser              = $toUser->save();
         }
 
         if ($this->isLoginBlocked($toUser)) {
             $_SESSION['login_block'] = time() + 600;
-            db_log('Login', 'Attempt: blocked (too many tries)', $toUser? $toUser->username : $_POST['username']);
+            db_log('Login', 'Attempt: blocked (too many tries)', $toUser ? $toUser->username : $_POST['username']);
         }
+    }
+
+    public function logout()
+    {
+        $lang = $_SESSION['lang'];
+        $this->site->user->logout();
+        return header('Location: ' . Path::makeURL('', 'index.php'));
     }
 }

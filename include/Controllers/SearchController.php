@@ -14,21 +14,25 @@
 
 namespace Controllers;
 
+use Lang;
 use Models\Ban;
+use Models\DB;
+use PDO;
+use Support\BaseController;
 
 /**
  * Class SearchController
  *
  * @package Controllers
  */
-class SearchController extends \Support\BaseController
+class SearchController extends BaseController
 {
     public function index()
     {
         $db      = $this->site->config->getDb();
         $servers = $db->prepare("SELECT `server_ip`,`server_name` FROM `{$db->prefix}_bans` GROUP BY `server_ip` ORDER BY `server_name`");
         $servers->execute();
-        $servers = $servers->fetch(\PDO::FETCH_KEY_PAIR);
+        $servers = $servers->fetch(PDO::FETCH_KEY_PAIR);
         $this->site->output->assign([
             'amxadmins' => Ban::query()->select(['admin_id', 'admin_nick']),
             'servers'   => $servers,
@@ -39,7 +43,7 @@ class SearchController extends \Support\BaseController
     public function store()
     {
         if (!$this->site->validateFormAuth()) {
-            $this->site->output->assign('message', ['type' => 'warning', 'text' => \Lang::get('invalidCSRF')]);
+            $this->site->output->assign('message', ['type' => 'warning', 'text' => Lang::get('invalidCSRF')]);
             return $this->index();
         }
         if (empty($_POST['search'])
@@ -51,21 +55,21 @@ class SearchController extends \Support\BaseController
             return $this->index();
         }
 
-        $db  = new \Models\DB();
+        $db  = new DB();
         $pdo = $this->site->config->getDb();
         if ($_POST['search'] == 'text') {
             if ($_POST['text'] == 'name') {
                 $bans = Ban::query()->where('player_nick', $_POST['value'])->limit(100)->orderBy('ban_created', true)
-                           ->select();
+                    ->select();
             } elseif ($_POST['text'] == 'steamid') {
                 $bans = Ban::query()->where('player_id', $_POST['value'])->limit(100)->orderBy('ban_created', true)
-                           ->select();
+                    ->select();
             } elseif ($_POST['text'] == 'ip') {
                 $bans = Ban::query()->where('player_ip', $_POST['value'])->limit(100)->orderBy('ban_created', true)
-                           ->select();
+                    ->select();
             } elseif ($_POST['text'] == 'reason') {
                 $bans = Ban::query()->where('ban_reason', $_POST['value'])->limit(100)->orderBy('ban_created', true)
-                           ->select();
+                    ->select();
             }
         } elseif ($_POST['search'] == 'date') {
             $bans = $db::selectRaw("SELECT * FROM `{$pdo->prefix}_bans` WHERE FROM_UNIXTIME(ban_created, %d%m%Y) LIKE ? ORDER BY ban_created",
@@ -78,16 +82,16 @@ class SearchController extends \Support\BaseController
                     continue;
                 }
                 $ban               = Ban::query()->orderBy('ban_created')->where('player_id', $item->player_id)
-                                        ->where('expired', false)->selectOne();
+                    ->where('expired', false)->selectOne();
                 $ban->times_banned = $item->ban_count;
                 $bans[]            = $ban;
             }
         } elseif ($_POST['search'] == 'admin') {
             $bans = Ban::query()->where('admin_id', $_POST['admin'])->orderBy('ban_created', true)->limit(100)
-                       ->select();
+                ->select();
         } elseif ($_POST['search'] == 'server') {
             $bans = Ban::query()->where('server_ip', $_POST['server'])->orderBy('ban_created', true)->limit(100)
-                       ->select();
+                ->select();
         }
 
         $this->site->output->assign('bans', $bans ?? []);
