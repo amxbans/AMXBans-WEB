@@ -208,7 +208,6 @@ return [
 
     'username'      => 'Username',
     'password'      => 'Password',
-    'remember'      => 'Remember my login',
     'login_blocked' => 'Blocked login',
     'loginfailed'   => 'Login failed!',
     'logintry'      => 'Try',

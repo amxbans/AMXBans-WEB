@@ -12,9 +12,6 @@
 		<label class="col-sm-3 text-sm-right col-form-label" for="pass">{'password'|lang}</label>
 		<div class="col-sm-9"><input type="password" name="password" class="form-control" id="pass" required value="{'password'|input}" /></div>
 
-		<div class="col-sm-3 text-sm-right"><input type="checkbox" name="rem" class="form" id="rem"{if 'rem'|input:false} checked{/if} /></div>
-		<label for="rem" class="col-sm-9">{'remember'|lang}</label>
-
 		<div class="col-sm-3 text-right">{if $blocked}{'login_blocked'|lang}:{/if}</div>
 		<div class="col-sm-9">
 			<button class="btn btn-primary">{'login'|lang}</button>

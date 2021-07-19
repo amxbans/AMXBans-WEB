@@ -22,11 +22,11 @@ use Lang;
 use Models\Ban;
 use Models\BansLog;
 use Models\Comment;
-use Models\DB;
 use Models\Server;
 use PDO;
 use Rcon;
 use Support\BaseController;
+use Support\DB;
 use Support\Path;
 
 /**

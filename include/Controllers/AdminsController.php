@@ -15,8 +15,8 @@
 namespace Controllers;
 
 use Models\AMXAdmin;
-use Models\DB;
 use Support\BaseController;
+use Support\DB;
 
 /**
  * Class AdminsController

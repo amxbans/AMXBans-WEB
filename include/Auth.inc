@@ -11,6 +11,7 @@
  */
 
 use Models\WebAdmin;
+use Support\Path;
 
 
 /**
@@ -72,10 +73,7 @@ class Auth
     }
 
     /**
-     * TODO: adjust LOGIN method
-     *
      * @param WebAdmin $user
-     * @param bool     $rem Remember (as cookie) or not
      *
      * @throws Exception
      */
@@ -93,7 +91,7 @@ class Auth
     {
         setcookie('unID', 0, [
             'expires'  => 1,
-            'path'     => \Support\Path::getBaseURL(),
+            'path'     => Path::getBaseURL(),
             'samesite' => 'Strict',
         ]);
         unset($_SESSION['unID']);

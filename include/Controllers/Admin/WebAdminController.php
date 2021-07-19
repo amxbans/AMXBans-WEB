@@ -15,10 +15,10 @@
 namespace Controllers\Admin;
 
 
-use Models\DB;
 use Models\WebAdmin;
 use PDO;
 use Support\BaseController;
+use Support\DB;
 
 class WebAdminController extends BaseController
 {

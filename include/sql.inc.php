@@ -85,7 +85,7 @@ function sql_get_reasons() {
 	return $reasons;
 }
 function sql_get_reasons_list() {
-    return Models\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR);
+    return Support\DB::table('reasons')->select(['id', 'reason'], PDO::FETCH_KEY_PAIR);
 }
 function sql_get_amxadmins() {
 	global $config, $mysql;

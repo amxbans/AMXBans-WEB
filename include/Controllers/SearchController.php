@@ -16,9 +16,9 @@ namespace Controllers;
 
 use Lang;
 use Models\Ban;
-use Models\DB;
 use PDO;
 use Support\BaseController;
+use Support\DB;
 
 /**
  * Class SearchController

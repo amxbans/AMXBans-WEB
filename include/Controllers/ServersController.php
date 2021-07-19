@@ -18,10 +18,10 @@ use Exception;
 use Lang;
 use Models\AMXAdmin;
 use Models\Ban;
-use Models\DB;
 use Models\Server;
 use Rcon;
 use Support\BaseController;
+use Support\DB;
 use Support\Path;
 
 /**
@@ -153,7 +153,7 @@ class ServersController extends BaseController
         $out['lang'] = [
             'players'      => Lang::get('players_online'),
             'player'       => Lang::get('player_info'),
-            'address'      => Lang::get('address'), // TODO: edit the key in template
+            'address'      => Lang::get('address'),
             'friendlyFire' => Lang::get('friendly_fire'),
             'password'     => Lang::get('server_password'),
             'map'          => Lang::get('map'),
