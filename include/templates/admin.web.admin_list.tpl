@@ -26,7 +26,7 @@
                         <form method="post" class="float-right" action="{array('web', 'users', $user.id)|url}">
                             {Site::makeFormAuth('DELETE')}
                             <a class="btn btn-outline-info"
-                               href="{array('web', 'users', $user.id)|url}">{'edit'|lang}</a>
+                               href="{array('web', 'users', $user.id, 'edit')|url}">{'edit'|lang}</a>
                             <button class="btn btn-outline-danger do-confirm">{'delete'|lang}</button>
                         </form>
                     {/if}
