@@ -91,12 +91,14 @@
 					{"what_level"|lang|sprintf:$permission.level}
 					<span>
 					<a href="{array('web', 'groups', $permission.level, 'edit')|url}">{"edit"|lang}</a>
-					<a href="{array('web', 'groups', $permission.level)|url}" class="ajax text-danger" data-method="DELETE">{'delete'|lang}</a>
+					<a href="{array('web', 'groups', $permission.level)|url}" class="ajax text-danger"
+					   data-ajax-method="DELETE">{'delete'|lang}</a>
 					</span>
 				</div>
 				<div class="card-body">
 					{foreach Auth::PERMISSIONS as $perm}
-						<span class="text-{if (($perm|substr:0:4 != 'bans' || $perm == 'bans_add') && $permission.$perm == 1) OR ($perm|substr:0:4 == 'bans' && $permission.$perm == 2)}success{elseif $perm|substr:0:4 == 'bans' && $permission.$perm == 1}warning{else}danger{/if}">{$perm|lang}</span>{if !$perm@last},{/if}
+						<span
+						class="text-{if (($perm|substr:0:4 != 'bans' || $perm == 'bans_add') && $permission.$perm == 1) OR ($perm|substr:0:4 == 'bans' && $permission.$perm == 2)}success{elseif $perm|substr:0:4 == 'bans' && $permission.$perm == 1}warning{else}danger{/if}">{$perm|lang}</span>{if !$perm@last},{/if}
 					{/foreach}
 				</div>
 			</div>
