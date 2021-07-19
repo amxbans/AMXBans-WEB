@@ -407,7 +407,7 @@ return [
         ],
         'web'    => [
             'users'    => 'Web Users', // menuwebadmins
-            'groups'   => 'Permission levels', // menuuserlevel
+            'groups'   => 'Permission groups', // menuuserlevel - modified!!!
             'settings' => 'Settings', // menuwebconfig
         ],
         'other'  => [

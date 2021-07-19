@@ -43,26 +43,29 @@ class WebPermissionController extends BaseController
      */
     public function store()
     {
-        WebPermission::query()->insert(
-            [
-                'bans_add'         => $_POST['bans_add'],
-                'bans_edit'        => $_POST['bans_edit'],
-                'bans_delete'      => $_POST['bans_delete'],
-                'bans_unban'       => $_POST['bans_unban'],
-                'amxadmins_view'   => $_POST['amxadmins_view'],
-                'amxadmins_edit'   => $_POST['amxadmins_edit'],
-                'webadmins_view'   => $_POST['webadmins_view'],
-                'webadmins_edit'   => $_POST['webadmins_edit'],
-                'websettings_view' => $_POST['websettings_view'],
-                'websettings_edit' => $_POST['websettings_edit'],
-                'permissions_edit' => $_POST['permissions_edit'],
-                'prune_db'         => $_POST['prune_db'],
-                'servers_edit'     => $_POST['servers_edit'],
-                'ip_view'          => $_POST['ip_view'],
-            ]
-        );
+        if (!Auth::hasPermission('permissions_edit')) {
+            header('HTTP/2.0 403 Forbidden');
+            die;
+        }
 
-        db_log('USER LEVELS', 'Created level ' . DB::lastInsertId());
+        $perm                   = new WebPermission();
+        $perm->bans_add         = $_POST['bans_add'];
+        $perm->bans_edit        = $_POST['bans_edit'];
+        $perm->bans_delete      = $_POST['bans_delete'];
+        $perm->bans_unban       = $_POST['bans_unban'];
+        $perm->amxadmins_view   = $_POST['amxadmins_view'];
+        $perm->amxadmins_edit   = $_POST['amxadmins_edit'];
+        $perm->webadmins_view   = $_POST['webadmins_view'];
+        $perm->webadmins_edit   = $_POST['webadmins_edit'];
+        $perm->websettings_view = $_POST['websettings_view'];
+        $perm->websettings_edit = $_POST['websettings_edit'];
+        $perm->permissions_edit = $_POST['permissions_edit'];
+        $perm->prune_db         = $_POST['prune_db'];
+        $perm->servers_edit     = $_POST['servers_edit'];
+        $perm->ip_view          = $_POST['ip_view'];
+        $perm->save();
+
+        db_log('USER LEVELS', 'Created group ' . DB::lastInsertId());
         $this->site->output->assign('message', Lang::get('saved'));
         $this->index();
     }
@@ -86,6 +89,11 @@ class WebPermissionController extends BaseController
      */
     public function update($permission)
     {
+        if (!Auth::hasPermission('permissions_edit')) {
+            header('HTTP/2.0 403 Forbidden');
+            die;
+        }
+
         $permission                   = WebPermission::find($permission);
         $permission->bans_add         = $_POST['bans_add'];
         $permission->bans_edit        = $_POST['bans_edit'];
@@ -118,7 +126,7 @@ class WebPermissionController extends BaseController
     {
         WebPermission::query()->delete($permission);
 
-        db_log('USER LEVELS', 'Deleted level ' . $permission);
+        db_log('USER LEVELS', 'Deleted group ' . $permission);
         $this->site->output->assign('message', Lang::get('deleted'));
         $this->index();
     }
