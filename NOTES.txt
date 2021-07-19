@@ -1,0 +1,12 @@
+ACP:
+ - online add_ban will not be developed further until live servers are found  to test functionality
+
+
+
+
+TODO:
+  > Make whole bunch of server-related routes in ACP (server/server; server/reasons etc.)
+  > Rewrite and adjust language files to the new standard
+  > Adjust installation for AMXBans if there should be any changes
+  ACP:
+    -
