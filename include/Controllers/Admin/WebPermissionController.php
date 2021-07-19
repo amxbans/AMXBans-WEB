@@ -19,7 +19,6 @@ use Auth;
 use Lang;
 use Models\WebPermission;
 use Support\BaseController;
-use Support\DB;
 
 class WebPermissionController extends BaseController
 {
@@ -65,7 +64,7 @@ class WebPermissionController extends BaseController
         $perm->ip_view          = $_POST['ip_view'];
         $perm->save();
 
-        db_log('USER LEVELS', 'Created group ' . DB::lastInsertId());
+        db_log('USER LEVELS', 'Created group ' . $perm->level);
         $this->site->output->assign('message', Lang::get('saved'));
         $this->index();
     }
