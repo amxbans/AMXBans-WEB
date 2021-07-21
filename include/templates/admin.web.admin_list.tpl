@@ -15,7 +15,7 @@
                 <input name="new_password" type="password" placeholder="{'password'|lang}" required
                        class="form-control-sm form-control" autocomplete="off">
                 <span class="ml-2 mr-1">{'level'|lang}:</span>
-                {html_options name='level' values=$perm_levels output=$perm_levels class='form-control form-control-sm'}
+                {html_options name='level' values=$perm_levels output="what_level"|lang|array_map:$perm_levels class='form-control form-control-sm'}
                 <button class="btn btn-success btn-sm ml-2">{'save'|lang}</button>
             </form>
         {/if}
