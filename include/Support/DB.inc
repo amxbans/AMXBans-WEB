@@ -236,7 +236,6 @@ class DB
             $this->where($id_field ?? $this->primary, 'IN', (array)$ids);
         }
         $q = "DELETE FROM `{$this->getTableName()}` {$this->processWhere()}";
-        var_dump($q, $this->wheres);
         return $this->db($q)->execute($this->wheres);
     }
 

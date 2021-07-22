@@ -89,11 +89,12 @@
 			<div class="card my-2">
 				<div class="card-header d-flex justify-content-between">
 					{"group_id"|lang|sprintf:$permission.level}
-					<span>
-					<a href="{array('web', 'groups', $permission.level, 'edit')|url}">{"edit"|lang}</a>
-					<a href="{array('web', 'groups', $permission.level)|url}" class="ajax text-danger"
-					   data-ajax-method="DELETE">{'delete'|lang}</a>
-					</span>
+					<form method="post" action="{array('web', 'groups', $permission.level)|url}">
+						<a class="btn btn-link"
+						   href="{array('web', 'groups', $permission.level, 'edit')|url}">{"edit"|lang}</a>
+						{Site::makeFormAuth('DELETE')}
+						<button class="btn btn-link text-danger">{'delete'|lang}</button>
+					</form>
 				</div>
 				<div class="card-body">
 					{foreach Auth::PERMISSIONS as $perm}
