@@ -15,6 +15,7 @@
 namespace Controllers\Admin;
 
 
+use Lang;
 use Models\WebAdmin;
 use PDO;
 use Support\BaseController;
@@ -29,9 +30,10 @@ class WebAdminController extends BaseController
      */
     public function index()
     {
-        $perm_levels = DB::table('permissions')->orderBy('level')->select('level', PDO::FETCH_COLUMN);
+        $permissions = DB::table('permissions')->orderBy('level')->select('level', PDO::FETCH_COLUMN);
+        $permissions = array_map(function ($value) { return sprintf(Lang::get('group_id'), $value); }, $permissions);
         $users       = WebAdmin::query()->select();
-        $this->site->output->assign(compact('perm_levels', 'users'));
+        $this->site->output->assign(compact('permissions', 'users'));
 
         $this->site->output->display('admin.web.admin_list.tpl');
     }

@@ -477,7 +477,8 @@ return [
     'new_group'  => 'New Group',
     'edit_group' => 'Edit Group',
     'group_list' => 'Permission groups',
-    'what_level' => 'Group %d', // Used in permission list,
+    'group_id'   => 'Group %d',
+    'permission' => 'Permission',
 
     "bans_add"         => 'Add bans',
     "bans_edit"        => 'Edit bans',

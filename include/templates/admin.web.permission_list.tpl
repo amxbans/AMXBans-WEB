@@ -88,7 +88,7 @@
 		{foreach $perm_list as $permission}
 			<div class="card my-2">
 				<div class="card-header d-flex justify-content-between">
-					{"what_level"|lang|sprintf:$permission.level}
+					{"group_id"|lang|sprintf:$permission.level}
 					<span>
 					<a href="{array('web', 'groups', $permission.level, 'edit')|url}">{"edit"|lang}</a>
 					<a href="{array('web', 'groups', $permission.level)|url}" class="ajax text-danger"
