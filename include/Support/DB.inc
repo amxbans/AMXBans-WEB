@@ -20,11 +20,12 @@ class DB
     /** @var string $limits Stores a string of LIMIT and OFFSET clauses */
     protected $limits;
 
-    public static function table($table, $model = null)
+    public static function table($table, $model = null, $primary = null)
     {
-        $c        = new self();
-        $c->table = $table;
-        $c->model = $model;
+        $c          = new self();
+        $c->table   = $table;
+        $c->primary = $primary ?: $c->primary;
+        $c->model   = $model;
         return $c;
     }
 
@@ -229,12 +230,13 @@ class DB
         return (int)$q->fetchColumn()[0];
     }
 
-    public function delete($ids = [])
+    public function delete($ids = [], string $id_field = null)
     {
         if (!empty($ids)) {
-            $this->where($this->primary, 'IN', (array)$ids);
+            $this->where($id_field ?? $this->primary, 'IN', (array)$ids);
         }
         $q = "DELETE FROM `{$this->getTableName()}` {$this->processWhere()}";
+        var_dump($q, $this->wheres);
         return $this->db($q)->execute($this->wheres);
     }
 

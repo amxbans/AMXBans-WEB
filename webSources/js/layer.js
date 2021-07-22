@@ -103,17 +103,6 @@ $(function () {
 			$('ul:not(.players)', $child).append($(tpl).clone().html('<b>' + data.lang.nextmap + ':</b> ' + data.info.nextmap));
 		});
 	});
-
-	$('.ajax').click((e) => {
-		e.preventDefault();
-		let $this = $(this);
-		$.ajax($this.attr('href'), {
-			method: $this.data('ajax-method') ?? 'post',
-
-		});
-		//TODO: permission_list ajax call unification
-		// 1. idk what else but definitely need to remove list element - data-ajax elem to point to?? @see admin.web.permission_list.tpl
-	});
 });
 
 /*

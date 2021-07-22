@@ -31,7 +31,7 @@ class Model implements ArrayAccess
      */
     public static function query()
     {
-        return DB::table((new static())->table, static::class);
+        return DB::table((new static())->table, static::class, (new static())->primary);
     }
 
     public function __construct()
