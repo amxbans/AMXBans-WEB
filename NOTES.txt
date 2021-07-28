@@ -5,8 +5,7 @@ ACP:
 
 
 TODO:
-  > Write methods for these classes:
-     - WebAdminController: store, edit, update, delete
+  > Make web/settings route, controller, views in ACP
   > Make whole bunch of server-related routes in ACP (server/server; server/reasons etc.)
   > Rewrite and adjust language files to the new standard
   > Adjust installation for AMXBans if there should be any changes

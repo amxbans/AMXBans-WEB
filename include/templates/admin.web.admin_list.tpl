@@ -6,16 +6,26 @@
     {if Auth::hasPermission('webadmins_view')}
         <h2 class="title">{'admin_menu_subtitles'|lang:'web':'users'}</h2>
         {if Auth::hasPermission('webadmins_edit')}
-            <form class="form-inline border-secondary border-bottom border-top bg-light p-sm-2" method="post">
-                <h4 class="mr-2">{'add_new'|lang}:</h4>
-                <input name="new_username" placeholder="{'username'|lang}" required class="form-control-sm form-control"
-                       autocomplete="off">
-                <input name="email" type="email" placeholder="{'email'|lang}" required
-                       class="form-control-sm form-control" autocomplete="off">
-                <input name="new_password" type="password" placeholder="{'password'|lang}" required
-                       class="form-control-sm form-control" autocomplete="off">
-                <span class="ml-2 mr-1">{'permission'|lang}:</span>
-                {html_options name='level' options=$permissions class='form-control form-control-sm'}
+            <form class="form-inline border-secondary border-bottom border-top bg-light p-sm-2"
+                  method="post"{if isset($admin)} action="{array('web', 'users', $admin.id)|url}" {/if}>
+
+                {if isset($admin)}
+                    {Site::makeFormAuth('PUT')}
+                    <h4 class="mr-2">{$admin.username}:</h4>
+                    {html_options name='level' options=$permissions selected=$admin.perm_level class='form-control form-control-sm'}
+                {else}
+                    <h4 class="mr-2">{'add_new'|lang}:</h4>
+                    <input name="new_username" placeholder="{'username'|lang}" required
+                           class="form-control-sm form-control"
+                           autocomplete="off">
+                    <input name="email" type="email" placeholder="{'email'|lang}" required
+                           class="form-control-sm form-control" autocomplete="off">
+                    <input name="new_password" type="password" placeholder="{'password'|lang}" required
+                           class="form-control-sm form-control" autocomplete="off">
+                    <span class="ml-2 mr-1">{'permission'|lang}:</span>
+                    {html_options name='level' options=$permissions class='form-control form-control-sm'}
+                {/if}
+
                 <button class="btn btn-success btn-sm ml-2">{'save'|lang}</button>
             </form>
         {/if}
@@ -37,9 +47,9 @@
         </ul>
         {if Auth::hasPermission('webadmins_edit')}
             <script>
-                $('.do-confirm').click(function () {
-                    return confirm('{'confirm_message'|lang}');
-                });
+				$('.do-confirm').click(function () {
+					return confirm('{'confirm_message'|lang}');
+				});
             </script>
         {/if}
     {else}

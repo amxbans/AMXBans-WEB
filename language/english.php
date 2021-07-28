@@ -523,6 +523,8 @@ return [
 
     'bans_pruned'         => 'Bans pruned',
     'no_access'           => 'You are not authorized to view this page!',
+    //NEW IN v7.0
+    'no_permission'       => 'You are not permitted to do this action!',
     'err_wrong_pass'      => 'Password is not correct',
     //NEW IN v7.0
     'err_no_user'         => 'User with this username not found',
