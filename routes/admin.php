@@ -21,5 +21,9 @@ Route::get('index/servers/{id}', 'Admin\IndexController@ajaxServerPlayers');
 Route::resource('web/users', 'Admin\WebAdminController', ['create', 'view']);
 Route::resource('web/groups', 'Admin\WebPermissionController', ['create', 'view']);
 
+Route::get('web/settings', 'Admin\WebSettingsController@index');
+Route::get('web/settings/edit', 'Admin\WebSettingsController@edit');
+Route::post('web/settings/edit', 'Admin\WebSettingsController@update');
+
 
 Route::get('logout', 'LoginController@logout');

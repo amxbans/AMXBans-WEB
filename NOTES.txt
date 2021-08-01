@@ -5,7 +5,7 @@ ACP:
 
 
 TODO:
-  > Make web/settings route, controller, views in ACP
+  > Fill web/settings controller (WebSettingsController), views (admin.web.settings_list; create admin.web.settings_edit?) in ACP
   > Make whole bunch of server-related routes in ACP (server/server; server/reasons etc.)
   > Rewrite and adjust language files to the new standard
   > Adjust installation for AMXBans if there should be any changes
