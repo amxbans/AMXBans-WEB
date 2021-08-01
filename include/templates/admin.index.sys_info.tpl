@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-3 text-right">AMXBans</div>
-                        <div class="col">v{$version}</div>
+                        <div class="col">{$version}</div>
                     </div>
                     <div class="row">
                         <div class="col-3 text-right">{'webserver'|lang}</div>

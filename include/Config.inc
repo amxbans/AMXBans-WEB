@@ -100,7 +100,7 @@ class Config implements ArrayAccess
             return $this->variables[$name];
         }
         $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-        throw new Exception("Configuration variable '$name' was not found [L$caller[line] @ $caller[file]]");
+        throw new Exception("Configuration variable '$name' was not found [L{$caller['line']} @ {$caller['file']}]");
     }
 
 
