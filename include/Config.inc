@@ -25,7 +25,7 @@ use Support\Path;
  * @property-read bool   $bans_show_comments
  * @property-read int    $uploaded_file_size
  * @property-read array  $uploaded_file_types
- * @property-read string $allow_unregistered_comments
+ * @property-read bool   $allow_unregistered_comments
  * @property-read int    $prune_bans
  * @property-read int    $max_login_tries
  * @property-read array  $smilies
@@ -141,7 +141,7 @@ class Config implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
@@ -168,5 +168,13 @@ class Config implements ArrayAccess
     public function offsetUnset($offset)
     {
         // Nope. Preventing!
+    }
+
+    /**
+     * @return array
+     */
+    public function getVariables(): array
+    {
+        return $this->variables;
     }
 }

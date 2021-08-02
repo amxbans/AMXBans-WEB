@@ -14,12 +14,30 @@
 
 namespace Controllers\Admin;
 
+use Auth;
+use Lang;
 use Support\BaseController;
 
 class WebSettingsController extends BaseController
 {
     public function index()
     {
+        if (!Auth::hasPermission('websettings_view')) {
+            return $this->site->output->display('admin.web.settings_list');
+        }
+
+        $this->site->output->assign([
+            'arrays'   => ['uploaded_file_types'],
+            'integers' => ['per_page', 'uploaded_file_size', 'prune_bans', 'max_login_tries'],
+            'selects'  => ['banner_src', 'default_lang', 'start_page'],
+            'booleans' => ['bans_show_kicks', 'bans_show_comments', 'allow_unregistered_comments'],
+            'bool'     => [ucfirst(Lang::get('no')), ucfirst(Lang::get('yes'))],
+        ]);
+
+        $settings = $this->site->config->getVariables();
+        $this->site->output->assign('smilies', array_pop($settings));
+        $this->site->output->assign('settings', $settings);
+        $this->site->output->display('admin.web.settings_list');
     }
 
     public function edit()

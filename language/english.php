@@ -26,7 +26,6 @@ return [
     'add'             => 'Add',
     'edit'            => 'Edit',
     'editing'         => 'Editing',
-    'defaultlang'     => 'Default Language',
     'other'           => 'Others',
     'viewip'          => 'Show IP',
     'level'           => 'Level',
@@ -288,28 +287,21 @@ return [
 
 //settings
 
-    'sitesettings'                 => 'Site administration',
-    'banner'                       => 'Banner',
-    'bannerurl'                    => 'Banner URL',
-    'design'                       => 'Design',
-    'bansperpage'                  => 'Bans per page',
-    'newset'                       => 'New set',
-    'cookiename'                   => 'Cookie name',
-    'startpage'                    => 'Start page',
-    'showcommentscount'            => 'Show number of comments',
-    'showfilescount'               => 'Show number of files',
-    'showkickcount'                => 'Show number of kicks',
-    'file_useruploadallowed'       => 'Users are allowed to upload files',
-    'maxfilesize'                  => 'max. File size',
-    'file_allowedtypes'            => 'Allowed file extensions',
-    'commentuserallowedwrite'      => 'Users are allowed to write comments',
-    'usecapture'                   => 'Use Captcha',
-    'autoprune'                    => 'Automatic DB prune',
-    'usecommentsystem'             => 'Use comments system',
-    'usefilesystem'                => 'Use files system',
-    'autoprune_maxoffences'        => 'Maximum expired bans before permanent ban',
-    'autoprune_maxoffences_reason' => 'Ban reason for maximum expired bans',
-    'mustbeon'                     => 'must be on!',
+    'settings_names' => [
+        'banner_src'                  => 'Banner', // banner
+        'banner_url'                  => 'Banner URL', // bannerurl
+        'per_page'                    => 'Bans per page', //bansperpage
+        'cookie'                      => 'Cookie prefix',
+        'default_lang'                => 'Default Language', //defaultlang - in 'default' section
+        'start_page'                  => 'Start page', // startpage
+        'bans_show_kicks'             => 'Bans: show kick count', // showkickcount
+        'bans_show_comments'          => 'Bans: show comment count',
+        'uploaded_file_size'          => 'max. File size',
+        'uploaded_file_types'         => 'Allowed file extensions',
+        'allow_unregistered_comments' => 'Allow commenting for all',
+        'prune_bans'                  => 'Automatic DB prune',
+        'max_login_tries'             => 'Max login tries',
+    ],
 
 
 //admin list
@@ -460,7 +452,8 @@ return [
 
     'adminlevelsettings' => 'Web admin level administration',
     'amxadmins'          => 'AMX admins',
-    'websettings'        => 'Web settings',
+    'web_settings'       => 'Web settings',
+    // websettings
     'levelview'          => 'Show',
     'levelunban'         => 'Unban',
     'levelimport'        => 'Import',
