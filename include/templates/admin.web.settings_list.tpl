@@ -10,16 +10,23 @@
                 <a href="{'web/settings/edit'|url}" class="btn btn-outline-primary">{'edit'|lang}</a>
                 </small>{/if}
         </h2>
-        <div>
-            {foreach $settings as $key => $setting}
-                <div class="row">
-                    <div class="col-sm-2">{'settings_names'|lang:$key}</div>
-                    <div class="col">
-                        {if $key|in_array:$arrays}          {" "|implode:$setting}
-                        {elseif $key|in_array:$booleans}    {$bool.$setting}
-                        {else}                              {$setting}
-                        {/if}
-                    </div>
+        {foreach $settings as $key => $setting}
+            <div class="row">
+                <div class="col-auto col-md-6 col-lg-3 font-weight-bold">{'settings_names'|lang:$key}</div>
+                <div class="col">
+                    {if $key|in_array:$arrays}          {" "|implode:$setting}
+                    {elseif $key|in_array:$booleans}    {$bool.$setting}
+                    {else}                              {$setting}
+                    {/if}
+                </div>
+            </div>
+        {/foreach}
+        <div class="row">
+            <div class="col-12 font-weight-bold">{'emoticons'|lang}</div>
+            {foreach $smilies as $code => $data}
+                <div class="col-sm-4 col-md-3 col-xl-2 text-center">
+                    {$code} → <img title="{$data.1}"
+                                   src="{'/'|implode:['webSources/images/emoticons',$data[0]]|res_url}" />
                 </div>
             {/foreach}
         </div>
