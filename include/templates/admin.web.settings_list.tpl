@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="col-auto col-md-6 col-lg-3 font-weight-bold">{'settings_names'|lang:$key}</div>
                 <div class="col">
-                    {if $key|in_array:$arrays}          {" "|implode:$setting}
+                    {if $key|in_array:$arrays}          {"; "|implode:$setting}
                     {elseif $key|in_array:$booleans}    {$bool.$setting}
                     {else}                              {$setting}
                     {/if}
@@ -22,11 +22,23 @@
             </div>
         {/foreach}
         <div class="row">
-            <div class="col-12 font-weight-bold">{'emoticons'|lang}</div>
+            <div class="col font-weight-bold">{'emoticons'|lang}</div>
+            <div class="col-auto"><a href="{'web/settings/emoticons/create'|url}">{'add_new'|lang}</a></div>
+        </div>
+        <div class="row">
             {foreach $smilies as $code => $data}
-                <div class="col-sm-4 col-md-3 col-xl-2 text-center">
-                    {$code} → <img title="{$data.1}"
-                                   src="{'/'|implode:['webSources/images/emoticons',$data[0]]|res_url}" />
+                <div class="col-sm-4 col-md-3 col-xl-2 text-center justify-content-between d-flex">
+                    <span>
+                        {$code} → <img title="{$data.1}"
+                                       src="{'/'|implode:['webSources/images/emoticons',$data.0]|res_url}" />
+                    </span>
+                    {if Auth::hasPermission('websettings_edit')}
+                        <form method="post" action="{'web/settings/emoticons/delete'|url}">
+                            {Site::makeFormAuth('delete')}
+                            <input type="hidden" name="code" value="{$code|htmlspecialchars}">
+                            <button class="btn btn-outline-danger">{'delete'|lang}</button>
+                        </form>
+                    {/if}
                 </div>
             {/foreach}
         </div>

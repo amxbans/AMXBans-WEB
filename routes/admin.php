@@ -25,5 +25,8 @@ Route::get('web/settings', 'Admin\WebSettingsController@index');
 Route::get('web/settings/edit', 'Admin\WebSettingsController@edit');
 Route::post('web/settings/edit', 'Admin\WebSettingsController@update');
 
+Route::get('web/settings/emoticons/create', 'Admin\EmojiController@create');
+Route::post('web/settings/emoticons/create', 'Admin\Emojicontroller@store');
+Route::delete('web/settings/emoticons/delete', 'Admin\Emojicontroller@delete');
 
 Route::get('logout', 'LoginController@logout');
