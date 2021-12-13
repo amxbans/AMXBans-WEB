@@ -16,10 +16,24 @@ namespace Controllers\Admin;
 
 use Auth;
 use Lang;
+use Site;
 use Support\BaseController;
 
 class WebSettingsController extends BaseController
 {
+    public function __construct(Site $site, string $method, string $callable, array $arguments = [])
+    {
+        if (
+            ($callable == 'index' && !Auth::hasPermission('websettings_view')) ||
+            (in_array($callable, ['edit', 'update']) && !Auth::hasPermission('websettings_edit'))
+        ) {
+            header('HTTP/2.0 403 Forbidden');
+            die;
+        }
+
+        parent::__construct($site, $method, $callable, $arguments);
+    }
+
     public function index()
     {
         if (!Auth::hasPermission('websettings_view')) {
@@ -40,9 +54,23 @@ class WebSettingsController extends BaseController
 
     public function edit()
     {
+        $this->site->output->assign([
+            'arrays'   => ['uploaded_file_types'],
+            'appends'  => ['prune_bans' => Lang::get('days'), 'uploaded_file_size' => Lang::get('bytes')],
+            'integers' => ['per_page', 'uploaded_file_size', 'prune_bans', 'max_login_tries'],
+            'selects'  => ['banner_src', 'default_lang', 'start_page'],
+            'booleans' => ['bans_show_kicks', 'bans_show_comments', 'allow_unregistered_comments'],
+            'bool'     => [1 => ucfirst(Lang::get('yes')), 0 => ucfirst(Lang::get('no'))],
+        ]);
+
+        $settings = $this->site->config->getVariables();
+        array_pop($settings);
+        $this->site->output->assign('settings', $settings);
+        $this->site->output->display('admin.web.settings_edit');
     }
 
     public function update()
     {
+        //TODO NEXT: Implement update method
     }
 }

@@ -10,4 +10,4 @@ TODO:
   > Rewrite and adjust language files to the new standard
   > Adjust installation for AMXBans if there should be any changes
   ACP:
-    -
+    - bake hrtime() for performance measurements in footer when logged in
