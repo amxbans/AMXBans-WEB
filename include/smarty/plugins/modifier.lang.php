@@ -1,21 +1,18 @@
 <?php
+
 /**
  * Type:     modifier
  * Name:     lang
  * Purpose:  transform string with language replacement
  *
- * @param string $key input string
+ * @author indianiso1 <indianiso1 at gmail dot com>
  *
  * @param mixed  ...$additional
+ * @param string $key input string
  *
- * @return string made url
- * @author indianiso1 <indianiso1 at gmail dot com>
+ * @return array|string Translation string (or array)
  */
-function smarty_modifier_lang (string $key, ...$additional)
+function smarty_modifier_lang(string $key, ...$additional): array|string
 {
-    if ($additional) {
-        $last = array_pop($additional);
-        return smarty_modifier_lang($key, ...$additional)[$last];
-    }
-    return Lang::get($key);
+    return Lang::get(implode(".", [$key, ...$additional]));
 }
