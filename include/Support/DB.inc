@@ -227,7 +227,7 @@ class DB
         $q      = "SELECT COUNT($column) FROM {$this->getTableName()} {$this->processWhere()} {$this->processOrder()}";
         $q      = $this->db($q);
         $q->execute($this->wheres);
-        return (int)$q->fetchColumn()[0];
+        return (int)$q->fetchColumn();
     }
 
     public function delete($ids = [], string $id_field = null)

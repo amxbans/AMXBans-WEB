@@ -119,7 +119,7 @@ class Model implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
@@ -127,7 +127,7 @@ class Model implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->__get($offset);
     }
@@ -135,7 +135,7 @@ class Model implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->__set($offset, $value);
     }
@@ -143,7 +143,7 @@ class Model implements ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset) { }
+    public function offsetUnset($offset): void { }
 
     private function filterChanged(): array
     {
