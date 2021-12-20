@@ -16,6 +16,7 @@ namespace Controllers\Admin;
 
 use Auth;
 use Lang;
+use Models\WebSetting;
 use Site;
 use Support\BaseController;
 
@@ -49,7 +50,7 @@ class WebSettingsController extends BaseController
         $settings = $this->site->config->getVariables();
         $this->site->output->assign('smilies', array_pop($settings));
         $this->site->output->assign('settings', $settings);
-        $this->site->output->display('admin.web.settings_list');
+        return $this->site->output->display('admin.web.settings_list');
     }
 
     public function edit()
@@ -66,11 +67,25 @@ class WebSettingsController extends BaseController
         $settings = $this->site->config->getVariables();
         array_pop($settings);
         $this->site->output->assign('settings', $settings);
-        $this->site->output->display('admin.web.settings_edit');
+        return $this->site->output->display('admin.web.settings_edit');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function update()
     {
-        //TODO NEXT: Implement update method
+        $variables = $this->site->config->getVariables();
+        $var_keys  = array_keys($variables);
+        foreach ($var_keys as $var_key) {
+            WebSetting::query()
+                ->where('name', $var_key)
+                ->update([
+                    'value' => $_POST[$var_key]
+                ]);
+        }
+
+        db_log("Web config", "Modified settings"); // TODO MIGRATION: action "Websetting config" -> "Web config"
+        return $this->index();
     }
 }

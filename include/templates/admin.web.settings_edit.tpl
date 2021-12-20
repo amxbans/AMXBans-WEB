@@ -24,9 +24,14 @@
                                 {/foreach}
                             </select>
                         {elseif $key|in_array:$appends}
-                            <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}" />
+                            <fieldset class="input-group">
+                                <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}"/>
+                                <span class="input-group-append">
+                                    <span class="input-group-text">{$appends.$key}</span>
+                                </span>
+                            </fieldset>
                         {elseif $key|in_array:$arrays}
-                            <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}" />
+                            <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}"/>
                         {elseif $key|in_array:$booleans}
                             {foreach $bool as $v => $name}
                                 <label class="form-control mb-0">
