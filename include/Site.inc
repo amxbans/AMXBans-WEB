@@ -55,6 +55,7 @@ class Site
         spl_autoload_register('init_autoload');
 
         $this->config = new Config($install);
+
         $this->output = new Templating($this->config);
         $this->user = Auth::init($this->config);
         $this->route = new Route(basename($_SERVER['SCRIPT_FILENAME']));

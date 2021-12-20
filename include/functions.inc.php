@@ -16,9 +16,10 @@ use Models\Log;
  * @param string      $action
  * @param string      $context
  * @param string|null $user
+ *
  * @throws Exception
  */
-function db_log(string $action, string $context, $user = null): void
+function db_log(string $action, string $context, string $user = null): void
 {
     $log             = new Log();
     $log->ip         = $_SERVER['REMOTE_ADDR'];

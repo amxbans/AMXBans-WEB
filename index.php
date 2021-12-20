@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+const DEBUG = false;
+
 session_start();
 require_once "include/Site.inc";
 

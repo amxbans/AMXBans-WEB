@@ -19,8 +19,7 @@ class Lang
 
     public static function init(bool $install = false, string $default = 'english'): void
     {
-        self::$supported = require __DIR__ . '/../' . ($install ? 'install/' : '') .
-            'language/languages.php';
+        self::$supported = require Path::getRootPath() . DIRECTORY_SEPARATOR . ($install ? 'install/' : '') . 'language/languages.php';
 
         //save current language to session
         if (!isset($_SESSION["lang"])) {
@@ -46,6 +45,7 @@ class Lang
      * Allows dot (.) notation
      *
      * @param string $key
+     *
      * @return string|array
      */
     public static function get(string $key)

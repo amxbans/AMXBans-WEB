@@ -12,13 +12,16 @@ class DB extends PDO
     public function __construct($dsn = null, $username = null, $passwd = null, $options = null)
     {
         $this->credentials = require "db.Config.inc";
-        $this->prefix = (string)$this->credentials->prefix;
+        $this->prefix      = (string)$this->credentials->prefix;
         try {
             parent::__construct("mysql:dbname={$this->credentials->name};host={$this->credentials->host}",
                 $this->credentials->user, $this->credentials->pass);
             $this->exec("SET CHARSET utf8");
         } catch (PDOException $e) {
-            trigger_error($e->getMessage());
+            if (defined('DEBUG') && DEBUG === true) {
+                trigger_error($e->getMessage());
+            }
+            die("<h1>Server error</h1><p>Sorry, but there is database misconfiguration. Contact its administrator by email: " . $_SERVER['SERVER_ADMIN'] . "</p><hr />" . @$_SERVER['SERVER_SIGNATURE']);
         }
     }
 
