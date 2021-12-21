@@ -67,6 +67,7 @@ class WebSettingsController extends BaseController
     }
 
     /**
+     * TODO TEST!!
      * @throws \Exception
      */
     public function update()
