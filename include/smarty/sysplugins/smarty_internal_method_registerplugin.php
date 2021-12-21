@@ -44,12 +44,14 @@ class Smarty_Internal_Method_RegisterPlugin
         $cache_attr = null
     ) {
         $smarty = $obj->_getSmartyObj();
-        if (isset($smarty->registered_plugins[ $type ][ $name ])) {
+        if (isset($smarty->registered_plugins[$type][$name])) {
             throw new SmartyException("Plugin tag '{$name}' already registered");
         } elseif (!is_callable($callback)) {
             throw new SmartyException("Plugin '{$name}' not callable");
+        } elseif ($cacheable && $cache_attr) {
+            throw new SmartyException("Cannot set caching attributes for plugin '{$name}' when it is cacheable.");
         } else {
-            $smarty->registered_plugins[ $type ][ $name ] = array($callback, (bool)$cacheable, (array)$cache_attr);
+            $smarty->registered_plugins[$type][$name] = array($callback, (bool)$cacheable, (array)$cache_attr);
         }
         return $obj;
     }

@@ -210,27 +210,28 @@ class Smarty_Internal_Compile_Foreach extends Smarty_Internal_Compile_Private_Fo
             $output .= ', ' . var_export($name, true) . ', ' . var_export($namedAttr, true);
         }
         $output .= ");\n";
-        if (isset($itemAttr[ 'show' ])) {
+        if (isset($itemAttr['show'])) {
             $output .= "{$itemVar}->show = ({$itemVar}->total > 0);\n";
         }
-        if (isset($itemAttr[ 'iteration' ])) {
+        if (isset($itemAttr['iteration'])) {
             $output .= "{$itemVar}->iteration = 0;\n";
         }
-        if (isset($itemAttr[ 'index' ])) {
+        if (isset($itemAttr['index'])) {
             $output .= "{$itemVar}->index = -1;\n";
         }
-        $output .= "if (\$_from !== null) {\n";
-        $output .= "foreach (\$_from as {$keyTerm}{$itemVar}->value) {\n";
-        if (isset($attributes[ 'key' ]) && isset($itemAttr[ 'key' ])) {
+        $output .= "{$itemVar}->do_else = true;\n";
+        $output .= "if (\$_from !== null) foreach (\$_from as {$keyTerm}{$itemVar}->value) {\n";
+        $output .= "{$itemVar}->do_else = false;\n";
+        if (isset($attributes['key']) && isset($itemAttr['key'])) {
             $output .= "\$_smarty_tpl->tpl_vars['{$key}']->value = {$itemVar}->key;\n";
         }
-        if (isset($itemAttr[ 'iteration' ])) {
+        if (isset($itemAttr['iteration'])) {
             $output .= "{$itemVar}->iteration++;\n";
         }
-        if (isset($itemAttr[ 'index' ])) {
+        if (isset($itemAttr['index'])) {
             $output .= "{$itemVar}->index++;\n";
         }
-        if (isset($itemAttr[ 'first' ])) {
+        if (isset($itemAttr['first'])) {
             $output .= "{$itemVar}->first = !{$itemVar}->index;\n";
         }
         if (isset($itemAttr[ 'last' ])) {
@@ -296,7 +297,7 @@ class Smarty_Internal_Compile_Foreachelse extends Smarty_Internal_CompileBase
         if ($restore === 2) {
             $output .= "{$itemVar} = {$local}saved;\n";
         }
-        $output .= "}\n} else {\n?>";
+        $output .= "}\nif ({$itemVar}->do_else) {\n?>";
         return $output;
     }
 }
@@ -331,9 +332,6 @@ class Smarty_Internal_Compile_Foreachclose extends Smarty_Internal_CompileBase
         $output = "<?php\n";
         if ($restore === 2) {
             $output .= "{$itemVar} = {$local}saved;\n";
-        }
-        if ($restore > 0) {
-            $output .= "}\n";
         }
         $output .= "}\n";
         /* @var Smarty_Internal_Compile_Foreach $foreachCompiler */

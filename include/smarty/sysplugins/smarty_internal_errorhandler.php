@@ -65,14 +65,14 @@ class Smarty_Internal_ErrorHandler
      *
      * @return bool
      */
-    public static function mutingErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+    public static function mutingErrorHandler($errno, $errstr, $errfile, $errline, $errcontext = array())
     {
         $_is_muted_directory = false;
         // add the SMARTY_DIR to the list of muted directories
-        if (!isset(self::$mutedDirectories[ SMARTY_DIR ])) {
+        if (!isset(self::$mutedDirectories[SMARTY_DIR])) {
             $smarty_dir = realpath(SMARTY_DIR);
             if ($smarty_dir !== false) {
-                self::$mutedDirectories[ SMARTY_DIR ] =
+                self::$mutedDirectories[SMARTY_DIR] =
                     array('file' => $smarty_dir, 'length' => strlen($smarty_dir),);
             }
         }
