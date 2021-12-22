@@ -28,16 +28,16 @@ class Smarty_Internal_Method_LoadFilter
     /**
      * load a filter of specified type and name
      *
-     * @api  Smarty::loadFilter()
-     *
-     * @link http://www.smarty.net/docs/en/api.load.filter.tpl
-     *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type
      * @param string                                                          $name filter name
      *
      * @return bool
      * @throws SmartyException if filter could not be loaded
+     * @link https://www.smarty.net/docs/en/api.load.filter.tpl
+     *
+     * @api  Smarty::loadFilter()
+     *
      */
     public function loadFilter(Smarty_Internal_TemplateBase $obj, $type, $name)
     {

@@ -28,10 +28,6 @@ class Smarty_Internal_Method_RegisterFilter
     /**
      * Registers a filter function
      *
-     * @api  Smarty::registerFilter()
-     *
-     * @link http://www.smarty.net/docs/en/api.register.filter.tpl
-     *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param string                                                          $type filter type
      * @param callback                                                        $callback
@@ -39,6 +35,10 @@ class Smarty_Internal_Method_RegisterFilter
      *
      * @return \Smarty|\Smarty_Internal_Template
      * @throws \SmartyException
+     * @api  Smarty::registerFilter()
+     *
+     * @link https://www.smarty.net/docs/en/api.register.filter.tpl
+     *
      */
     public function registerFilter(Smarty_Internal_TemplateBase $obj, $type, $callback, $name = null)
     {

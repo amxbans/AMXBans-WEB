@@ -5,17 +5,18 @@
  * @package    Smarty
  * @subpackage PluginsFunction
  */
+
 /**
  * Smarty {fetch} plugin
  * Type:     function
  * Name:     fetch
  * Purpose:  fetch file, web or ftp data and display results
  *
- * @link   http://www.smarty.net/manual/en/language.function.fetch.php {fetch}
+ * @link   https://www.smarty.net/manual/en/language.function.fetch.php {fetch}
  *         (Smarty online manual)
  * @author Monte Ohrt <monte at ohrt dot com>
  *
- * @param array                    $params   parameters
+ * @param array                    $params parameters
  * @param Smarty_Internal_Template $template template object
  *
  * @throws SmartyException

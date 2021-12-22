@@ -21,16 +21,16 @@ class Smarty_Internal_Method_ConfigLoad
     /**
      * load a config file, optionally load just selected sections
      *
-     * @api  Smarty::configLoad()
-     * @link http://www.smarty.net/docs/en/api.config.load.tpl
-     *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string                                                  $config_file filename
-     * @param mixed                                                   $sections    array of section names, single
+     * @param mixed                                                   $sections array of section names, single
      *                                                                             section or null
      *
      * @return \Smarty|\Smarty_Internal_Data|\Smarty_Internal_Template
      * @throws \Exception
+     * @link https://www.smarty.net/docs/en/api.config.load.tpl
+     *
+     * @api  Smarty::configLoad()
      */
     public function configLoad(Smarty_Internal_Data $data, $config_file, $sections = null)
     {
@@ -42,13 +42,13 @@ class Smarty_Internal_Method_ConfigLoad
      * load a config file, optionally load just selected sections
      *
      * @api  Smarty::configLoad()
-     * @link http://www.smarty.net/docs/en/api.config.load.tpl
+     * @link https://www.smarty.net/docs/en/api.config.load.tpl
      *
      * @param \Smarty|\Smarty_Internal_Data|\Smarty_Internal_Template $data
      * @param string                                                  $config_file filename
-     * @param mixed                                                   $sections    array of section names, single
+     * @param mixed                                                   $sections array of section names, single
      *                                                                             section or null
-     * @param int                                                     $scope       scope into which config variables
+     * @param int                                                     $scope scope into which config variables
      *                                                                             shall be loaded
      *
      * @throws \Exception

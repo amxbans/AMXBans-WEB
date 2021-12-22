@@ -20,13 +20,13 @@
  * - indent_char   - string (" ")
  * - wrap_boundary - boolean (true)
  *
- * @link   http://www.smarty.net/manual/en/language.function.textformat.php {textformat}
+ * @link   https://www.smarty.net/manual/en/language.function.textformat.php {textformat}
  *         (Smarty online manual)
  *
- * @param array                    $params   parameters
- * @param string                   $content  contents of the block
- * @param Smarty_Internal_Template $template template object
- * @param boolean                  &$repeat  repeat flag
+ * @param array                     $params parameters
+ * @param string                    $content contents of the block
+ * @param Smarty_Internal_Template  $template template object
+ * @param boolean                  &$repeat repeat flag
  *
  * @return string content re-formatted
  * @author Monte Ohrt <monte at ohrt dot com>

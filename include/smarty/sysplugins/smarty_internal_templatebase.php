@@ -137,18 +137,18 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
     /**
      * test if cache is valid
      *
-     * @api  Smarty::isCached()
-     * @link http://www.smarty.net/docs/en/api.is.cached.tpl
-     *
-     * @param null|string|\Smarty_Internal_Template $template   the resource handle of the template file or template
+     * @param null|string|\Smarty_Internal_Template $template the resource handle of the template file or template
      *                                                          object
-     * @param mixed                                 $cache_id   cache id to be used with this template
+     * @param mixed                                 $cache_id cache id to be used with this template
      * @param mixed                                 $compile_id compile id to be used with this template
-     * @param object                                $parent     next higher level of Smarty variables
+     * @param object                                $parent next higher level of Smarty variables
      *
      * @return bool cache status
      * @throws \Exception
      * @throws \SmartyException
+     * @link https://www.smarty.net/docs/en/api.is.cached.tpl
+     *
+     * @api  Smarty::isCached()
      */
     public function isCached($template = null, $cache_id = null, $compile_id = null, $parent = null)
     {
@@ -199,10 +199,16 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
         try {
             $_smarty_old_error_level =
                 isset($smarty->error_reporting) ? error_reporting($smarty->error_reporting) : null;
+
+            if ($smarty->isMutingUndefinedOrNullWarnings()) {
+                $errorHandler = new Smarty_Internal_ErrorHandler();
+                $errorHandler->activate();
+            }
+
             if ($this->_objType === 2) {
                 /* @var Smarty_Internal_Template $this */
                 $template->tplFunctions = $this->tplFunctions;
-                $template->inheritance = $this->inheritance;
+                $template->inheritance  = $this->inheritance;
             }
             /* @var Smarty_Internal_Template $parent */
             if (isset($parent->_objType) && ($parent->_objType === 2) && !empty($parent->tplFunctions)) {
@@ -232,16 +238,21 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
                 $result = $template->render(false, $function);
                 $template->_cleanUp();
                 if ($saveVars) {
-                    $template->tpl_vars = $savedTplVars;
+                    $template->tpl_vars    = $savedTplVars;
                     $template->config_vars = $savedConfigVars;
                 } else {
-                    if (!$function && !isset(Smarty_Internal_Template::$tplObjCache[ $template->templateId ])) {
-                        $template->parent = null;
-                        $template->tpl_vars = $template->config_vars = array();
-                        Smarty_Internal_Template::$tplObjCache[ $template->templateId ] = $template;
+                    if (!$function && !isset(Smarty_Internal_Template::$tplObjCache[$template->templateId])) {
+                        $template->parent                                             = null;
+                        $template->tpl_vars                                           = $template->config_vars = array();
+                        Smarty_Internal_Template::$tplObjCache[$template->templateId] = $template;
                     }
                 }
             }
+
+            if (isset($errorHandler)) {
+                $errorHandler->deactivate();
+            }
+
             if (isset($_smarty_old_error_level)) {
                 error_reporting($_smarty_old_error_level);
             }
@@ -250,6 +261,10 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
             while (ob_get_level() > $level) {
                 ob_end_clean();
             }
+            if (isset($errorHandler)) {
+                $errorHandler->deactivate();
+            }
+
             if (isset($_smarty_old_error_level)) {
                 error_reporting($_smarty_old_error_level);
             }
@@ -260,6 +275,9 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
     /**
      * Registers plugin to be used in templates
      *
+     * @api  Smarty::registerPlugin()
+     * @link https://www.smarty.net/docs/en/api.register.plugin.tpl
+     *
      * @param string   $type plugin type
      * @param string   $name name of template tag
      * @param callable $callback PHP callback to register
@@ -268,9 +286,6 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
      *
      * @return \Smarty|\Smarty_Internal_Template
      * @throws \SmartyException
-     * @link http://www.smarty.net/docs/en/api.register.plugin.tpl
-     *
-     * @api  Smarty::registerPlugin()
      */
     public function registerPlugin($type, $name, $callback, $cacheable = true, $cache_attr = null)
     {
@@ -281,7 +296,7 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
      * load a filter of specified type and name
      *
      * @api  Smarty::loadFilter()
-     * @link http://www.smarty.net/docs/en/api.load.filter.tpl
+     * @link https://www.smarty.net/docs/en/api.load.filter.tpl
      *
      * @param string $type filter type
      * @param string $name filter name
@@ -298,7 +313,7 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
      * Registers a filter function
      *
      * @api  Smarty::registerFilter()
-     * @link http://www.smarty.net/docs/en/api.register.filter.tpl
+     * @link https://www.smarty.net/docs/en/api.register.filter.tpl
      *
      * @param string      $type filter type
      * @param callable    $callback
@@ -316,13 +331,13 @@ abstract class Smarty_Internal_TemplateBase extends Smarty_Internal_Data
      * Registers object to be used in templates
      *
      * @api  Smarty::registerObject()
-     * @link http://www.smarty.net/docs/en/api.register.object.tpl
+     * @link https://www.smarty.net/docs/en/api.register.object.tpl
      *
      * @param string $object_name
-     * @param object $object                     the referenced PHP object to register
+     * @param object $object the referenced PHP object to register
      * @param array  $allowed_methods_properties list of allowed methods (empty = all)
-     * @param bool   $format                     smarty argument format, else traditional
-     * @param array  $block_methods              list of block-methods
+     * @param bool   $format smarty argument format, else traditional
+     * @param array  $block_methods list of block-methods
      *
      * @return \Smarty|\Smarty_Internal_Template
      * @throws \SmartyException

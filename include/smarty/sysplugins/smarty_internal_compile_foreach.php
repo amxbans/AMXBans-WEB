@@ -234,7 +234,7 @@ class Smarty_Internal_Compile_Foreach extends Smarty_Internal_Compile_Private_Fo
         if (isset($itemAttr['first'])) {
             $output .= "{$itemVar}->first = !{$itemVar}->index;\n";
         }
-        if (isset($itemAttr[ 'last' ])) {
+        if (isset($itemAttr['last'])) {
             $output .= "{$itemVar}->last = {$itemVar}->iteration === {$itemVar}->total;\n";
         }
         if (isset($foreachVar)) {

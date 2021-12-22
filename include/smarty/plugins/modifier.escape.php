@@ -5,30 +5,28 @@
  * @package    Smarty
  * @subpackage PluginsModifier
  */
+
 /**
  * Smarty escape modifier plugin
  * Type:     modifier
  * Name:     escape
  * Purpose:  escape string for output
  *
- * @link   http://www.smarty.net/docs/en/language.modifier.escape
+ * @link   https://www.smarty.net/docs/en/language.modifier.escape
  * @author Monte Ohrt <monte at ohrt dot com>
  *
- * @param string  $string        input string
- * @param string  $esc_type      escape type
- * @param string  $char_set      character set, used for htmlspecialchars() or htmlentities()
+ * @param string  $string input string
+ * @param string  $esc_type escape type
+ * @param string  $char_set character set, used for htmlspecialchars() or htmlentities()
  * @param boolean $double_encode encode already encoded entitites again, used for htmlspecialchars() or htmlentities()
  *
  * @return string escaped input string
  */
 function smarty_modifier_escape($string, $esc_type = 'html', $char_set = null, $double_encode = true)
 {
-    static $_double_encode = null;
+    static $_double_encode = true;
     static $is_loaded_1 = false;
     static $is_loaded_2 = false;
-    if ($_double_encode === null) {
-        $_double_encode = version_compare(PHP_VERSION, '5.2.3', '>=');
-    }
     if (!$char_set) {
         $char_set = Smarty::$_CHARSET;
     }

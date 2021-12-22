@@ -21,15 +21,15 @@ class Smarty_Internal_Method_GetTags
     /**
      * Return array of tag/attributes of all tags used by an template
      *
-     * @api  Smarty::getTags()
-     * @link http://www.smarty.net/docs/en/api.get.tags.tpl
-     *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
      * @param null|string|Smarty_Internal_Template                            $template
      *
      * @return array of tag/attributes
      * @throws \Exception
      * @throws \SmartyException
+     * @link https://www.smarty.net/docs/en/api.get.tags.tpl
+     *
+     * @api  Smarty::getTags()
      */
     public function getTags(Smarty_Internal_TemplateBase $obj, $template = null)
     {

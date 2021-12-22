@@ -5,20 +5,21 @@
  * @package    Smarty
  * @subpackage PluginsModifier
  */
+
 /**
  * Smarty regex_replace modifier plugin
  * Type:     modifier
  * Name:     regex_replace
  * Purpose:  regular expression search/replace
  *
- * @link   http://smarty.php.net/manual/en/language.modifier.regex.replace.php
+ * @link   https://www.smarty.net/manual/en/language.modifier.regex.replace.php
  *          regex_replace (Smarty online manual)
  * @author Monte Ohrt <monte at ohrt dot com>
  *
- * @param string       $string  input string
- * @param string|array $search  regular expression(s) to search for
+ * @param string       $string input string
+ * @param string|array $search regular expression(s) to search for
  * @param string|array $replace string(s) that should be replaced
- * @param int          $limit   the maximum number of replacements
+ * @param int          $limit the maximum number of replacements
  *
  * @return string
  */

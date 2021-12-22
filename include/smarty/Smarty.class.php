@@ -20,7 +20,7 @@
  * Smarty mailing list. Send a blank e-mail to
  * smarty-discussion-subscribe@googlegroups.com
  *
- * @link      http://www.smarty.net/
+ * @link      https://www.smarty.net/
  * @copyright 2018 New Digital Group, Inc.
  * @copyright 2018 Uwe Tews
  * @author    Monte Ohrt <monte at ohrt dot com>
@@ -28,6 +28,7 @@
  * @author    Rodney Rehm
  * @package   Smarty
  */
+
 /**
  * set SMARTY_DIR to absolute path to Smarty library files.
  * Sets SMARTY_DIR only if user application has not already defined it.
@@ -59,19 +60,6 @@ if (!defined('SMARTY_MBSTRING')) {
      *
      */
     define('SMARTY_MBSTRING', function_exists('mb_get_info'));
-}
-if (!defined('SMARTY_RESOURCE_CHAR_SET')) {
-    // UTF-8 can only be done properly when mbstring is available!
-    /**
-     * @deprecated in favor of Smarty::$_CHARSET
-     */
-    define('SMARTY_RESOURCE_CHAR_SET', SMARTY_MBSTRING ? 'UTF-8' : 'ISO-8859-1');
-}
-if (!defined('SMARTY_RESOURCE_DATE_FORMAT')) {
-    /**
-     * @deprecated in favor of Smarty::$_DATE_FORMAT
-     */
-    define('SMARTY_RESOURCE_DATE_FORMAT', '%b %e, %Y');
 }
 /**
  * Load Smarty_Autoloader
@@ -111,7 +99,7 @@ class Smarty extends Smarty_Internal_TemplateBase
     /**
      * smarty version
      */
-    const SMARTY_VERSION = '3.1.40';
+    const SMARTY_VERSION = '4.0.0';
     /**
      * define variable scopes
      */
@@ -143,13 +131,7 @@ class Smarty extends Smarty_Internal_TemplateBase
     const DEBUG_OFF        = 0;
     const DEBUG_ON         = 1;
     const DEBUG_INDIVIDUAL = 2;
-    /**
-     * modes for handling of "<?php ... ?>" tags in templates.
-     */
-    const PHP_PASSTHRU = 0; //-> print tags as plain text
-    const PHP_QUOTE    = 1; //-> escape tags as entities
-    const PHP_REMOVE   = 2; //-> escape tags as entities
-    const PHP_ALLOW    = 3; //-> escape tags as entities
+
     /**
      * filter types
      */
@@ -179,13 +161,13 @@ class Smarty extends Smarty_Internal_TemplateBase
     /**
      * The character set to adhere to (e.g. "UTF-8")
      */
-    public static $_CHARSET = SMARTY_RESOURCE_CHAR_SET;
+    public static $_CHARSET = SMARTY_MBSTRING ? 'UTF-8' : 'ISO-8859-1';
 
     /**
      * The date format to be used internally
      * (accepts date() and strftime())
      */
-    public static $_DATE_FORMAT = SMARTY_RESOURCE_DATE_FORMAT;
+    public static $_DATE_FORMAT = '%b %e, %Y';
 
     /**
      * Flag denoting if PCRE should run in UTF-8 mode
@@ -368,13 +350,6 @@ class Smarty extends Smarty_Internal_TemplateBase
      * @var Smarty_Security
      */
     public $security_policy = null;
-
-    /**
-     * controls handling of PHP-blocks
-     *
-     * @var integer
-     */
-    public $php_handling = self::PHP_PASSTHRU;
 
     /**
      * controls if the php template file resource is allowed
@@ -661,10 +636,18 @@ class Smarty extends Smarty_Internal_TemplateBase
      * @var string[]
      */
     protected $accessMap = array(
-        'template_dir' => 'TemplateDir', 'config_dir' => 'ConfigDir',
-        'plugins_dir'  => 'PluginsDir', 'compile_dir' => 'CompileDir',
+        'template_dir' => 'TemplateDir',
+        'config_dir'   => 'ConfigDir',
+        'plugins_dir'  => 'PluginsDir',
+        'compile_dir'  => 'CompileDir',
         'cache_dir'    => 'CacheDir',
     );
+
+    /**
+     * PHP7 Compatibility mode
+     * @var bool
+     */
+    private $isMutingUndefinedOrNullWarnings = false;
 
     /**
      * Initialize new Smarty object
@@ -686,27 +669,6 @@ class Smarty extends Smarty_Internal_TemplateBase
         if (Smarty::$_CHARSET !== 'UTF-8') {
             Smarty::$_UTF8_MODIFIER = '';
         }
-    }
-
-    /**
-     * Enable error handler to mute expected messages
-     *
-     * @return     boolean
-     * @deprecated
-     */
-    public static function muteExpectedErrors()
-    {
-        return Smarty_Internal_ErrorHandler::muteExpectedErrors();
-    }
-
-    /**
-     * Disable error handler muting expected messages
-     *
-     * @deprecated
-     */
-    public static function unmuteExpectedErrors()
-    {
-        restore_error_handler();
     }
 
     /**
@@ -1387,11 +1349,6 @@ class Smarty extends Smarty_Internal_TemplateBase
     private function _normalizeDir($dirName, $dir)
     {
         $this->{$dirName} = $this->_realpath(rtrim($dir, "/\\") . DIRECTORY_SEPARATOR, true);
-        if (class_exists('Smarty_Internal_ErrorHandler', false)) {
-            if (!isset(Smarty_Internal_ErrorHandler::$mutedDirectories[ $this->{$dirName} ])) {
-                Smarty_Internal_ErrorHandler::$mutedDirectories[ $this->{$dirName} ] = null;
-            }
-        }
     }
 
     /**
@@ -1412,13 +1369,34 @@ class Smarty extends Smarty_Internal_TemplateBase
             $dir = (array)$dir;
         }
         foreach ($dir as $k => $v) {
-            if (!isset($processed[ $k ])) {
-                $dir[ $k ] = $v = $this->_realpath(rtrim($v, "/\\") . DIRECTORY_SEPARATOR, true);
-                $processed[ $k ] = true;
+            if (!isset($processed[$k])) {
+                $dir[$k]       = $v = $this->_realpath(rtrim($v, "/\\") . DIRECTORY_SEPARATOR, true);
+                $processed[$k] = true;
             }
         }
         $isConfig ? $this->_configDirNormalized = true : $this->_templateDirNormalized = true;
         $isConfig ? $this->_joined_config_dir = join('#', $this->config_dir) :
             $this->_joined_template_dir = join('#', $this->template_dir);
     }
+
+    /**
+     * Activates PHP7 compatibility mode:
+     * - converts E_WARNINGS for "undefined array key" and "trying to read property of null" errors to E_NOTICE
+     *
+     * @void
+     */
+    public function muteUndefinedOrNullWarnings(): void
+    {
+        $this->isMutingUndefinedOrNullWarnings = true;
+    }
+
+    /**
+     * Indicates if PHP7 compatibility mode is set.
+     * @bool
+     */
+    public function isMutingUndefinedOrNullWarnings(): bool
+    {
+        return $this->isMutingUndefinedOrNullWarnings;
+    }
+
 }

@@ -204,13 +204,6 @@ abstract class Smarty_Internal_TemplateCompilerBase
     public $blockOrFunctionCode = '';
 
     /**
-     * php_handling setting either from Smarty or security
-     *
-     * @var int
-     */
-    public $php_handling = 0;
-
-    /**
      * flags for used modifier plugins
      *
      * @var array
@@ -438,11 +431,6 @@ abstract class Smarty_Internal_TemplateCompilerBase
                 }
                 $this->smarty->_debug->start_compile($this->template);
             }
-            if (isset($this->template->smarty->security_policy)) {
-                $this->php_handling = $this->template->smarty->security_policy->php_handling;
-            } else {
-                $this->php_handling = $this->template->smarty->php_handling;
-            }
             $this->parent_compiler = $parent_compiler ? $parent_compiler : $this;
             $nocache = isset($nocache) ? $nocache : false;
             if (empty($template->compiled->nocache_hash)) {
@@ -632,6 +620,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
                         $pa[] = $this->syntaxMatchesVariable($p) ? 'isset(' . $p . ')' : '(' . $p . ' !== null )';
                     }
                     return '(' . implode(' && ', $pa) . ')';
+
                 } elseif (in_array(
                     $func_name,
                     array(
@@ -648,13 +637,8 @@ abstract class Smarty_Internal_TemplateCompilerBase
                         $this->trigger_template_error("Illegal number of parameter in '{$func_name()}'");
                     }
                     if ($func_name === 'empty') {
-                        if (!$this->syntaxMatchesVariable($parameter[0]) && version_compare(PHP_VERSION, '5.5.0',
-                                '<')) {
-                            return '(' . $parameter[0] . ' === false )';
-                        } else {
-                            return $func_name . '(' .
-                                str_replace("')->value", "',null,true,false)->value", $parameter[0]) . ')';
-                        }
+                        return $func_name . '(' .
+                            str_replace("')->value", "',null,true,false)->value", $parameter[0]) . ')';
                     } else {
                         return $func_name . '(' . $parameter[ 0 ] . ')';
                     }
@@ -671,9 +655,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
      * Determines whether the passed string represents a valid (PHP) variable.
      * This is important, because `isset()` only works on variables and `empty()` can only be passed
      * a variable prior to php5.5
-     *
      * @param $string
-     *
      * @return bool
      */
     private function syntaxMatchesVariable($string)
@@ -692,6 +674,7 @@ abstract class Smarty_Internal_TemplateCompilerBase
      */
     public function processText($text)
     {
+
         if (strpos($text, '<') === false) {
             return preg_replace($this->stripRegEx, '', $text);
         }
