@@ -1,5 +1,5 @@
 {extends file="master.tpl"}
-{block name="head-title" prepend}{'admin_menu_subtitles'|lang:'index':'sys_info'} - {'admin_menu_titles'|lang:'index'} | {/block}
+{block name="head-title" prepend}{'admin_menu_subtitles'|lang:'web':'groups'} - {'admin_menu_titles'|lang:'web'} | {/block}
 
 {block name="BODY"}
 	{include file="messages.tpl"}

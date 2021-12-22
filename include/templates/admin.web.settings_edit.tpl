@@ -23,9 +23,9 @@
                                     <option value="{$k}"{if $k == $setting} selected{/if}>{$v|lang}</option>
                                 {/foreach}
                             </select>
-                        {elseif $key|in_array:$appends}
+                        {elseif isset($appends.$key)}
                             <fieldset class="input-group">
-                                <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}"/>
+                                <input name="{$key}" required class="form-control" value="{$setting}"/>
                                 <span class="input-group-append">
                                     <span class="input-group-text">{$appends.$key}</span>
                                 </span>
