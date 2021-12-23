@@ -10,6 +10,15 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+const DEBUG = false;
+
+
+if (str_starts_with(PHP_VERSION, "8.1")) {
+    // Since PHP8.1 has deprecated support for function strftime() but smarty 4.0.0 still uses it and is not in rush to
+    // remove it, we need to disable deprecation messages
+    error_reporting(E_ALL & ~E_DEPRECATED);
+}
+
 session_start();
 require_once "include/Site.inc";
 
