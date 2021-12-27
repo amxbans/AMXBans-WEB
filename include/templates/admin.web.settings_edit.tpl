@@ -3,7 +3,7 @@
 
 {block name="BODY"}
     {include file="messages.tpl"}
-    {if Auth::hasPermission('websettings_view')}
+    {if Auth::hasPermission('websettings_edit')}
         <h2>
             {'web_settings'|lang}
             {if Auth::hasPermission('websettings_edit')}<small class="float-right">
@@ -31,7 +31,7 @@
                                 </span>
                             </fieldset>
                         {elseif $key|in_array:$arrays}
-                            <input name="{$key}" required class="form-control" value="{"; "|implode:$setting}"/>
+                            <input name="{$key}" required class="form-control" value="{", "|implode:$setting}"/>
                         {elseif $key|in_array:$booleans}
                             {foreach $bool as $v => $name}
                                 <label class="form-control mb-0">
@@ -40,7 +40,9 @@
                                 </label>
                             {/foreach}
                         {else}
-                            <input name="{$key}" required class="form-control" value="{$setting}" />
+                            <input name="{$key}"
+                                   {if $key|in_array:$integers}type="number"{/if} {if !($key|in_array:$nullable)}required{/if}
+                                   class="form-control" value="{$setting}"/>
                         {/if}
                     </div>
                 </div>
