@@ -15,10 +15,11 @@
 namespace Controllers\Admin;
 
 use Auth;
+use Config;
 use Lang;
-use Models\WebSetting;
 use Site;
 use Support\BaseController;
+use Support\Path;
 
 class WebSettingsController extends BaseController
 {
@@ -44,8 +45,9 @@ class WebSettingsController extends BaseController
         ]);
 
         $settings = $this->site->config->getVariables();
-        $this->site->output->assign('smilies', array_pop($settings));
-        $this->site->output->assign('settings', $settings);
+        $this->site->output->assign('smilies', $settings['smilies']);
+        $this->site->output->assign('settings', array_diff_key($settings, ['smilies' => null]));
+
         return $this->site->output->display('admin.web.settings_list');
     }
 
@@ -61,8 +63,7 @@ class WebSettingsController extends BaseController
         ]);
 
         $settings = $this->site->config->getVariables();
-        array_pop($settings);
-        $this->site->output->assign('settings', $settings);
+        $this->site->output->assign('settings', array_diff_key($settings, ['smilies' => null]));
         return $this->site->output->display('admin.web.settings_edit');
     }
 
