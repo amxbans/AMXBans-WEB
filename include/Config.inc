@@ -10,42 +10,49 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Models\WebSetting;
 use Support\Path;
 
 /**
  * Class Config
  *
- * @property-read string $cookie
- * @property-read int    $per_page
- * @property-read string $banner_src
- * @property-read string $banner_url
- * @property-read string $default_lang
- * @property-read int    $start_page
- * @property-read bool   $bans_show_kicks
- * @property-read bool   $bans_show_comments
- * @property-read int    $uploaded_file_size
- * @property-read array  $uploaded_file_types
- * @property-read bool   $allow_unregistered_comments
- * @property-read int    $prune_bans
- * @property-read int    $max_login_tries
- * @property-read array  $smilies
+ * @property-read string      $cookie
+ * @property-read int         $per_page
+ * @property-read string|null $banner_src
+ * @property-read string      $banner_url
+ * @property-read string      $default_lang
+ * @property-read int         $start_page
+ * @property-read bool        $bans_show_kicks
+ * @property-read bool        $bans_show_comments
+ * @property-read int         $uploaded_file_size
+ * @property-read array       $uploaded_file_types
+ * @property-read bool        $allow_unregistered_comments
+ * @property-read int         $prune_bans
+ * @property-read int         $max_login_tries
+ * @property-read array       $smilies
  */
 class Config implements ArrayAccess
 {
+    public const VARS_ARRAYS = ['uploaded_file_types', 'smilies'];
+    public const VARS_INTEGERS = ['per_page', 'start_page', 'uploaded_file_size', 'prune_bans', 'max_login_tries'];
+    public const VARS_BOOLEANS = ['bans_show_kicks', 'bans_show_comments', 'allow_unregistered_comments'];
+    public const VARS_NULLABLE = ['banner_src', 'prune_bans'];
+
     /**
      * @var array
      */
     public const start_pages = ['bans', 'servers', 'admins'];
 
     /**
-     * @var string
+     * @var string Core AMXBans version. <br />
+     * Please do NOT change this by Yourself.
      */
     const version = '7.0';
 
     /**
-     * @var array
+     * @var array Default values for configuration
      */
-    private $variables = [
+    private array $variables = [
         'cookie'                      => 'amxx',
         'per_page'                    => 50,
         'banner_src'                  => 'amxbans.png',
@@ -59,6 +66,7 @@ class Config implements ArrayAccess
         'allow_unregistered_comments' => false,
         'prune_bans'                  => 5,
         'max_login_tries'             => 5,
+        'smilies'                     => [],
     ];
 
     /** @var DB */
@@ -86,7 +94,10 @@ class Config implements ArrayAccess
     /**
      * @return DB
      */
-    public function getDb(): DB { return $this->db; }
+    public function getDb(): DB
+    {
+        return $this->db;
+    }
 
     /**
      * @param $name
@@ -115,27 +126,18 @@ class Config implements ArrayAccess
         $query = $query->fetchAll(PDO::FETCH_KEY_PAIR);
 
         foreach ($query as $k => $v) {
-            if (!isset($this->variables[$k])) {
-                $this->variables[$k] = $v;
-            } elseif (is_string($this->variables[$k])) {
-                $this->variables[$k] = $v;
-            } elseif (is_int($this->variables[$k]) && $v != '') {
-                $this->variables[$k] = (int)$v;
-            } elseif (is_array($this->variables[$k])) {
-                $this->variables[$k] = explode(', ', $v);
-            } elseif (is_bool($this->variables[$k])) {
-                $this->variables[$k] = (bool)$v;
-            } elseif (is_int($this->variables[$k]) && $v == '') {
+            if (in_array($k, self::VARS_NULLABLE) && is_null($v)) { // Check if nullable
                 $this->variables[$k] = null;
+            } elseif (in_array($k, self::VARS_ARRAYS)) {            // Check if array
+                $this->variables[$k] = json_decode($v, true);
+            } elseif (in_array($k, self::VARS_BOOLEANS)) {          // Check if boolean
+                $this->variables[$k] = (bool)$v;
+            } elseif (in_array($k, self::VARS_INTEGERS)) {           // Check if integer
+                $this->variables[$k] = (int)$v;
+            } else {                                                        // Fill all the other settings
+                $this->variables[$k] = $v;
             }
         }
-
-
-        // Smilies
-        $query = $this->db->prepare("SELECT `code`, `url`, `name` FROM `{$this->db->prefix}_smilies`");
-        $query->execute();
-
-        $this->variables['smilies'] = $query->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_NUM|PDO::FETCH_UNIQUE);
     }
 
     /**
@@ -176,5 +178,69 @@ class Config implements ArrayAccess
     public function getVariables(): array
     {
         return $this->variables;
+    }
+
+    public function changeValueIfDifferent($variable, string $newRawInputValue): bool
+    {
+        $value = $this->variables[$variable] ?? null;
+
+        //nullables beforehand
+        if (in_array($variable, self::VARS_NULLABLE) && empty($newRawInputValue)) {
+            if (array_key_exists($variable, $this->variables) && $value === $newRawInputValue) {
+                return false;
+            }
+
+            $this->variables[$variable] = null;
+            WebSetting::query()->where('name', $variable)->delete();
+            WebSetting::query()->insert(['name' => $variable, 'value' => null]);
+            return true;
+        }
+
+        // First - arrays (because the most complicated)
+        if (in_array($variable, Config::VARS_ARRAYS)) {
+            if (implode(", ", $this->$variable) === $newRawInputValue) {
+                return false;
+            }
+            // Save new value in config
+            $newValue                   = explode(", ", $newRawInputValue);
+            $this->variables[$variable] = $newValue;
+            // And in database
+            $newValue = json_encode($newValue);
+            WebSetting::query()->where('name', $variable)->delete();
+            WebSetting::query()->insert(['name' => $variable, 'value' => $newValue]);
+            return true;
+        }
+
+        // Booleans before integers (because bool can be interpreted as int)
+        if (in_array($variable, self::VARS_BOOLEANS)) {
+            if ($value === (bool)$newRawInputValue) {
+                return false;
+            }
+            $this->variables[$variable] = (bool)$newRawInputValue;
+            WebSetting::query()->where('name', $variable)->delete();
+            WebSetting::query()->insert(['name' => $variable, 'value' => $this->$variable]);
+            return true;
+        }
+
+        // Integer check
+        if (in_array($variable, self::VARS_INTEGERS)) {
+            if ($value === (int)$newRawInputValue) {
+                return false;
+            }
+            $this->variables[$variable] = (int)$newRawInputValue;
+            WebSetting::query()->where('name', $variable)->delete();
+            WebSetting::query()->insert(['name' => $variable, 'value' => $this->$variable]);
+            return true;
+        }
+
+        // All other values
+        if ($value === $newRawInputValue) {
+            return false;
+        }
+
+        $this->variables[$variable] = $newRawInputValue;
+        WebSetting::query()->where('name', $variable)->delete();
+        WebSetting::query()->insert(['name' => $variable, 'value' => $this->$variable]);
+        return true;
     }
 }

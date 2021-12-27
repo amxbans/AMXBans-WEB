@@ -1,13 +1,13 @@
 DROP TABLE if exists PREFIX_admins_servers, PREFIX_amxadmins,
-  PREFIX_bans, PREFIX_bans_edit,
-  PREFIX_comments,
-  PREFIX_flagged,
-  PREFIX_logs,
-  PREFIX_permissions,
-  PREFIX_reasons, PREFIX_reasons_set, PREFIX_reasons_to_set,
-  PREFIX_serverinfo, PREFIX_smilies,
-  PREFIX_usermenu,
-  PREFIX_webadmins, PREFIX_webconfig;
+    PREFIX_bans, PREFIX_bans_edit,
+    PREFIX_comments,
+    PREFIX_flagged,
+    PREFIX_logs,
+    PREFIX_permissions,
+    PREFIX_reasons, PREFIX_reasons_set, PREFIX_reasons_to_set,
+    PREFIX_serverinfo, /*TODO migration: PREFIX_smilies,*/
+    PREFIX_usermenu,
+    PREFIX_webadmins, PREFIX_webconfig;
 
 
 CREATE TABLE PREFIX_admins_servers
@@ -165,15 +165,6 @@ CREATE TABLE PREFIX_serverinfo
   amxban_menu    int          NOT NULL DEFAULT '1',
   reasons        int          NULL,
   timezone_fixx  int          NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE PREFIX_smilies
-(
-  id   SMALLINT    NOT NULL AUTO_INCREMENT,
-  code varchar(10) NOT NULL,
-  url  varchar(50) NOT NULL,
-  name varchar(25) NOT NULL,
   PRIMARY KEY (id)
 );
 

@@ -54,11 +54,11 @@ class WebSettingsController extends BaseController
     public function edit()
     {
         $this->site->output->assign([
-            'arrays'   => ['uploaded_file_types'],
+            'arrays'   => Config::VARS_ARRAYS,
             'appends'  => ['prune_bans' => Lang::get('days'), 'uploaded_file_size' => Lang::get('bytes')],
-            'integers' => ['per_page', 'uploaded_file_size', 'prune_bans', 'max_login_tries'],
-            'selects'  => ['banner_src', 'default_lang', 'start_page'],
-            'booleans' => ['bans_show_kicks', 'bans_show_comments', 'allow_unregistered_comments'],
+            'integers' => Config::VARS_INTEGERS,
+            'booleans' => Config::VARS_BOOLEANS,
+            'nullable' => Config::VARS_NULLABLE,
             'bool'     => [1 => ucfirst(Lang::get('yes')), 0 => ucfirst(Lang::get('no'))],
         ]);
 
@@ -76,14 +76,17 @@ class WebSettingsController extends BaseController
         $variables = $this->site->config->getVariables();
         $var_keys  = array_keys($variables);
         foreach ($var_keys as $var_key) {
-            WebSetting::query()
-                ->where('name', $var_key)
-                ->update([
-                    'value' => $_POST[$var_key]
-                ]);
+            if ($var_key == "smilies") {
+                continue;
+            }
+            if ($this->site->config->changeValueIfDifferent($var_key, $_POST[$var_key])) {
+                $changed[] = $var_key;
+            }
         }
 
-        db_log("Web config", "Modified settings"); // TODO MIGRATION: action "Websetting config" -> "Web config"
-        return $this->index();
+
+        db_log("Web config", "Modified settings: " . implode(", ",
+                $changed ?? ['nothing'])); // TODO MIGRATION: action "Websetting config" -> "Web config"
+        return header("Location: " . Path::makeURL("web/settings"));
     }
 }
