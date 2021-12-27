@@ -5,7 +5,8 @@ ACP:
 
 
 TODO:
-  > Fill web/settings controller (WebSettingsController), views (admin.web.settings_list; create admin.web.settings_edit?) in ACP
+  > Since emoticon handling has changed, check if it works properly in commenting at bans!
+  > NEXT: emoticon administration - deletion and then addition
   > Make whole bunch of server-related routes in ACP (server/server; server/reasons etc.)
   > Rewrite and adjust language files to the new standard
   > Adjust installation for AMXBans if there should be any changes
