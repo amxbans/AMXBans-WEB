@@ -46,7 +46,6 @@ class Templating extends Smarty
         $this->assign('app_name', 'AMXBans v' . Config::version);
         $this->assign('version', Config::version);
         $this->assign(compact('config'));
-
     }
 
     private function getAvailableLanguages()
@@ -60,7 +59,7 @@ class Templating extends Smarty
 
     public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
     {
-        if (!strpos($template, '.tpl', 1)) {
+        if (!str_ends_with($template, '.tpl')) {
             $template .= '.tpl';
         }
         parent::display($template, $cache_id, $compile_id, $parent);
