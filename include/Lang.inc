@@ -116,6 +116,10 @@ class Lang
             return;
         }
 
+        if (!array_key_exists($key, $data)) {
+            $data[$key] = true;
+        }
+
         if (is_bool($data[$key])) {
             $data[$key] = true;
         }

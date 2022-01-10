@@ -29,8 +29,8 @@
             {foreach $smilies as $code => $data}
                 <div class="col-sm-4 col-md-3 col-xl-2 text-center justify-content-between d-flex">
                     <span>
-                        {$code} → <img title="{$data.1}"
-                                       src="{'/'|implode:['webSources/images/emoticons',$data.0]|res_url}" />
+                        {$code|htmlspecialchars} → <img title="{$data.1}"
+                                                        src="{'/'|implode:['webSources/images/emoticons',$data.0]|res_url}"/>
                     </span>
                     {if Auth::hasPermission('websettings_edit')}
                         <form method="post" action="{'web/settings/emoticons/delete'|url}">

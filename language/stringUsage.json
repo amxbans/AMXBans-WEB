@@ -14,7 +14,7 @@
     "adminarea": false,
     "nosite": false,
     "delete": true,
-    "add": false,
+    "add": true,
     "edit": true,
     "editing": false,
     "other": false,
@@ -657,5 +657,9 @@
         "greet": false,
         "intro": false,
         "site": false
-    }
+    },
+    "symbol": true,
+    "title": true,
+    "emoticons_file_name": true,
+    "file_not_found": true
 }
