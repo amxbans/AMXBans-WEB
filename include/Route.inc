@@ -10,6 +10,8 @@
  * If not, see http://creativecommons.org/licenses/by-nc-sa/2.0/
  */
 
+use Support\Path;
+
 /**
  * Class Route
  */
@@ -81,7 +83,7 @@ class Route
      *
      * @throws Exception
      */
-    public static function resource(string $url, $executor, $exclude = [], $include = false): void
+    public static function resource(string $url, $executor, array $exclude = [], bool $include = false): void
     {
         foreach (self::resourceTpl as $item) {
             [$type, $key, $append] = array_values($item);
@@ -111,7 +113,7 @@ class Route
     {
 //        var_dump(self::$getRoutes, self::$postRoutes, self::$putRoutes, self::$deleteRoutes);
         $method .= 'Routes';
-        $url    = \Support\Path::getFakePathArray();
+        $url    = Path::getFakePathArray();
         $routes = array_keys(self::$$method);
         foreach ($routes as $route) {
             $args  = [];
@@ -137,6 +139,6 @@ class Route
     /** @noinspection PhpIncludeInspection */
     public function __construct(string $routing)
     {
-        include_once \Support\Path::getRootPath() . '/routes/' . $routing;
+        include_once Path::getRootPath() . '/routes/' . $routing;
     }
 }

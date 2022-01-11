@@ -50,7 +50,6 @@ class EmojiController extends BaseController
         return header("Location: " . Path::makeURL("web/settings"));
     }
 
-    //structure: shortcut(key) => [ url, title ]
     public function delete()
     {
         $emoticons = $this->site->config->smilies;

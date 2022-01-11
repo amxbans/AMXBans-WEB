@@ -29,4 +29,6 @@ Route::get('web/settings/emoticons/create', 'Admin\EmojiController@create');
 Route::post('web/settings/emoticons/create', 'Admin\Emojicontroller@store');
 Route::delete('web/settings/emoticons/delete', 'Admin\Emojicontroller@delete');
 
+Route::resource('other/sys_logs', 'Admin\LogsController', ['index'], true);
+
 Route::get('logout', 'LoginController@logout');
