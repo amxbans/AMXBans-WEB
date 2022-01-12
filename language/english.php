@@ -483,15 +483,15 @@ return [
     'group_id'   => 'Group %d',
     'permission' => 'Permission',
 
-    "bans_add"          => 'Add bans',
-    "bans_edit"         => 'Edit bans',
-    "bans_delete"       => 'Delete bans',
-    "bans_unban"        => 'Unban',
-    "amxadmins_view"    => 'View server admins',
-    "amxadmins_edit"    => 'Edit server admins',
-    "webadmins_view"    => 'View web users',
-    "webadmins_edit"    => 'Edit web users',
-    "websettings_view"  => 'View web settings',
+    "bans_add"         => 'Add bans',
+    "bans_edit"        => 'Edit bans',
+    "bans_delete"      => 'Delete bans',
+    "bans_unban"       => 'Unban',
+    "amxadmins_view"   => 'View server admins',
+    "amxadmins_edit"   => 'Edit server admins',
+    "webadmins_view"   => 'View web users',
+    "webadmins_edit"   => 'Edit web users',
+    "websettings_view" => 'View web settings',
     "websettings_edit" => 'Edit web settings',
     "permissions_edit" => 'Edit user groups',
     "prune_db"         => 'Prune database',
@@ -501,15 +501,17 @@ return [
 
 //admin logs
 
-    'logs'       => 'Website log',
-    'filter'     => 'Filter',
-    'all'        => 'all logs',
-    'olderthen'  => 'Logs older than',
-    'go'         => 'Go',
-    'action'     => 'Action',
-    'actionlogs' => 'Actions done',
-    'remarks'    => 'Description',
-    'user'       => 'User',
+    'logs'             => 'Website log',
+    'filter'           => 'Filter',
+    'wipe_all_entries' => 'All %d entries',
+    // original - all
+    'older_then'       => 'Logs older than',
+    // original - olderthen
+    'go'               => 'Go',
+    'action'           => 'Action',
+    'actionlogs'       => 'Actions done',
+    'remarks'          => 'Description',
+    'user'             => 'User',
 
 
 //add ban

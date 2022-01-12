@@ -320,7 +320,7 @@
         },
         "other": {
             "sys_upgade": false,
-            "sys_logs": false
+            "sys_logs": true
         }
     },
     "usermenu": false,
@@ -382,14 +382,14 @@
     "servers_edit": true,
     "ip_view": true,
     "logs": false,
-    "filter": false,
+    "filter": true,
     "all": false,
     "olderthen": false,
-    "go": false,
-    "action": false,
+    "go": true,
+    "action": true,
     "actionlogs": false,
     "remarks": false,
-    "user": false,
+    "user": true,
     "addban": false,
     "newban": false,
     "nobanname": false,
@@ -661,5 +661,7 @@
     "symbol": true,
     "title": true,
     "emoticons_file_name": true,
-    "file_not_found": true
+    "file_not_found": true,
+    "wipe_all_entries": true,
+    "older_then": true
 }
