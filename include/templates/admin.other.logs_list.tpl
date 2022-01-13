@@ -14,6 +14,8 @@
             <span class="input-group-prepend"><span class="input-group-text">{"action"|lang}</span></span>
             {html_options name="search_action" options=$search_actions selected=$smarty.get.search_action class="form-control"}
         </label>
+
+        <button class="btn btn-outline-primary">{"do_search"|lang}</button>
     </form>
     {if Auth::hasPermission("websettings_edit")}
         <form method="post" action="{"other/sys_logs/delete"|url}">
@@ -33,45 +35,32 @@
                 <div class="col-auto p-1">{"or"|lang}</div>
                 <div class="col">
                     <button class="form-control btn btn-danger" name="wipe_data" value="0">
-                        {"wipe_all_entries"|lang|sprintf:($logs|count)}
+                        {"wipe_all_entries"|lang|sprintf:$logs_count}
                     </button>
                 </div>
             </div>
         </form>
     {/if}
-    <table width="95%">
-        <tr>
-            <td>
-        <tr>
-            <td>
-                <table border="1" width="100%">
-                    <tr class="htabletop">
-                        <td colspan="4"><b>{"_ACTIONLOGS"|lang}</b></td>
-                    </tr>
-                    <tr class="htablebottom">
-                        <td width="1%">
-                            <nobr>{"_INVOKED"|lang}</nobr>
-                        </td>
-                        <td width="1%" align="center">{"_USER"|lang}</td>
-                        <td width="1%" align="center">
-                            <nobr>{"_ACTION"|lang}</nobr>
-                        </td>
-                        <td>{"_REMARKS"|lang}</td>
-                    </tr>
-                    {foreach from=$logs item=log_item}
-                        <tr class="list">
-                            <td width="1%">
-                                <nobr>{$log_item.timestamp|date_format:"%d.%m.%Y - %T"}</nobr>
-                            </td>
-                            <td width="1%" align="center">{$log_item.username|escape}</td>
-                            <td width="1%" align="center">
-                                <nobr>{$log_item.action|escape}</nobr>
-                            </td>
-                            <td>{$log_item.remarks|escape}</td>
-                        </tr>
-                    {/foreach}
-                </table>
-            </td>
-        </tr>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>{"invoked"|lang}</th>
+                <th>{"user"|lang}</th>
+                <th>{"action"|lang}</th>
+                <th>{"remarks"|lang}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach from=$logs item=log_item}
+                <tr>
+                    <td>{$log_item.created_at|date_format:$lang_date_format}</td>
+                    <td>{$log_item.username|escape}</td>
+                    <td>{$log_item.action|escape}</td>
+                    <td>{$log_item.remarks|escape}</td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+    </div>
 {/block}
