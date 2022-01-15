@@ -32,4 +32,7 @@ Route::delete('web/settings/emoticons/delete', 'Admin\Emojicontroller@delete');
 Route::get('other/sys_logs', 'Admin\LogsController@index');
 Route::post('other/sys_logs/delete', 'Admin\LogsController@delete');
 
+Route::get('other/sys_upgrade', 'Admin\SysUpgradeController@index');
+Route::post('other/sys_upgrade', 'Admin\SysUpgradeController@upgrade');
+
 Route::get('logout', 'LoginController@logout');
